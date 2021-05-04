@@ -22,10 +22,10 @@ AS.path({
 jc.prop.loadModules = {
 	'basic' : [
 		AS.path('jsroot') + 'css/jc.css',
-		'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css',
-		'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js',
 		'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
 		'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
+		AS.path('jsroot') + 'libs/sweetalert/sweetalert.css',
+		AS.path('jsroot') + 'libs/sweetalert/sweetalert.min.js',
 		'wait:()=>( window.swal && jQuery.fn.select2 )',
 	],
 	'edit' : [
@@ -780,7 +780,7 @@ jc.prefs = {
 	},
 	purge  : k => {
 		delete jc.prop.prefs[k];
-		jc.prefs.commit();
+		jc.vault.purge('jc::prefs',k);
 	},
 	commit : () => {
 		for ( k in jc.prop.prefs ) {
@@ -1143,13 +1143,13 @@ jc.page = {
 			let canedit = o.editable;
 			o.rendered = o.blocks.map( (b,idx) => {
 				let out = jc.page.blocks[b.type] ? jc.page.blocks[b.type].call(window,b,pdata) : '';
-				if ( canedit && jc.page.prop.editMode && out ) {
+				if ( canedit && jc.page.prop.editMode ) {
 					let w = true;
 					if ( (out instanceof jQuery)||(out instanceof NodeList)||(out instanceof Node) ) w = ! $('.jcEditable',out).length;
 					else if ( AS.test.str(out) ) w = ( out.indexOf('<div class="jcEditable">') < 0 );
 					if ( w ) {
 						let editable = { prop: b.prop, type: 'block', subtype: b.type };
-						out = $('<div class="jcEditable"></div>').data('editable',editable).append( out );
+						out = $('<div class="jcEditable"></div>').data('editable',editable).append( out||'Empty' );
 					}
 				}
 				return out;
@@ -1176,8 +1176,8 @@ jc.page = {
 				if ( ! AS.test.obj( sb )) return;
 				if ( ! sb.type ) sb.type='text';
 				if (jc.page.blocks[sb.type]) {
-					let r = jc.page.blocks[sb.type].call(window,{prop:sb.type},sb);
-					if ( jc.page.prop.editMode && r ) {
+					let r = jc.page.blocks[sb.type].call(window,{prop:sb.type},sb) || '';
+					if ( jc.page.prop.editMode ) {
 						let editable = { prop: b.prop, type: 'block', subtype: sb.type, idx: idx, qt: qt };
 						r = $('<div class="jcEditable"></div>').data('editable',editable).append( r );
 					}
@@ -1190,15 +1190,37 @@ jc.page = {
 	edit : ( status ) => {
 		if ( jc.page.prop.editMode = !! status ) {
 			jc.springLoad('module:edit');
-			let foo = () => {
-				if ( jc.edit ) return jc.page.reload();
-				window.setTimeout( foo, 100 );
+			if ( ! jc.edit ) return window.setTimeout( ()=>{ jc.page.edit(true) }, 100 );
+			let oe = jc.edit.data();
+			if ( oe ) {
+				swal(
+					{
+						title: AS.label('editYetItTitle'),
+						text: AS.label('editYetItBody'),
+						type: "warning",
+						showCancelButton: true,
+						confirmButtonText: AS.label('editYetItOk'),
+						cancelButtonText: AS.label('editYetItCancel'),
+						closeOnConfirm: true,
+						closeOnCancel: true,
+					},
+					function (ok) {
+						if (ok) {
+							jc.edit.data(oe);
+							jc.page.reload();
+						} else {
+							jc.edit.data( jc.page.data().pageContent );
+							jc.page.reload();
+						}
+					}
+				);
+				return;
 			}
-			foo.call(window);
-		} else {
-			jc.page.reload();
+			jc.edit.data( jc.page.data().pageContent );
 		}
+		jc.page.reload();
 	},
+	
 };
 
 jc.actionsMenu = (e) => {

@@ -1,5 +1,16 @@
 jc.edit = {
-	start : () => {
+	start : ( delayed ) => {
+		if ( ! delayed ) {
+			let e;
+			if ( jc.prop.editorStarting ) {
+				try {
+					window.clearTimeout( jc.prop.editorStarting )
+				} catch(e) {}
+			}
+			jc.prop.editorStarting = window.setTimeout( ()=>{ jc.edit.start(true); }, 500 );
+			return;
+		}
+		delete jc.prop.editorStarting;
 		$('.jcEditable:not(.jcEditableParsed)').each( (idx,d)=>{
 			let $d = $(d);
 			let data = $d.data('editable');
@@ -18,19 +29,20 @@ jc.edit = {
 			$d.on('contextmenu',jc.edit.menu);
 			$('.jcEditMenu .jcEditDropdown',$d).on('click contextmenu',jc.edit.menu);
 		});
-		let oe = jc.edit.data();
-		if ( ! oe ) oe = jc.edit.data( jc.page.data().pageContent );
 	},
 	data : (d) => {
-		if ( AS.test.obj(d) ) {
+		if ( d == false ) {
+			jc.prefs.purge('onEditData');
+		} else if ( AS.test.obj(d) ) {
 			jc.prefs.key('onEditData',{ page:jc.page.current(), id:jc.page.data().id, data: d });
 			return jc.prefs.key('onEditData').data;
+		} else if ( jc.page.prop.editMode ) {
+			d = jc.prefs.key('onEditData');
+			let theSame = d && ( d.page == jc.page.current() );
+			if ( theSame && d.id ) theSame = ( d.id == jc.page.data().id );
+			if ( theSame ) return d.data;
+			jc.prefs.purge('onEditData');
 		}
-		d = jc.prefs.key('onEditData');
-		let theSame = d && ( d.page == jc.page.current() );
-		if ( theSame && d.id ) theSame = ( d.id == jc.page.data().id );
-		if ( theSame ) return d.data;
-		jc.prefs.purge('onEditData');
 		return undefined;
 	},
 	menu : (e) => {
