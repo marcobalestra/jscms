@@ -1,16 +1,5 @@
 jc.edit = {
 	start : ( delayed ) => {
-		if ( ! delayed ) {
-			let e;
-			if ( jc.prop.editorStarting ) {
-				try {
-					window.clearTimeout( jc.prop.editorStarting )
-				} catch(e) {}
-			}
-			jc.prop.editorStarting = window.setTimeout( ()=>{ jc.edit.start(true); }, 500 );
-			return;
-		}
-		delete jc.prop.editorStarting;
 		$('.jcEditable:not(.jcEditableParsed)').each( (idx,d)=>{
 			let $d = $(d);
 			let data = $d.data('editable');
