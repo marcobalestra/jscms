@@ -6,6 +6,8 @@ body .dataTable thead .sorting:after, body .dataTable thead .sorting_asc_disable
 body .dataTable thead .sorting.sorting_asc:after { color: #36c; content: "△"; }
 body .dataTable thead .sorting.sorting_desc:after { color: #36c; content: "▽"; }
 .jcicon svg { display: inline-block; height: 32px; margin: 0; padding: 0; width: 32px; }
+.jcicon.danger svg { fill: #c00; }
+.jcicon.warning svg { fill: #c90; }
 p .jcicon svg { display: inline; height: 18px; line-height: 1px; vertical-align: -2px; width: 18px; }
 p .jcicon svg path, button svg path { display: inline; line-height: 1px; }
 .jcMenu { cursor: pointer; }

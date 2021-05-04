@@ -9,10 +9,10 @@ jc.edit = {
 			}
 			$d.addClass('jcEditableParsed');
 			let $em = $(`<div class="jcEditMenu"></div>`);
-			$em.append('<span class="jcEditDropdown" onclick="jc.edit.menu(event)">'+AS.icon('menu')+'</span>');
+			$em.append('<span class="jcEditDropdown">'+AS.icon('menu')+'</span>');
 			$d.prepend($em);
-// 			$d.attr('oncontextmenu','jc.edit.menu(event)');
 			$d.on('contextmenu',jc.edit.menu);
+			$('.jcEditMenu .jcEditDropdown',$d).on('click contextmenu',jc.edit.menu);
 		});
 	},
 	menu : (e) => {
@@ -20,16 +20,27 @@ jc.edit = {
 		e.preventDefault;
 		let hl = '.jcEditable';
 		let data = $(e.target).closest('.jcEditable').data('editable');
-		let acts = [];
-		console.log(data);
-		if ( data.subtype == 'mixed' ) {
-			hl = false;
-		} else {
-			acts.push({icon:'jcicon',iconKey:'edit',label:AS.label('blockEditContent'),action:jc.edit.edit});
+		let acts = [{icon:'jcicon',iconKey:'edit',label:AS.label('blockEditContent'),action:jc.edit.edit}];
+		if ( data.subtype ) {
+			let canAdd = AS.test.def(data.idx);
+			if ( data.subtype == 'mixed' ) {
+				hl = false;
+				canAdd = true;
+				acts.shift();
+			} else if (canAdd) {
+				acts.push('-',{icon:'jcicon danger',iconKey:'editRemove',label:AS.label('blockDeleteContent'),action:jc.edit.rm},'-');
+			}
+			if (canAdd) acts.push({icon:'jcicon',iconKey:'editAdd',label:AS.label('blockAddContent'),action:jc.edit.add});
 		}
 		jc.menu(e, { content: acts, highlight: hl });
 	},
-	edit : () => {
+	edit : (e) => {
+		
+	},
+	add : (e) => {
+		
+	},
+	rm : (e) => {
 		
 	},
 	getModal : ( empty ) => {
