@@ -1041,12 +1041,7 @@ jc.page = {
 					} );
 				}
 				$( ()=>{
-					if ( AS && AS.labels ) $tgt.html( AS.labels.labelize( $tgt.html() ) );
-					$('.jcMenu',$tgt).each( (idx,m) => {
-						let $m = $(m);
-						if ( ! $m.attr('onclick') ) $m.attr('onclick','jc.actionsMenu(event)');
-						if ( ! $m.attr('oncontextmenu') ) $m.attr('oncontextmenu','jc.actionsMenu(event)');
-					});
+					$('.jcMenu:not(.jcMenuAttached)',$tgt).addClass('jcMenuAttached').on('click contextmenu',jc.actionsMenu);
 					$tgt.toggle(!e.hidden);
 					if ( jc.page.prop.editMode && jc.edit ) jc.edit.start();
 				});
@@ -1130,6 +1125,7 @@ jc.page = {
 			if ( $(o.selector).data('jc_part_label') != o.content ) {
 				$(o.selector).data('jc_part_label',o.content);
 				o.rendered = jc.page.prop.parts[o.content];
+				if ( AS && AS.labels ) o.rendered = AS.labels.labelize( o.rendered );
 				jc.page.render.main(o);
 			}
 		},
@@ -1138,7 +1134,7 @@ jc.page = {
 			let canedit = o.editable;
 			o.rendered = o.blocks.map( (b,idx) => {
 				let out = jc.page.blocks[b.type] ? jc.page.blocks[b.type].call(window,b,pdata) : '';
-				if ( canedit && jc.page.prop.editMode && out && (b.type != 'mixed') ) {
+				if ( canedit && jc.page.prop.editMode && out ) {
 					let editable = { prop: b.prop, type: 'block', subtype: b.type };
 					out = $('<div class="jcEditable"></div>').data('editable',editable).append( out );
 				}

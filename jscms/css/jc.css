@@ -51,8 +51,8 @@ h { display: none; }
 .flip-vertical { transform: scaleY(-1); }
 .modal .asFormWrap .asFakeForm { width: 100%; resize:  unset; }
 
-.jcEditable { border: #ccc dashed 1px; overflow: auto; }
-.jcEditMenu { border: #999 solid 1px; float: right; height: 22px; margin: 0; padding: 0; }
-.jcEditMenu span { display: inline-block; overflow: auto; padding: 2px; }
+.jcEditable { border: #ccc dashed 1px; overflow: auto; min-height: 24px; clear: right; }
+.jcEditMenu { border: #999 solid 1px; margin: 0; padding: 0; float: right; height: 22px; }
+.jcEditMenu span { display: inline; padding: 0; margin: 0; }
 .jcEditMenu span:hover { cursor: pointer; }
-.jcEditMenu span svg { display: block; height: 18px; margin: 0; padding: 0; width: 18px; }
+.jcEditMenu span svg { display: block; height: 18px; margin: 2px; padding: 0; width: 18px; }

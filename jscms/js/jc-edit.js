@@ -11,15 +11,23 @@ jc.edit = {
 			let $em = $(`<div class="jcEditMenu"></div>`);
 			$em.append('<span class="jcEditDropdown" onclick="jc.edit.menu(event)">'+AS.icon('menu')+'</span>');
 			$d.prepend($em);
-			$d.attr('oncontextmenu','jc.edit.menu(event)');
+// 			$d.attr('oncontextmenu','jc.edit.menu(event)');
+			$d.on('contextmenu',jc.edit.menu);
 		});
 	},
 	menu : (e) => {
 		e.stopPropagation;
 		e.preventDefault;
+		let hl = '.jcEditable';
 		let data = $(e.target).closest('.jcEditable').data('editable');
-		let acts = [{icon:'jcicon',iconKey:'edit',label:AS.label('blockEditContent'),action:jc.edit.edit}];
-		jc.menu(e, { content: acts, highlight: '.jcEditable' });
+		let acts = [];
+		console.log(data);
+		if ( data.subtype == 'mixed' ) {
+			hl = false;
+		} else {
+			acts.push({icon:'jcicon',iconKey:'edit',label:AS.label('blockEditContent'),action:jc.edit.edit});
+		}
+		jc.menu(e, { content: acts, highlight: hl });
 	},
 	edit : () => {
 		
