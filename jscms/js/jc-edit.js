@@ -23,14 +23,14 @@ jc.edit = {
 	},
 	data : (d) => {
 		if ( AS.test.obj(d) ) {
-			jc.prefs.key('onEdit',JSON.stringify({ page:jc.page.current(), id:jc.page.data().id, data: d }));
-			return jc.prefs.key('onEdit').data;
+			jc.prefs.key('onEditData',{ page:jc.page.current(), id:jc.page.data().id, data: d });
+			return jc.prefs.key('onEditData').data;
 		}
-		d = JSON.parse(jc.prefs.key('onEdit')||'{}');
+		d = jc.prefs.key('onEditData');
 		let theSame = d && ( d.page == jc.page.current() );
 		if ( theSame && d.id ) theSame = ( d.id == jc.page.data().id );
 		if ( theSame ) return d.data;
-		jc.prefs.purge('onEdit');
+		jc.prefs.purge('onEditData');
 		return undefined;
 	},
 	menu : (e) => {
@@ -59,9 +59,7 @@ jc.edit = {
 		let b = jc.edit.itemdata(e);
 		let d = jc.edit.data();
 		if ( Array.isArray( d[b.prop]) ) {
-			let foo = d[b.prop][b.idx];
-			d[b.prop][b.idx] = d[b.prop][b.idx -1];
-			d[b.prop][b.idx -1] = foo;
+			d[b.prop].splice( b.idx -1, 2, d[b.prop][b.idx], d[b.prop][b.idx -1]);
 			jc.edit.data(d);
 			jc.page.reload();
 		}
@@ -70,9 +68,7 @@ jc.edit = {
 		let b = jc.edit.itemdata(e);
 		let d = jc.edit.data();
 		if ( Array.isArray( d[b.prop]) ) {
-			let foo = d[b.prop][b.idx];
-			d[b.prop][b.idx] = d[b.prop][b.idx +1];
-			d[b.prop][b.idx +1] = foo;
+			d[b.prop].splice( b.idx, 2, d[b.prop][b.idx +1], d[b.prop][b.idx]);
 			jc.edit.data(d);
 			jc.page.reload();
 		}
@@ -84,7 +80,13 @@ jc.edit = {
 		
 	},
 	rm : (e) => {
-		
+		let b = jc.edit.itemdata(e);
+		let d = jc.edit.data();
+		if ( Array.isArray( d[b.prop]) ) {
+			d[b.prop].splice( b.idx, 1 );
+			jc.edit.data(d);
+			jc.page.reload();
+		}
 	},
 	getModal : ( empty ) => {
 		let mod = $('#jcEditModalLg');

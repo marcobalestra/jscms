@@ -30,7 +30,8 @@ jc.prop.loadModules = {
 	],
 	'edit' : [
 		AS.path('jsroot') + '/js/jc-edit.js',
-		'wait:()=>( !! jc.edit )',
+		'https://cdn.altersoftware.org/js-as-form/as-form.js',
+		'wait:()=>( jc.edit && AS.form )',
 	],
 	'datatables': [
 		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
@@ -905,6 +906,7 @@ jc.page = {
 		return jc.page.prop.data;
 	},
 	open : ( page, id, data, infokey ) => {
+		if ( ! AS && AS.labels && AS.labels.loaded ) return setTimeout( ()=>{ jc.page.open(page, id, data, infokey) }, 100);
 		var initialargs = JSON.parse(JSON.stringify([page,data]));
 		if ( ! page ) page = 'index';
 		if ( AS.test.str(data) ) data = $.parseParams( data );
