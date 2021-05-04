@@ -4,7 +4,7 @@ AS.labels.load('en',[{
 	'blockDeleteContent' : 'Delete this item',
 	'blockEditContent' : 'Edit content',
 	'blockType' : 'Content type',
-	'headerTag' : 'Here chefs write and averyone can read',
+	'headerTag' : 'Recipes from real Chefs',
 	'menuActionsTitle' : 'Available actions',
 	'menuEditOver' : 'Quit page editor',
 	'menuEditStart' : 'Edit page',
