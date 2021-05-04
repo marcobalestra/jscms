@@ -30,7 +30,7 @@ jc.prop.loadModules = {
 	],
 	'edit' : [
 		AS.path('jsroot') + '/js/jc-edit.js',
-		'wait:()=>( !! jc._edit )',
+		'wait:()=>( !! jc.edit )',
 	],
 	'datatables': [
 		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
@@ -1029,6 +1029,8 @@ jc.page = {
 							if ( c.rendered ) {
 								if ( jc.page.prop.editMode ) jc.page.render.editable(c);
 								$('#'+c.id,$tgt).after( c.rendered ).remove();
+								delete c.rendered;
+								delete c.internalRecursion;
 								delete c.id;
 							} else if ( c.type ){
 								c.internalRecursion = true;
@@ -1046,6 +1048,7 @@ jc.page = {
 						if ( ! $m.attr('oncontextmenu') ) $m.attr('oncontextmenu','jc.actionsMenu(event)');
 					});
 					$tgt.toggle(!e.hidden);
+					if ( jc.page.prop.editMode && jc.edit ) jc.edit.start();
 				});
 			} );
 		},
@@ -1070,7 +1073,7 @@ jc.page = {
 			}
 		},
 		editable : ( c ) => {
-			if ( jc.page.prop.editMode && c.rendered && c.editable ) {
+			if ( jc.page.prop.editMode && c.rendered && c.editable && AS.test.obj(c.editable) ) {
 				c.rendered = $('<div class="jcEditable"></div>').data('editable',c.editable).append( c.rendered );
 			}
 			return c;
@@ -1132,7 +1135,15 @@ jc.page = {
 		},
 		blocks : (o,pdata,pfull) => {
 			if ( ! Array.isArray(o.blocks)) o.blocks = [o.blocks];
-			o.rendered = o.blocks.map( b => ( jc.page.blocks[b.type] ? jc.page.blocks[b.type].call(window,b,pdata) : '' ) );
+			let canedit = o.editable;
+			o.rendered = o.blocks.map( (b,idx) => {
+				let out = jc.page.blocks[b.type] ? jc.page.blocks[b.type].call(window,b,pdata) : '';
+				if ( canedit && jc.page.prop.editMode && out && (b.type != 'mixed') ) {
+					let editable = { prop: b.prop, type: 'block', subtype: b.type };
+					out = $('<div class="jcEditable"></div>').data('editable',editable).append( out );
+				}
+				return out;
+			});
 			jc.page.render.main(o);
 		},
 	},
@@ -1147,25 +1158,29 @@ jc.page = {
 		},
 		mixed : (b,d) => {
 			if ( ! d[b.prop] ) return '';
-			let out = $(b.wrap || '<div></div>');
+			let out = $(b.wrap || '<div class="jcMixedBlocks"></div>');
 			if ( ! Array.isArray(d[b.prop]) ) d[b.prop] = [d[b.prop]];
-			d[b.prop].forEach( sb => {
+			d[b.prop].forEach( (sb,idx) => {
 				if ( AS.test.str( sb ) ) sb = { content:sb };
 				if ( ! AS.test.obj( sb )) return;
 				if ( ! sb.type ) sb.type='text';
 				if (jc.page.blocks[sb.type]) {
 					let r = jc.page.blocks[sb.type].call(window,{prop:sb.type},sb);
+					if ( jc.page.prop.editMode && r ) {
+						let editable = { prop: b.prop, type: 'block', subtype: sb.type, idx: idx };
+						r = $('<div class="jcEditable"></div>').data('editable',editable).append( r );
+					}
 					out.append( r );
 				}
 			} );
 			return out;
 		},
 	},
-	editor : ( status ) => {
+	edit : ( status ) => {
 		if ( jc.page.prop.editMode = !! status ) {
 			jc.springLoad('module:edit');
 			let foo = () => {
-				if ( jc._edit ) return jc.page.reload();
+				if ( jc.edit ) return jc.page.reload();
 				window.setTimeout( foo, 100 );
 			}
 			foo.call(window);
@@ -1173,24 +1188,14 @@ jc.page = {
 			jc.page.reload();
 		}
 	},
-	edit : () => {
-		if ( ! jc._edit ) {
-			jc.springLoad('module:edit');
-			setTimeout( ()=> { jc.page.edit() }, 100 );
-			return;
-		}
-		let p = jc.page.current();
-		let d = jc.page.data();
-		jc.edit( p, d.id );
-	},
 };
 
 jc.actionsMenu = (e) => {
 	let acts = [AS.label('menuActionsTitle')];
 	if ( jc.page.prop.editMode ) {
-		acts.push({icon:'jcicon',iconKey:'done',label:AS.label('menuEditOver'),action:()=>{jc.page.editor(false);} });
+		acts.push({icon:'jcicon',iconKey:'done',label:AS.label('menuEditOver'),action:()=>{jc.page.edit(false);} });
 	} else {
-		acts.push({icon:'jcicon',iconKey:'edit',label:AS.label('menuEditStart'),action:()=>{jc.page.editor(true);} });
+		acts.push({icon:'jcicon',iconKey:'edit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit(true);} });
 	}
 	jc.menu(e, { content: acts, highlight: false });
 };

@@ -51,3 +51,9 @@ h { display: none; }
 .flip-horizontal { transform: scaleX(-1); }
 .flip-vertical { transform: scaleY(-1); }
 .modal .asFormWrap .asFakeForm { width: 100%; resize:  unset; }
+
+.jcEditable { border: #ccc dashed 1px; overflow: auto; }
+.jcEditMenu { border: #999 solid 1px; float: right; height: 22px; margin: 0; padding: 0; }
+.jcEditMenu span { display: inline-block; overflow: auto; padding: 2px; }
+.jcEditMenu span:hover { cursor: pointer; }
+.jcEditMenu span svg { display: block; height: 18px; margin: 0; padding: 0; width: 18px; }
