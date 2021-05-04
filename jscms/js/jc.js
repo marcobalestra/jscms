@@ -908,11 +908,6 @@ jc.page = {
 	open : ( page, id, data, infokey ) => {
 		var initialargs = JSON.parse(JSON.stringify([page,data]));
 		if ( ! page ) page = 'index';
-// 		if ( jc.page.current() == page ) {
-// 			if ( ! id ) return;
-// 			let d = jc.page.data();
-// 			if ( d.id == parseInt(id) ) return;
-// 		}
 		if ( AS.test.str(data) ) data = $.parseParams( data );
 		if ( data && AS.test.str(data.template) ) {
 			if (! infokey) infokey = String(data.template);
@@ -1134,9 +1129,16 @@ jc.page = {
 		},
 	},
 	editor : ( status ) => {
-		jc.page.prop.editMode = !! status;
-		if ( jc.page.prop.editMode ) jc.springLoad('module:edit');
-		jc.page.reload();
+		if ( jc.page.prop.editMode = !! status ) {
+			jc.springLoad('module:edit');
+			let foo = () => {
+				if ( jc._edit ) return jc.page.reload();
+				window.setTimeout( foo, 100 );
+			}
+			foo.call(window);
+		} else {
+			jc.page.reload();
+		}
 	},
 	edit : () => {
 		if ( ! jc._edit ) {
@@ -1151,11 +1153,11 @@ jc.page = {
 };
 
 jc.actionsMenu = (e) => {
-	let acts = ['Azioni disponibili'];
+	let acts = [AS.label('menuActionsTitle')];
 	if ( jc.page.prop.editMode ) {
-		acts.push({icon:'jcicon',iconKey:'done',label:'Modifica terminata',action:()=>{jc.page.editor(false);} });
+		acts.push({icon:'jcicon',iconKey:'done',label:AS.label('menuEditOver'),action:()=>{jc.page.editor(false);} });
 	} else {
-		acts.push({icon:'jcicon',iconKey:'edit',label:'Modifica la pagina',action:()=>{jc.page.editor(true);} });
+		acts.push({icon:'jcicon',iconKey:'edit',label:AS.label('menuEditStart'),action:()=>{jc.page.editor(true);} });
 	}
 	jc.menu(e, { content: acts, highlight: false });
 };
