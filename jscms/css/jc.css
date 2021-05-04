@@ -24,10 +24,9 @@ hflex.align-top, vflex.align-top { align-items: flex-start; }
 h { display: none; }
 .dropdown-menu.text-right > li > a { text-align: right; }
 .dropdown-menu.text-left > li > a { text-align: left; }
-.panel-ems .panel-heading { background-color: #49565d; color: #fff; }
 .appContextHighlight, .appContextHighlight:hover, .appContextHighlight *, .appContextHighlight *:hover { background: none ! important; }
 .appContextHighlight { filter: saturate(200%) brightness(10%); }
-.appContextHighlightTent { background-image: linear-gradient(to top, rgba(0,128,255,.25) 0%,rgba(0,128,255,.1) 25%,rgba(0,128,255,.1) 75%,rgba(0,128,255,.2) 100%); border: 1px solid rgba(0,128,255,.25); display: block; outline: 32px solid rgba(255,255,255,.75); position: absolute; z-index: 99; }
+.appContextHighlightTent { background-image: linear-gradient(to top, rgba(0,128,255,.25) 0%,rgba(0,128,255,.1) 25%,rgba(0,128,255,.1) 75%,rgba(0,128,255,.2) 100%); display: block; outline: 32px solid rgba(192,192,192,.75); position: absolute; z-index: 99; }
 .dropdown.appContextMenu { position: absolute; z-index: 100; display: none; }
 .dropdown-menu.appContextMenuContent { background-color: #fff; display: block; margin-bottom: 5px; padding: 0; position: static; }
 .dropdown-menu.appContextMenuContent li { display: block; margin: 0; position: relative; }

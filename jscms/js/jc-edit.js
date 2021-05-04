@@ -2,13 +2,24 @@ jc.edit = {
 	start : () => {
 		$('.jcEditable:not(.jcEditableParsed)').each( (idx,d)=>{
 			let $d = $(d);
-			$d.addClass('jcEditableParsed');
 			let data = $d.data('editable');
-			if ( ! data && AS.test.obj(data) ) return;
+			if ( ! data && AS.test.obj(data) ) {
+				$d.removeClass('jcEditable');
+				return;
+			}
+			$d.addClass('jcEditableParsed');
 			let $em = $(`<div class="jcEditMenu"></div>`);
-			$em.append('<span class="jcEditEdit">'+AS.icon('edit')+'</span>');
+			$em.append('<span class="jcEditDropdown" onclick="jc.edit.menu(event)">'+AS.icon('menu')+'</span>');
 			$d.prepend($em);
+			$d.attr('oncontextmenu','jc.edit.menu(event)');
 		});
+	},
+	menu : (e) => {
+		e.stopPropagation;
+		e.preventDefault;
+		let data = $(e.target).closest('.jcEditable').data('editable');
+		let acts = [{icon:'jcicon',iconKey:'edit',label:AS.label('blockEditContent'),action:jc.edit.edit}];
+		jc.menu(e, { content: acts, highlight: '.jcEditable' });
 	},
 	edit : () => {
 		

@@ -1160,6 +1160,7 @@ jc.page = {
 			if ( ! d[b.prop] ) return '';
 			let out = $(b.wrap || '<div class="jcMixedBlocks"></div>');
 			if ( ! Array.isArray(d[b.prop]) ) d[b.prop] = [d[b.prop]];
+			let qt = d[b.prop].length;
 			d[b.prop].forEach( (sb,idx) => {
 				if ( AS.test.str( sb ) ) sb = { content:sb };
 				if ( ! AS.test.obj( sb )) return;
@@ -1167,7 +1168,7 @@ jc.page = {
 				if (jc.page.blocks[sb.type]) {
 					let r = jc.page.blocks[sb.type].call(window,{prop:sb.type},sb);
 					if ( jc.page.prop.editMode && r ) {
-						let editable = { prop: b.prop, type: 'block', subtype: sb.type, idx: idx };
+						let editable = { prop: b.prop, type: 'block', subtype: sb.type, idx: idx, qt: qt };
 						r = $('<div class="jcEditable"></div>').data('editable',editable).append( r );
 					}
 					out.append( r );

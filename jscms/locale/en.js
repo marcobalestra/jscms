@@ -1,5 +1,6 @@
 AS.labels.load('en',[{
 	'blockContent' : 'Content',
+	'blockEditContent' : 'Edit content',
 	'blockType' : 'Content type',
 	'headerTag' : 'Here chefs write and averyone can read',
 	'menuActionsTitle' : 'Available actions',
