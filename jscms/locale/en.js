@@ -3,6 +3,7 @@ AS.labels.load('en',[{
 	'blockContent' : 'Content',
 	'blockDeleteContent' : 'Delete this item',
 	'blockEditContent' : 'Edit content',
+	'blockTextAspect' : 'Behavior',
 	'blockType' : 'Content type',
 	'editYetItTitle' : 'Previous edit detected.',
 	'editYetItBody' : 'Resume previous edit or restart?',

@@ -75,7 +75,57 @@ jc.edit = {
 		}
 	},
 	edit : (e) => {
-		
+		let b = jc.edit.itemdata(e);
+		let d = jc.edit.data();
+		let t = b.subtype||b.type;
+		if ( ! jc.edit.form[t] ) return;
+		let fopt = jc.edit.form[t].call(window,b,d);
+		let $mod = jc.edit.getModal();
+		console.log(fopt);
+		$mod.on('shown.bs.modal',()=>{ AS.form.create( fopt ); });
+		$mod.modal('show');
+	},
+	form : {
+		_ : ()=>{
+			let $mod = jc.edit.getModal(true);
+			$('.modal-dialog',$mod).append(`<div class="modal-content">
+				<div class="modal-header" style="background-color:#eee;padding:16px 20px;">
+					<p style="margin:0;padding:0;">
+						<span class="jcicon modalCloser" style="float:right;cursor:pointer;" onclick="jc.edit.noModal()">${ AS.icon('circleClose') }</span>
+						<span class="jcicon">${ AS.icon('edit') }</span> 
+						<b>${ AS.label('Edit') } “${ jc.page.current() }” ${ jc.page.data().id ? 'ID: '+jc.page.data().id : '' }</b>
+					</p>
+				</div>
+				<div class="modal-body" id="jcPageEditor"></div>
+			</div>`);
+			return {
+				requires : ['basic','pikaday','tinymce','iro','slider'],
+				options : { subforms: [] },
+				fields : [],
+				target: 'jcPageEditor',
+			};
+		},
+		text : (b,d) => {
+			let o = jc.edit.form._();
+			o.fields.push(
+				["type",'select',{asLabel:'blockType',default:'html',options:[{label:AS.label('HTML'),value:'html'},{label:AS.label('Text'),value:'text'}],onchange:(x,fo)=>{
+					let f = fo.getForm();
+					['text','html'].forEach( fn => {
+						f.fieldByName(fn).disable();
+						f.fieldByName(fn).hide();
+					} );
+					let rf = f.fieldByName(x)
+					rf.setValue( (rf.realField && rf.realField()) ? rf.realField().value : '' );
+					rf.enable();
+					rf.show();
+				}}],
+				["html","html",{nolabel:true,trim:true,asTitle:'onlyNonEmptyFields',value:""}],
+				["wrap",'select',{asLabel:'blockTextAspect',default:'<h4></h4>',options:[{label:AS.label('H3'),value:'<h3></h3>'},{label:AS.label('H4'),value:'<h4></h4>'},{label:AS.label('Text'),value:'<div></div>'}],depends:'type=text'}],
+				["text","textarea",{nolabel:true,trim:true,asTitle:'onlyNonEmptyFields',value:""}],
+			);
+			return o;
+		},
+		html : (b,d) => { return jc.edit.form.text(b,d); },
 	},
 	add : (e) => {
 		
@@ -100,7 +150,7 @@ jc.edit = {
 		return mod;
 	},
 	noModal : () => {
-		let mod = jc._edit.getModal();
+		let mod = jc.edit.getModal();
 		mod.removeClass("in");
 		$(".modal-backdrop").remove();
 		mod.hide();
