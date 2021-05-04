@@ -1153,7 +1153,7 @@ jc.page = {
 	},
 	blocks : {
 		text : (b,d)=>{
-			let out = $(b.wrap || '<div></div>');
+			let out = $(b.wrap||d.wrap||'<div></div>');
 			out.append( d[b.prop] );
 			return out;
 		},

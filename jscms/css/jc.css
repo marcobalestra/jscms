@@ -53,7 +53,7 @@ h { display: none; }
 .flip-vertical { transform: scaleY(-1); }
 .modal .asFormWrap .asFakeForm { width: 100%; resize:  unset; }
 
-.jcEditable { border: #ccc dashed 1px; overflow: auto; min-height: 24px; clear: right; }
+.jcEditable { border: #ccc dashed 1px; overflow: auto; min-height: 24px; clear: right; margin: 1px; }
 .jcEditMenu { border: #999 solid 1px; margin: 0; padding: 0; float: right; height: 22px; }
 .jcEditMenu span { display: inline; padding: 0; margin: 0; }
 .jcEditMenu span:hover { cursor: pointer; }
