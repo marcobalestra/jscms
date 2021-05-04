@@ -1,0 +1,65 @@
+body {
+        background-color : #ddd;
+                  margin : 0;
+                 padding : 0;
+}
+#topBarContainer {
+        background-color : #fff;
+                  height :  94px;
+                  margin : 0;
+                overflow : visible;
+                 padding : 0;
+                position : relative;
+}
+#topBarContainer #topBar {
+                  height : 128px;
+                  margin : 0;
+                 padding : 0;
+                position : relative;
+                   width : 100%;
+}
+#topBarContainer .topBarImage {
+        background-image : url(../img/banner-large.png);
+       background-repeat : no-repeat;
+                  cursor : pointer;
+                  height : 121px;
+                    left :   8px;
+                position : absolute;
+                     top :   2px;
+                   width : 461px;
+}
+#topBarContainer .topBarText {
+                   color : #69c;
+               font-size : 140%;
+             font-weight : bold;
+                    left : 160px;
+                overflow : hidden;
+                position : absolute;
+                   right : 120px;
+           text-overflow : ellipsis;
+                     top :  14px;
+               transform : scaleY(1.5);
+             white-space : nowrap;
+}
+#topBarContainer .jcMenu {
+                    fill : #666;
+                position : absolute;
+                   right :  16px;
+                     top :  24px;
+}
+#topBarContainer .jcMenu svg {
+                  height :  48px;
+                   width :  48px;
+}
+#topBarContainer .jcMenu:hover {
+                    fill : #000;
+}
+#topContainer {
+        background-color : #fff;
+           border-radius :   4px;
+                  margin :  48px  auto;
+               max-width : 1280px;
+                 padding :  10px;
+                position : relative;
+                border: solid 1px #ccc;
+}

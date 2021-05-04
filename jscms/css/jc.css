@@ -1,0 +1,53 @@
+body .dataTable thead .sorting, body .dataTable thead .sorting_asc, body .dataTable thead .sorting_desc, body .dataTable thead .sorting_asc_disabled, body .dataTable thead .sorting_desc_disabled { left: 0; padding: 0 18px 0 2px; position: static; right: 0; top: 0; }
+body .dataTable thead .sorting:before, body .dataTable thead .sorting_asc:before, body .dataTable thead .sorting_desc:before, body .dataTable thead .sorting_asc_disabled:before, body .dataTable thead .sorting_desc_disabled:before { display: none; }
+body .dataTable thead .sorting:after, body .dataTable thead .sorting_asc:after, body .dataTable thead .sorting_desc:after, body .dataTable thead .sorting_asc_disabled:after, body .dataTable thead .sorting_desc_disabled:after { float: right; margin: 2px -12px 0 0; position: static; right: 0; top: 0; }
+body .dataTable thead .sorting_asc, body .dataTable thead .sorting_desc { color: #36c; }
+body .dataTable thead .sorting:after, body .dataTable thead .sorting_asc_disabled:after, body .dataTable thead .sorting_desc_disabled:after { color: #666; content: "◇"; }
+body .dataTable thead .sorting.sorting_asc:after { color: #36c; content: "△"; }
+body .dataTable thead .sorting.sorting_desc:after { color: #36c; content: "▽"; }
+.jcicon svg { display: inline-block; height: 32px; margin: 0; padding: 0; width: 32px; }
+p .jcicon svg { display: inline; height: 18px; line-height: 1px; vertical-align: -2px; width: 18px; }
+p .jcicon svg path, button svg path { display: inline; line-height: 1px; }
+.jcMenu { cursor: pointer; }
+vflex { align-items: stretch; display: flex; flex-direction: column; justify-content: flex-start; }
+vflex > * { margin: 0 0 8px 0; }
+vflex > *:last-child { margin: 0; }
+hflex { align-items: center; display: flex; flex-direction: rows; justify-content: flex-start; }
+hflex.span, vflex.span { justify-content: space-between; }
+hflex > * { margin: 0 8px 0 0; }
+hflex > *:last-child { margin: 0; }
+hflex.align-center, vflex.align-center { justify-content: center; }
+hflex.align-end, vflex.align-end { justify-content: flex-end; }
+hflex.align-bottom, vflex.align-bottom { align-items: flex-end; }
+hflex.align-baseline, vflex.align-baseline { align-items: baseline; }
+hflex.align-top, vflex.align-top { align-items: flex-start; }
+h { display: none; }
+.dropdown-menu.text-right > li > a { text-align: right; }
+.dropdown-menu.text-left > li > a { text-align: left; }
+.panel-ems .panel-heading { background-color: #49565d; color: #fff; }
+.appContextHighlight, .appContextHighlight:hover, .appContextHighlight *, .appContextHighlight *:hover { background: none ! important; }
+.appContextHighlight { filter: saturate(200%) brightness(10%); }
+.appContextHighlightTent { background-image: linear-gradient(to top, rgba(0,128,255,.25) 0%,rgba(0,128,255,.1) 25%,rgba(0,128,255,.1) 75%,rgba(0,128,255,.2) 100%); border: 1px solid rgba(0,128,255,.25); display: block; outline: 32px solid rgba(255,255,255,.75); position: absolute; z-index: 99; }
+.dropdown.appContextMenu { position: absolute; z-index: 100; display: none; }
+.dropdown-menu.appContextMenuContent { background-color: #fff; display: block; margin-bottom: 5px; padding: 0; position: static; }
+.dropdown-menu.appContextMenuContent li { display: block; margin: 0; position: relative; }
+.dropdown-menu.appContextMenuContent li.title { background-image: linear-gradient(to right, #aaa,#ddd); color: #fff; padding: 2px 16px; text-shadow: 1px 1px 3px rgba(0,0,0,.5); text-transform: uppercase; }
+.dropdown-menu.appContextMenuContent li a { clear: both; color: #333; display: block; outline: 0; overflow: hidden; padding: 8px 16px; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.dropdown-menu.appContextMenuContent li a:hover { background-color: #eee; }
+.dropdown-menu.appContextMenuContent li a i { float: left; margin: 0 16px 0 0; top: 2px; }
+.dropdown-menu.appContextMenuContent li .jcicon svg { display: inline; height: 20px; vertical-align: -1px; width: 20px; }
+.dropdown-menu.appContextMenuContent li a i.rIcon { color: #ccc; float: right; margin: 0 0 0 16px; }
+.dropdown-menu.appContextMenuContent li ul { display: block; margin: 0; padding: 0; }
+.dropdown-menu.appContextMenuContent li ul li a { padding: 8px 16px 8px 40px; }
+.dropdown-menu.appContextMenuContent hr { margin: 0; padding: 0; }
+.dropdown-menu.appContextMenuContent li.disabled > a { cursor: not-allowed; opacity: .5; }
+.dropdown-menu.appContextMenuContent li.disabled a i.rIcon { display: none; }
+.dropdown-menu.appContextMenuContent li.subMenu > a { cursor: default; font-style: italic; opacity: .5; }
+.dropdown-menu.appContextMenuContent li.disabled > a:hover,
+.dropdown-menu.appContextMenuContent li.subMenu > a:hover { background-color: #fff; color: #333; }
+.rotate-90 { transform: rotate(90deg); }
+.rotate-180 { transform: rotate(180deg); }
+.rotate-270 { transform: rotate(270deg); }
+.flip-horizontal { transform: scaleX(-1); }
+.flip-vertical { transform: scaleY(-1); }
+.modal .asFormWrap .asFakeForm { width: 100%; resize:  unset; }
