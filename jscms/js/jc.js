@@ -967,6 +967,10 @@ jc.page = {
 		jc.page.getPageData( page, id );
 	},
 	loadData : ( page, id, callback ) => {
+		if ( jc.page.prop.editMode && jc.edit && jc.edit.data() ) {
+			if ( AS.test.func(callback) ) callback.call( window, jc.edit.data() );
+			return;
+		}
 		let url = AS.path('jsdataroot') + page;
 		if ( id ) url += id;
 		url += '.js';

@@ -9,17 +9,33 @@ jc.edit = {
 			}
 			$d.addClass('jcEditableParsed');
 			let $em = $(`<div class="jcEditMenu"></div>`);
+			if ( AS.test.def(data.idx) ) {
+				if ( data.idx ) $em.append('<span class="jcEditMoveUp" onclick="jc.edit.moveup(event)">'+AS.icon('moveUp')+'</span>');
+				if ( data.idx < (data.qt -1) ) $em.append('<span class="jcEditMoveDown" onclick="jc.edit.movedown(event)">'+AS.icon('moveDown')+'</span>');
+			}
 			$em.append('<span class="jcEditDropdown">'+AS.icon('menu')+'</span>');
 			$d.prepend($em);
 			$d.on('contextmenu',jc.edit.menu);
 			$('.jcEditMenu .jcEditDropdown',$d).on('click contextmenu',jc.edit.menu);
 		});
+		let oe = jc.edit.data();
+		if ( ! oe ) oe = jc.edit.data( jc.page.data().pageContent );
+	},
+	data : (d) => {
+		if ( AS.test.obj(d) ) {
+			jc.prefs.key('onEdit',JSON.stringify({ page:jc.page.current(), id:jc.page.data().id, data: d }));
+			return jc.prefs.key('onEdit').data;
+		}
+		d = JSON.parse(jc.prefs.key('onEdit')||'{}');
+		let theSame = d && ( d.page == jc.page.current() );
+		if ( theSame && d.id ) theSame = ( d.id == jc.page.data().id );
+		if ( theSame ) return d.data;
+		jc.prefs.purge('onEdit');
+		return undefined;
 	},
 	menu : (e) => {
-		e.stopPropagation;
-		e.preventDefault;
+		let data = jc.edit.itemdata(e);
 		let hl = '.jcEditable';
-		let data = $(e.target).closest('.jcEditable').data('editable');
 		let acts = [{icon:'jcicon',iconKey:'edit',label:AS.label('blockEditContent'),action:jc.edit.edit}];
 		if ( data.subtype ) {
 			let canAdd = AS.test.def(data.idx);
@@ -33,6 +49,33 @@ jc.edit = {
 			if (canAdd) acts.push({icon:'jcicon',iconKey:'editAdd',label:AS.label('blockAddContent'),action:jc.edit.add});
 		}
 		jc.menu(e, { content: acts, highlight: hl });
+	},
+	itemdata : (e) => {
+		e.preventDefault;
+		e.stopPropagation;
+		return $(e.target).closest('.jcEditable').data('editable');
+	},
+	moveup : (e) => {
+		let b = jc.edit.itemdata(e);
+		let d = jc.edit.data();
+		if ( Array.isArray( d[b.prop]) ) {
+			let foo = d[b.prop][b.idx];
+			d[b.prop][b.idx] = d[b.prop][b.idx -1];
+			d[b.prop][b.idx -1] = foo;
+			jc.edit.data(d);
+			jc.page.reload();
+		}
+	},
+	movedown : (e) => {
+		let b = jc.edit.itemdata(e);
+		let d = jc.edit.data();
+		if ( Array.isArray( d[b.prop]) ) {
+			let foo = d[b.prop][b.idx];
+			d[b.prop][b.idx] = d[b.prop][b.idx +1];
+			d[b.prop][b.idx +1] = foo;
+			jc.edit.data(d);
+			jc.page.reload();
+		}
 	},
 	edit : (e) => {
 		

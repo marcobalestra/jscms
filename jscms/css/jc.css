@@ -56,6 +56,7 @@ h { display: none; }
 
 .jcEditable { border: #ccc dashed 1px; overflow: auto; min-height: 24px; clear: right; margin: 1px; }
 .jcEditMenu { border: #999 solid 1px; margin: 0; padding: 0; float: right; height: 22px; }
-.jcEditMenu span { display: inline; padding: 0; margin: 0; }
+.jcEditMenu span { display: inline-block; padding: 0; margin: 0; }
+.jcEditMenu span + span { margin-left: 8px; }
 .jcEditMenu span:hover { cursor: pointer; }
 .jcEditMenu span svg { display: block; height: 18px; margin: 2px; padding: 0; width: 18px; }
