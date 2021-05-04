@@ -22,7 +22,6 @@ AS.path({
 jc.prop.loadModules = {
 	'basic' : [
 		AS.path('jsroot') + '/css/jc.css',
-		AS.path('jsextensions') + 'blocks.js',
 		'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css',
 		'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js',
 		'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
@@ -1028,6 +1027,7 @@ jc.page = {
 								$('#'+c.id,$tgt).data(c);
 							}
 							if ( c.rendered ) {
+								if ( jc.page.prop.editMode ) jc.page.render.editable(c);
 								$('#'+c.id,$tgt).after( c.rendered ).remove();
 								delete c.id;
 							} else if ( c.type ){
@@ -1067,10 +1067,13 @@ jc.page = {
 					else if ( c.render ) c.type = 'customJs';
 				}
 				if ( c.func && (! c.rendered) ) c.rendered =  c.func.call(window,pdata, pfull);
-				if ( jc.page.prop.editMode && c.rendered && c.editable ) {
-					c.rendered = $('<div class="jcEditable"></div>').data('editable',c.editable).append( c.rendered );
-				}
 			}
+		},
+		editable : ( c ) => {
+			if ( jc.page.prop.editMode && c.rendered && c.editable ) {
+				c.rendered = $('<div class="jcEditable"></div>').data('editable',c.editable).append( c.rendered );
+			}
+			return c;
 		},
 		customJs : ( o ) => {
 			if ( ! jc.page.prop.renderers[o.render] ) {
@@ -1126,6 +1129,36 @@ jc.page = {
 				o.rendered = jc.page.prop.parts[o.content];
 				jc.page.render.main(o);
 			}
+		},
+		blocks : (o,pdata,pfull) => {
+			if ( ! Array.isArray(o.blocks)) o.blocks = [o.blocks];
+			o.rendered = o.blocks.map( b => ( jc.page.blocks[b.type] ? jc.page.blocks[b.type].call(window,b,pdata) : '' ) );
+			jc.page.render.main(o);
+		},
+	},
+	blocks : {
+		text : (b,d)=>{
+			let out = $(b.wrap || '<div></div>');
+			out.append( d[b.prop] );
+			return out;
+		},
+		html : (b,d)=> {
+			return d[b.prop];
+		},
+		mixed : (b,d) => {
+			if ( ! d[b.prop] ) return '';
+			let out = $(b.wrap || '<div></div>');
+			if ( ! Array.isArray(d[b.prop]) ) d[b.prop] = [d[b.prop]];
+			d[b.prop].forEach( sb => {
+				if ( AS.test.str( sb ) ) sb = { content:sb };
+				if ( ! AS.test.obj( sb )) return;
+				if ( ! sb.type ) sb.type='text';
+				if (jc.blocks[sb.type]) {
+					let r = jc.page.blocks[sb.type].call(window,{prop:sb.type},sb);
+					out.append( r );
+				}
+			} );
+			return out;
 		},
 	},
 	editor : ( status ) => {
