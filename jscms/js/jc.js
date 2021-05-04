@@ -1153,7 +1153,7 @@ jc.page = {
 				if ( AS.test.str( sb ) ) sb = { content:sb };
 				if ( ! AS.test.obj( sb )) return;
 				if ( ! sb.type ) sb.type='text';
-				if (jc.blocks[sb.type]) {
+				if (jc.page.blocks[sb.type]) {
 					let r = jc.page.blocks[sb.type].call(window,{prop:sb.type},sb);
 					out.append( r );
 				}
