@@ -1,3 +1,4 @@
+h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, h6:first-child { margin-top: 0; }
 body .dataTable thead .sorting, body .dataTable thead .sorting_asc, body .dataTable thead .sorting_desc, body .dataTable thead .sorting_asc_disabled, body .dataTable thead .sorting_desc_disabled { left: 0; padding: 0 18px 0 2px; position: static; right: 0; top: 0; }
 body .dataTable thead .sorting:before, body .dataTable thead .sorting_asc:before, body .dataTable thead .sorting_desc:before, body .dataTable thead .sorting_asc_disabled:before, body .dataTable thead .sorting_desc_disabled:before { display: none; }
 body .dataTable thead .sorting:after, body .dataTable thead .sorting_asc:after, body .dataTable thead .sorting_desc:after, body .dataTable thead .sorting_asc_disabled:after, body .dataTable thead .sorting_desc_disabled:after { float: right; margin: 2px -12px 0 0; position: static; right: 0; top: 0; }
