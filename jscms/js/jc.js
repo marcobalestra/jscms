@@ -6,7 +6,7 @@ var jc = { prop : {
 	mainContainerId : 'jcToplevelContainer',
 	prefs: {
 		debugURI : false,
-		debugLevel : 0,
+		debugLevel : 1,
 		prefsVersion : 1,
 	}
 }};
