@@ -1,2 +1,2 @@
 # jscms
-JS CMS, JSON-driven and DB-free
+Javascript CMS, JSON-driven and DB-free
