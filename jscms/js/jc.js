@@ -21,7 +21,7 @@ AS.path({
 
 jc.prop.loadModules = {
 	'basic' : [
-		AS.path('jsroot') + '/css/jc.css',
+		AS.path('jsroot') + 'css/jc.css',
 		'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css',
 		'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js',
 		'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
@@ -1069,7 +1069,10 @@ jc.page = {
 		},
 		editable : ( c ) => {
 			if ( jc.page.prop.editMode && c.rendered && c.editable && AS.test.obj(c.editable) ) {
-				c.rendered = $('<div class="jcEditable"></div>').data('editable',c.editable).append( c.rendered );
+				let w = true;
+				if ( (c.rendered instanceof jQuery)||(c.rendered instanceof NodeList)||(c.rendered instanceof Node) ) w = ! $('.jcEditable',c.rendered).length;
+				else if ( AS.test.str(c.rendered) ) w = ( c.rendered.indexOf('<div class="jcEditable">') < 0 );
+				if ( w ) c.rendered = $('<div class="jcEditable"></div>').data('editable',c.editable).append( c.rendered );
 			}
 			return c;
 		},
@@ -1135,8 +1138,13 @@ jc.page = {
 			o.rendered = o.blocks.map( (b,idx) => {
 				let out = jc.page.blocks[b.type] ? jc.page.blocks[b.type].call(window,b,pdata) : '';
 				if ( canedit && jc.page.prop.editMode && out ) {
-					let editable = { prop: b.prop, type: 'block', subtype: b.type };
-					out = $('<div class="jcEditable"></div>').data('editable',editable).append( out );
+					let w = true;
+					if ( (out instanceof jQuery)||(out instanceof NodeList)||(out instanceof Node) ) w = ! $('.jcEditable',out).length;
+					else if ( AS.test.str(out) ) w = ( out.indexOf('<div class="jcEditable">') < 0 );
+					if ( w ) {
+						let editable = { prop: b.prop, type: 'block', subtype: b.type };
+						out = $('<div class="jcEditable"></div>').data('editable',editable).append( out );
+					}
 				}
 				return out;
 			});
