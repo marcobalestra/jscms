@@ -1,0 +1,26 @@
+# File types
+	AddType 'text/html; charset=UTF-8' .html .xhtml
+	AddType 'text/css; charset=UTF-8' .css
+	AddType 'text/xml; charset=UTF-8' .xml
+	AddType 'text/xsl; charset=UTF-8' .xsl
+	AddType 'text/javascript; charset=UTF-8' .js
+
+# Rewrite
+	RewriteEngine On
+
+# site styles
+	RewriteRule ^style:(.+) styles/$1 [L]
+
+# Determine Template - if any -> tmpl
+	RewriteRule ^[-_]jscms/([^0-9,/]+) - [E=tmpl:$1]
+
+
+# Specific template, if exists
+	RewriteCond %{ENV:tmpl} !=""
+	RewriteCond %{DOCUMENT_ROOT}/%{ENV:tmpl}.html -f
+	RewriteRule .* %{ENV:tmpl}.html [L]
+
+# Index template, otherwise
+	RewriteCond %{ENV:tmpl} !=""
+	RewriteRule .* index.html [L]
+
