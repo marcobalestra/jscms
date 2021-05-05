@@ -57,8 +57,8 @@ h { display: none; }
 .jcEditable { border: #ccc dashed 1px; clear: right; margin: 2px 0; min-height: 30px; overflow: auto; overflow: visible; }
 .jcEditMenu { background: #fff; border: #ccc solid 1px; float: right; height: 28px; margin: -1px -1px 0 0; padding: 0; }
 .jcEditMenu span { display: inline-block; fill: #999; margin: 0; padding: 0; }
-.jcEditable:hover .jcEditMenu { box-shadow: 1px 1px 3px #ccc; background-color : #ffe; border-color: #999; }
+.jcEditable:hover .jcEditMenu { box-shadow: 1px 1px 3px #ccc; border-color: #999; }
 .jcEditable:hover .jcEditMenu span { fill: #333; }
 .jcEditMenu span + span { margin-left: 2px; }
-.jcEditable .jcEditMenu span:hover { background-color: #333; cursor: pointer; fill: #eee; }
+.jcEditable .jcEditMenu span:hover { background-color: #336; cursor: pointer; fill: #ffc; }
 .jcEditMenu span svg { display: block; height: 18px; margin: 4px; padding: 0; width: 18px; }

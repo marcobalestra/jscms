@@ -1149,7 +1149,7 @@ jc.page = {
 					else if ( AS.test.str(out) ) w = ( out.indexOf('<div class="jcEditable">') < 0 );
 					if ( w ) {
 						let editable = { prop: b.prop, type: 'block', subtype: b.type };
-						out = $('<div class="jcEditable"></div>').data('editable',editable).append( out||'Empty' );
+						out = $('<div class="jcEditable"></div>').data('editable',editable).append( out||'<span class="placeHolder">Empty</span>' );
 					}
 				}
 				return out;
@@ -1188,10 +1188,10 @@ jc.page = {
 		},
 	},
 	edit : ( status ) => {
+		let oe = (jc.edit && jc.edit.data())||false;
 		if ( jc.page.prop.editMode = !! status ) {
 			jc.springLoad('module:edit');
 			if ( ! jc.edit ) return window.setTimeout( ()=>{ jc.page.edit(true) }, 100 );
-			let oe = jc.edit.data();
 			if ( oe ) {
 				swal(
 					{
@@ -1217,12 +1217,65 @@ jc.page = {
 				return;
 			}
 			jc.edit.data( jc.page.data().pageContent );
-		} else {
-			jc.edit.data(false);
+			jc.page.reload();
+			return;
 		}
-		jc.page.reload();
+		if ( ! oe ) {
+			jc.page.reload();
+			return;
+		}
+		swal(
+			{
+				title: "Salvare le modifiche?",
+				text: 'Vuoi salvare le modifiche alla pagina?',
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonText: 'Ok',
+				cancelButtonText: 'No',
+				closeOnConfirm: true,
+				closeOnCancel: true,
+			},
+			function (ok) {
+				if (ok) {
+					jc.page.save( oe );
+				} else {
+					jc.edit.data(false);
+					jc.page.reload();
+				}
+			}
+		);
 	},
-	
+	save : ( data, page, id ) => {
+		if ( AS.test.udef(data)) data = jc.edit.data();
+		if ( AS.test.udef(page)) page = jc.page.current();
+		if ( AS.test.udef(id) ) id = (jc.page.data()||{}).id;
+		data = JSON.stringify(data);
+		console.log('IN-DATA',data);
+		let url = AS.path('jsdataroot') + page + ( id ? id : '') + '.js';
+		fetch(
+			url,
+			{
+				method: 'PUT', // Method itself
+				headers: {
+					'Content-type': 'application/json; charset=UTF-8' // Indicates the content
+				},
+				body: data // We send data in JSON format
+			}
+		).then( response => {
+			console.log('RESPONSE');
+			console.log(response);
+		}).then( data => {
+			// Manipulate the data retrieved back, if we want to do something with it
+			console.log('RESP-DATA');
+			console.log(data);
+			jc.edit.data(false);
+			jc.page.reload();
+		}).catch( err => {
+			// Do something with the error
+			console.log('ERROR');
+			console.log(err)
+		});
+	},
 };
 
 jc.actionsMenu = (e) => {

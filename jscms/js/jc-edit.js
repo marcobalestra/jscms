@@ -13,6 +13,8 @@ jc.edit = {
 				if ( data.idx ) $em.append('<span class="jcEditMoveUp" onclick="jc.edit.moveup(event)">'+AS.icon('moveUp')+'</span>');
 				if ( data.idx < (data.qt -1) ) $em.append('<span class="jcEditMoveDown" onclick="jc.edit.movedown(event)">'+AS.icon('moveDown')+'</span>');
 				$em.append('<span class="jcEditDropdown">'+AS.icon('menu')+'</span>');
+ 			} else if ( data.subtype == 'mixed' )  {
+ 				$em.append('<span class="jcEditDropdown">'+AS.icon('editAdd')+'</span>');
 			} else {
 				$em.append('<span class="jcEditDropdown">'+AS.icon('edit')+'</span>');
 			}
