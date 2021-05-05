@@ -1286,11 +1286,6 @@ jc.page = {
 jc.actionsMenu = (e) => {
 	let acts = [AS.label('menuActionsTitle')];
 	if ( jc.page.prop.editMode ) {
-// 		acts.push(
-// 			{icon:'jcicon',iconKey:'circleClose',label:AS.label('menuEditOver'),action:()=>{jc.page.edit(false);} },
-// 			{icon:'jcicon',iconKey:'done',label:AS.label('menuEditOverSave'),action:()=>{jc.page.edit(false,true);} },
-// 			{icon:'jcicon',iconKey:'editRemove',label:AS.label('menuEditOverDiscard'),action:()=>{jc.page.edit(false,false);} }
-// 		);
 		acts.push({label:AS.label('menuEditOver'),content:[
 			{icon:'jcicon',iconKey:'done',label:AS.label('menuEditOverSave'),action:()=>{jc.page.edit(false,true);} },
 			{icon:'jcicon',iconKey:'editRemove',label:AS.label('menuEditOverDiscard'),action:()=>{jc.page.edit(false,false);} }
