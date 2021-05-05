@@ -1217,6 +1217,8 @@ jc.page = {
 				return;
 			}
 			jc.edit.data( jc.page.data().pageContent );
+		} else {
+			jc.edit.data(false);
 		}
 		jc.page.reload();
 	},
