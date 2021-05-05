@@ -26,9 +26,10 @@ Virtual site configuration will look like:
 	AddOutputFilterByType DEFLATE text/css
 	AddOutputFilterByType DEFLATE text/xml
 	AddOutputFilterByType DEFLATE text/xsl
-	AddOutputFilterByType DEFLATE application/font-woff
 	AddOutputFilterByType DEFLATE image/svg+xml
-
+	
+	DavLockDB /tmp/DavLock.jscms
+	
 	<Directory "/path/to/document-root">
 		AllowOverride All
 		AuthType Basic
