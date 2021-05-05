@@ -1,1 +1,1 @@
-{ "username":"<!--#echo encoding="entity" var="REMOTE_USER" -->" }
+{ "username":"<!--#echo encoding="none" var="REMOTE_USER" -->" }
