@@ -57,5 +57,5 @@ Jscms uses Apache’s basic authentication.
 
 This authentication _could be_ insecure, in order to secure it it’s reccommended to:
 
-* Enable HTTS on the site, e.g. using `certbot`
+* Enable and force HTTPS on the site, e.g. using `certbot`
 * Enable `fail2ban` with an appropriate _cage_ for HTTP auth failures.
