@@ -194,7 +194,7 @@ jc.edit = {
 			if (empty) $('.modal-dialog',mod).html('');
 			return mod;
 		}
-		mod = $('<div id="jcEditModalLg" class="modal"><div class="modal-dialog modal-lg"></div></div>');
+		mod = $('<div id="jcEditModalLg" class="modal" data-backdrop="static"><div class="modal-dialog modal-lg"></div></div>');
 		$(document.body).append( mod );
 		return mod;
 	},
