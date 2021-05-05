@@ -1,0 +1,8 @@
+ErrorDocument 401 "false"
+AddType "application/json;charset=UTF-8" .sjson
+AddOutputFilter INCLUDES .sjson
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME}.shtml -f
+RewriteRule .* %{REQUEST_FILENAME}.shtml [L]
+RewriteCond %{REQUEST_FILENAME}.sjson -f
+RewriteRule .* %{REQUEST_FILENAME}.sjson [L]

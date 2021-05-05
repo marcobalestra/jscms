@@ -16,6 +16,7 @@ Requires Apache Modules: `auth_basic`, `rewrite`, `include`, `dav`, `dav_fs`
 Virtual site configuration will look like:
 
 ```
+	RewriteEngine On
 	SetOutputFilter DEFLATE
 	AddOutputFilterByType DEFLATE application/javascript
 	AddOutputFilterByType DEFLATE application/json
@@ -45,10 +46,7 @@ Virtual site configuration will look like:
 	</Directory>
 	
 	<Directory "/path/to/document-root/jscms/login">
-		RewriteCond %{REQUEST_FILENAME}.shtml -f
-		RewriteRule .* %{REQUEST_FILENAME}.shtml [L]
-		Options +Includes
-		Require valid-user
+		Options +Includes -Indexes
 	</Directory>
 	
 ```

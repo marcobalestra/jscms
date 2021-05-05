@@ -17,6 +17,7 @@ AS.path({
 	jsextensions : '/jscms/templates/extensions/',
 	jsdataroot : '/jscms/data/',
 	jsreporoot : '/jscms/repository/',
+	jsauth : '/jscms/login/',
 });
 
 jc.prop.loadModules = {
@@ -1047,7 +1048,7 @@ jc.page = {
 					} );
 				}
 				$( ()=>{
-					$('.jcMenu:not(.jcMenuAttached)',$tgt).addClass('jcMenuAttached').on('click contextmenu',jc.actionsMenu);
+					jc.page.checkJcMenu($tgt);
 					$tgt.toggle(!e.hidden);
 					if ( jc.page.prop.editMode && jc.edit ) jc.edit.start();
 				});
@@ -1156,6 +1157,41 @@ jc.page = {
 			});
 			jc.page.render.main(o);
 		},
+	},
+	checkJcMenu : ( ctx )=>{
+		if ( AS.test.udef(ctx)) ctx = document.body;
+		let $menu = $('.jcMenu:not(.jcMenuParsed)',ctx);
+		if ( ! $menu.length ) return;
+		$menu.html('');
+		$menu.addClass('jcMenuParsed');
+		if ( jc.prop.authUser ) {
+			$menu.append(`<div class="jcicon jcAuth">${ AS.icon('user') }</div><div class="jcUser">${ jc.prop.authUser }</div>`);
+			$menu.on('click contextmenu',jc.actionsMenu);
+		} else {
+			$menu.append(`<span class="jcicon jcUnauth">${ AS.icon('lock') }</span>`);
+			$('.jcUnauth',$menu).on('click',jc.page.login);
+		}
+	},
+	login : () => {
+		let sp = (new Date()).getTime();
+		let url = AS.path('jsauth') + 'auth/username';
+		$.ajax( url, {
+			cache: true,
+			method: 'GET',
+			dataType: 'json',
+			error: jc.getError,
+			success: d => {
+				if ( ! d ) return;
+				jc.prop.authUser = d.username;
+				$('.jcMenu').removeClass('jcMenuParsed');
+				jc.page.checkJcMenu();
+				let ep = (new Date()).getTime();
+				if ( (ep - sp) > 2000 ) {
+					swal({ title: AS.label('LoginDoneTitle'), text: AS.label('LoginDoneBody',{user:jc.prop.authUser}), type: "success" });
+				}
+			},
+		});
+		return;
 	},
 	blocks : {
 		text : (b,d)=>{

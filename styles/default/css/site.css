@@ -42,17 +42,9 @@ body {
              white-space : nowrap;
 }
 #topBarContainer .jcMenu {
-                    fill : #666;
                 position : absolute;
                    right :  16px;
                      top :  24px;
-}
-#topBarContainer .jcMenu svg {
-                  height :  48px;
-                   width :  48px;
-}
-#topBarContainer .jcMenu:hover {
-                    fill : #000;
 }
 #topContainer {
         background-color : #fff;

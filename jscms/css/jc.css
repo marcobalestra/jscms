@@ -11,7 +11,6 @@ body .dataTable thead .sorting.sorting_desc:after { color: #36c; content: "▽";
 .jcicon.warning svg { fill: #c90; }
 p .jcicon svg { display: inline; height: 18px; line-height: 1px; vertical-align: -2px; width: 18px; }
 p .jcicon svg path, button svg path { display: inline; line-height: 1px; }
-.jcMenu { cursor: pointer; }
 vflex { align-items: stretch; display: flex; flex-direction: column; justify-content: flex-start; }
 vflex > * { margin: 0 0 8px 0; }
 vflex > *:last-child { margin: 0; }
@@ -53,6 +52,14 @@ h { display: none; }
 .flip-horizontal { transform: scaleX(-1); }
 .flip-vertical { transform: scaleY(-1); }
 .modal .asFormWrap .asFakeForm { width: 100%; resize:  unset; }
+.jcMenu { background-color: #fff; cursor: pointer; text-align: center; }
+.jcMenu .jcicon svg { height: 32px; width: 32px; }
+.jcMenu .jcUnauth { fill: #966; }
+.jcMenu:hover .jcUnauth { fill: #900; }
+.jcMenu .jcAuth { fill: #696; }
+.jcMenu:hover .jcAuth { fill: #090; }
+.jcMenu .jcUser { color: #696; }
+.jcMenu:hover .jcUser { color: #090; }
 .jcEditable, .jcEditable * { box-sizing: border-box; }
 .jcEditable { border: #ccc dashed 1px; clear: right; margin: 2px 0; min-height: 30px; overflow: auto; overflow: visible; }
 .jcEditMenu { background: #fff; border: #ccc solid 1px; float: right; height: 28px; margin: -1px -1px 0 0; padding: 0; }
