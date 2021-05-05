@@ -7,10 +7,14 @@
 </div>
 <script type="text/javascript">
 	function dummy() {
-		let s = document.getElementById('demoModeSwitch').checked;
-		jc.prop.authUser = s ? 'Dummy' : undefined;
+		let s = document.getElementById('demoModeSwitch');
+		if ( jc.prop.authUser && jc.prop.authUser != 'Dummy' ) {
+			$(s).closest('div').remove();
+			return;
+		}
+		jc.prop.authUser = s.checked ? 'Dummy' : undefined;
 		$('.jcMenu').removeClass('jcMenuParsed');
 		jc.page.checkJcMenu();
-		if (s) swal("Demo mode","With a “Dummy” user you’ll be able to edit content, but changes won’t be saved.","info");
+		if (s.checked) swal("Demo mode","With a “Dummy” user you’ll be able to edit content, but changes won’t be saved.","info");
 	}
 </script>
