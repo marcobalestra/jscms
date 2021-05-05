@@ -13,7 +13,7 @@ JSCMS can run WITHOUT any type of serverside language, using simply EcmaScript6 
 
 Virtual site configuration will look like:
 
-`
+```
 	SetOutputFilter DEFLATE
 	AddOutputFilterByType DEFLATE application/javascript
 	AddOutputFilterByType DEFLATE application/json
@@ -41,4 +41,4 @@ Virtual site configuration will look like:
 			Require valid-user
 		</LimitExcept>
 	</Directory>
-`
+```
