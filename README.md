@@ -11,8 +11,9 @@ Editing occurs in the browser, only at the end of the edit process the page is s
 
 JSCMS can run **WITHOUT** any type of serverside language, using simply EcmaScript6 and Apache 2.4 DAV features.
 
-* **Doesn’t** require MySQL or other DB
+* **Doesn’t** require MySQL, Oracle, MariaDB, Postgres nor any other DB
 * **Doesn’t** require PHP
+* **Doesn’t** require Node.js
 * **Doesn’t** require Java
 * **Doesn’t** require Perl, Python, Ruby or any other scripting language
 
