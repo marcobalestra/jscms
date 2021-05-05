@@ -60,3 +60,8 @@ This authentication _could be_ insecure, in order to secure it it’s reccommend
 * Enable and force HTTPS on the site, e.g. using `certbot`
 * Enable `fail2ban` with an appropriate _jail_ for HTTP auth failures.
 Usually the `apache-auth` jail is shipped with `fail2ban` distribution, just activate it.
+
+## Limitations, by design
+
+Given the absence of a framework and a datbase backing-up the CMS, it’s intended for the use
+of (personal) ordinary sites with a few users and only one administrator.
