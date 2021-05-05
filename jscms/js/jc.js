@@ -1187,7 +1187,7 @@ jc.page = {
 			return out;
 		},
 	},
-	edit : ( status ) => {
+	edit : ( status, savePolicy ) => {
 		let oe = (jc.edit && jc.edit.data())||false;
 		if ( jc.page.prop.editMode = !! status ) {
 			jc.springLoad('module:edit');
@@ -1224,26 +1224,27 @@ jc.page = {
 			jc.page.reload();
 			return;
 		}
-		swal(
-			{
-				title: "Salvare le modifiche?",
-				text: 'Vuoi salvare le modifiche alla pagina?',
-				type: "warning",
-				showCancelButton: true,
-				confirmButtonText: 'Ok',
-				cancelButtonText: 'No',
-				closeOnConfirm: true,
-				closeOnCancel: true,
-			},
-			function (ok) {
-				if (ok) {
-					jc.page.save( oe );
-				} else {
-					jc.edit.data(false);
-					jc.page.reload();
-				}
-			}
-		);
+		if ( AS.test.udef(savePolicy)) {
+			jc.page.prop.editMode = true;
+			swal(
+				{
+					title: AS.label('SaveChangesTitle'),
+					text: AS.label('SaveChangesBody'),
+					type: "warning",
+					showCancelButton: true,
+					closeOnConfirm: true,
+					closeOnCancel: true,
+				},
+				function (ok) { jc.page.edit(false,ok); }
+			);
+			return;
+		}
+		if (savePolicy) {
+			jc.page.save( oe );
+		} else {
+			jc.edit.data(false);
+			jc.page.reload();
+		}
 	},
 	save : ( data, page, id ) => {
 		if ( AS.test.udef(data)) data = jc.edit.data();
@@ -1285,7 +1286,15 @@ jc.page = {
 jc.actionsMenu = (e) => {
 	let acts = [AS.label('menuActionsTitle')];
 	if ( jc.page.prop.editMode ) {
-		acts.push({icon:'jcicon',iconKey:'done',label:AS.label('menuEditOver'),action:()=>{jc.page.edit(false);} });
+// 		acts.push(
+// 			{icon:'jcicon',iconKey:'circleClose',label:AS.label('menuEditOver'),action:()=>{jc.page.edit(false);} },
+// 			{icon:'jcicon',iconKey:'done',label:AS.label('menuEditOverSave'),action:()=>{jc.page.edit(false,true);} },
+// 			{icon:'jcicon',iconKey:'editRemove',label:AS.label('menuEditOverDiscard'),action:()=>{jc.page.edit(false,false);} }
+// 		);
+		acts.push({label:AS.label('menuEditOver'),content:[
+			{icon:'jcicon',iconKey:'done',label:AS.label('menuEditOverSave'),action:()=>{jc.page.edit(false,true);} },
+			{icon:'jcicon',iconKey:'editRemove',label:AS.label('menuEditOverDiscard'),action:()=>{jc.page.edit(false,false);} }
+		]});
 	} else {
 		acts.push({icon:'jcicon',iconKey:'edit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit(true);} });
 	}
