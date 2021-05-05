@@ -53,9 +53,11 @@ h { display: none; }
 .flip-horizontal { transform: scaleX(-1); }
 .flip-vertical { transform: scaleY(-1); }
 .modal .asFormWrap .asFakeForm { width: 100%; resize:  unset; }
-.jcEditable { border: #ccc dashed 1px; clear: right; margin: 2px 0; min-height: 24px; overflow: auto; overflow: visible; }
-.jcEditMenu { background: #fff; border: #ccc solid 1px; float: right; height: 26px; margin: -1px -1px 0 0; padding: 0; box-shadow: 1px 1px 3px #ccc; }
+.jcEditable, .jcEditable * { box-sizing: border-box; }
+.jcEditable { border: #ccc dashed 1px; clear: right; margin: 2px 0; min-height: 30px; overflow: auto; overflow: visible; }
+.jcEditMenu { background: #fff; border: #ccc solid 1px; float: right; height: 28px; margin: -1px -1px 0 0; padding: 0; }
 .jcEditMenu span { display: inline-block; fill: #999; margin: 0; padding: 0; }
+.jcEditable:hover .jcEditMenu { box-shadow: 1px 1px 3px #ccc; background-color : #ffe; border-color: #999; }
 .jcEditable:hover .jcEditMenu span { fill: #333; }
 .jcEditMenu span + span { margin-left: 2px; }
 .jcEditable .jcEditMenu span:hover { background-color: #333; cursor: pointer; fill: #eee; }
