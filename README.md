@@ -11,6 +11,8 @@ Editing occurs in the browser, only at the end of the edit process the page is s
 
 JSCMS can run **WITHOUT** any type of serverside language, using simply EcmaScript6 and Apache 2.4 DAV features.
 
+Requires Apache Modules: `auth_basic`, `rewrite`, `include`, `dav`, `dav_fs`
+
 Virtual site configuration will look like:
 
 ```
@@ -41,4 +43,12 @@ Virtual site configuration will look like:
 			Require valid-user
 		</LimitExcept>
 	</Directory>
+	
+	<Directory "/path/to/document-root/jscms/login">
+		RewriteCond %{REQUEST_FILENAME}.shtml -f
+		RewriteRule .* %{REQUEST_FILENAME}.shtml [L]
+		Options +Includes
+		Require valid-user
+	</Directory>
+	
 ```
