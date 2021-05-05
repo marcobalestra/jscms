@@ -9,7 +9,7 @@ A first preview is available on https://casadelcuoco.it
 
 Editing occurs in the browser, only at the end of the edit process the page is saved.
 
-JSCMS can run WITHOUT any type of serverside language, using simply EcmaScript6 and Apache 2.4 DAV features.
+JSCMS can run **WITHOUT** any type of serverside language, using simply EcmaScript6 and Apache 2.4 DAV features.
 
 Virtual site configuration will look like:
 
