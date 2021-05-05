@@ -1,5 +1,5 @@
 jc.edit = {
-	start : ( delayed ) => {
+	start : () => {
 		$('.jcEditable:not(.jcEditableParsed)').each( (idx,d)=>{
 			let $d = $(d);
 			let data = $d.data('editable');
@@ -56,8 +56,8 @@ jc.edit = {
 		else jc.menu(e, { content: acts, highlight: hl });
 	},
 	itemdata : (e) => {
-		e.preventDefault;
-		e.stopPropagation;
+		e.preventDefault();
+		e.stopPropagation();
 		return $(e.target).closest('.jcEditable').data('editable');
 	},
 	moveup : (e) => {
