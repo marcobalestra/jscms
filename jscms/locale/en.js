@@ -14,5 +14,7 @@ AS.labels.load('en',[{
 	'menuEditOver' : 'Quit page editor',
 	'menuEditStart' : 'Edit page',
 	'onlyNonEmptyFields' : 'Field not included if empty',
+	'PageSavedTitle' : 'Page was saved',
+	'PageSavedBody' : 'The page of type “{{page|unknown}}” ID: {{id|(no id)}} was saved.',
 }]);
 

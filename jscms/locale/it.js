@@ -14,6 +14,8 @@ AS.labels.load('it',[{
 	'menuActionsTitle' : 'Azioni disponibili',
 	'menuEditOver' : 'Modifica terminata',
 	'menuEditStart' : 'Modifica la pagina',
+	'PageSavedTitle' : 'Pagina salvata',
+	'PageSavedBody' : 'La pagina di tipo “{{page|unknown}}” ID: {{id|(nessuno)}} è stata salvata.',
 	'Text' : 'Testo',
 }]);
 

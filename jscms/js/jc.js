@@ -1249,9 +1249,9 @@ jc.page = {
 		if ( AS.test.udef(data)) data = jc.edit.data();
 		if ( AS.test.udef(page)) page = jc.page.current();
 		if ( AS.test.udef(id) ) id = (jc.page.data()||{}).id;
-		data = JSON.stringify(data);
-		console.log('IN-DATA',data);
+		let edata = JSON.stringify(data);
 		let url = AS.path('jsdataroot') + page + ( id ? id : '') + '.js';
+		let ok = false;
 		fetch(
 			url,
 			{
@@ -1259,22 +1259,26 @@ jc.page = {
 				headers: {
 					'Content-type': 'application/json; charset=UTF-8' // Indicates the content
 				},
-				body: data // We send data in JSON format
+				body: edata // We send data in JSON format
 			}
 		).then( response => {
-			console.log('RESPONSE');
-			console.log(response);
-		}).then( data => {
-			// Manipulate the data retrieved back, if we want to do something with it
-			console.log('RESP-DATA');
-			console.log(data);
-			jc.edit.data(false);
-			jc.page.reload();
-		}).catch( err => {
-			// Do something with the error
-			console.log('ERROR');
-			console.log(err)
+			// console.log('RESPONSE',response);
+			// can chek for response.ok => true
+			// console.log('SAVED!');
+			ok = !!( response.ok && response.type );
+		}).then( retdata => {
+			// retdata is empty for PUT
+			// console.log('RETURNED-DATA',retdata);
+			if ( ok ) window.setTimeout(()=>{ jc.page.saved.call(window,data,page,id); },500);
+		}).catch( error => {
+			console.log('PUT ERROR', error);
 		});
+	},
+	saved : ( data, page, id ) => {
+		swal({ title: AS.label('PageSavedTitle'), text: AS.label('PageSavedBody',{page:page,id:id}), type: "success" });
+		window.setTimeout(()=>{ swal.close() },2000);
+		jc.edit.data(false);
+		jc.page.reload();
 	},
 };
 
