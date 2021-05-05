@@ -325,7 +325,7 @@ jc.menu = (ev,menu)=>{
 	ev.preventDefault();
 	ev.stopPropagation();
 	let zapMenus = () => {
-		$('.appContextMenu').each( (idx,el)=>{ $(el).fadeOut(10,()=>{ $(el).remove();} ); } );
+		document.querySelectorAll('.appContextMenu').forEach( el=>{ $(el).fadeOut(10,()=>{ $(el).remove();} ); } );
 		$('.appContextHighlight').removeClass('appContextHighlight');
 		$('.appContextHighlightTent').remove();
 		$('.appContextActive').removeClass('appContextActive');
