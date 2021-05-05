@@ -9,7 +9,7 @@ A first preview is available on https://casadelcuoco.it
 
 Editing occurs in the browser, only at the end of the edit process the page is saved.
 
-JSCMS can run **WITHOUT** any type of serverside language, using simply EcmaScript6 and Apache 2.4 DAV features.
+JSCMS can run **WITHOUT** any type of serverside language, using simply EcmaScript6 and Apache2 DAV features.
 
 * **Doesn’t** require MySQL, Oracle, MariaDB, Postgres nor any other DB
 * **Doesn’t** require PHP
@@ -19,13 +19,15 @@ JSCMS can run **WITHOUT** any type of serverside language, using simply EcmaScri
 
 ## About authentication
 
-Jscms uses Apache’s basic authentication.
+JSCMS uses Apache’s basic authentication.
 
 This authentication _could be_ insecure, in order to secure it it’s reccommended to:
 
 * Enable and force HTTPS on the site, e.g. using `certbot`
 * Enable `fail2ban` with an appropriate _jail_ for HTTP auth failures.
 Usually the `apache-auth` jail is shipped with `fail2ban` distribution, just activate it.
+
+To logout just quit the browser.
 
 ## Limitations, by design
 
