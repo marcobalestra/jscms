@@ -81,24 +81,12 @@ jc.edit = {
 		let d = jc.edit.data();
 		let t = b.subtype||b.type;
 		if ( ! jc.edit.form[t] ) return;
-		let fopt = jc.edit.form[t].call(window,b,d);
-		let $mod = jc.edit.getModal();
-		fopt.callback = (f) => {
-			if ( b.qt ) {
-				console.log( d[b.prop][b.idx] );
-				f.parse( d[b.prop][b.idx] );
-			} else {
-				let fd = {};
-				fd[t] = d[b.prop];
-				f.parse(fd);
-			}
-		};
-		$mod.on('shown.bs.modal',()=>{ AS.form.create( fopt ); });
-		$mod.modal('show');
+		jc.edit.getModal().on('shown.bs.modal',()=>{ AS.form.create( jc.edit.form[t].call(window,b,d) ); }).modal('show');
 	},
 	form : {
 		_ : (b,d)=>{
 			let $mod = jc.edit.getModal(true);
+			let t = b.subtype||b.type;
 			$('.modal-dialog',$mod).append(`<div class="modal-content">
 				<div class="modal-header" style="background-color:#eee;padding:16px 20px;">
 					<p style="margin:0;padding:0;">
@@ -114,9 +102,29 @@ jc.edit = {
 			</div>`);
 			return {
 				requires : ['basic','pikaday','tinymce','iro','slider'],
-				options : { subforms: [] },
-				fields : [],
+				options : {
+					subforms: [],
+					jsaction: (fd,fo) => {
+						fo.destroy();
+						jc.edit.noModal();
+						if ( b.qt ) {
+							d[b.prop][b.idx] = fd;
+						} else {
+							d[b.prop] = fd[t];
+						}
+						jc.edit.data(d);
+						jc.page.reload();
+					}
+				},
+				fields : [ ['btns','buttons',{position:'bottom',list:[{label:'Exit',icon:AS.icon('circleClose'),onclick:jc.edit.noModal},{btype:'reset'},{btype:'submit'}]}] ],
 				target: 'jcPageEditor',
+				callback : (f) => {
+					if ( b.qt ) {
+						f.parse( d[b.prop][b.idx] );
+					} else {
+						f.setValue(t,d[b.prop]);
+					}
+				},
 			};
 		},
 		text : (b,d) => {
