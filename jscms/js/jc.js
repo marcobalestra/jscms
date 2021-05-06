@@ -54,19 +54,16 @@ jc.prop.loadModules = {
 	],
 };
 
-var tp = {};
-var pp = {};
-
 /* Extend jQuery */
 
 (($)=>{
-	var re = /([^&=]+)=?([^&]*)/g;
-	var decodeRE = /\+/g;  // Regex for replacing addition symbol with a space
-	var decode = function (str) {return decodeURIComponent( str.replace(decodeRE, " ") );};
+	let re = /([^&=]+)=?([^&]*)/g;
+	let decodeRE = /\+/g;  // Regex for replacing addition symbol with a space
+	let decode = function (str) {return decodeURIComponent( str.replace(decodeRE, " ") );};
 	$.parseParams = function(query) {
-		var params = {}, e;
+		let params = {}, e;
 		while ( e = re.exec(query) ) {
-			var k = decode( e[1] ), v = decode( e[2] );
+			let k = decode( e[1] ), v = decode( e[2] );
 			if (k.substring(k.length - 2) === '[]') {
 				k = k.substring(0, k.length - 2);
 				(params[k] || (params[k] = [])).push(v);
@@ -91,7 +88,7 @@ $(() => {
 				$(document.body).addClass('iOS');
 			}
 			/* 1st page */
-			var sp = jc.URI.decode();
+			let sp = jc.URI.decode();
 			if ( AS.test.str(sp.page) ) jc.page.open(sp.page,sp.id,sp.data);
 			else jc.page.open('index');
 			jc.autoAdjustFields();
@@ -102,20 +99,22 @@ $(() => {
 	foo();
 } );
 
+var tp = {};
+
 /* Global changes */
 
 window.onpopstate = () => {
-	var sp = jc.URI.decode();
+	let sp = jc.URI.decode();
 	if ( AS.test.str(sp.page) ) {
 		jc.prop.lastHiEntry = jc.URI.encode( sp );
 		jc.page.open(sp.page,sp.data);
 	}
 };
 
-if (!Date.prototype.clone) Date.prototype.clone = function() { var d = new Date(); d.setTime( this.getTime()); return d; };
+if (!Date.prototype.clone) Date.prototype.clone = function() { let d = new Date(); d.setTime( this.getTime()); return d; };
 if (!Date.prototype.tosqldate) Date.prototype.tosqldate = function() {
-	var a = this.getFullYear() +'-';
-	var x = this.getMonth() +1;
+	let a = this.getFullYear() +'-';
+	let x = this.getMonth() +1;
 	a += (( x < 10 ) ? '0'+x : x)+'-';
 	x = this.getDate();
 	a += (( x < 10 ) ? '0'+x : x);
@@ -129,8 +128,8 @@ if (!Date.prototype.toitadate) Date.prototype.toitadate = function() {
 	return a;
 };
 if (!Date.prototype.tosql) Date.prototype.tosql = function() {
-	var a = this.tosqldate() +' ';
-	var x = this.getHours();
+	let a = this.tosqldate() +' ';
+	let x = this.getHours();
 	a += (( x < 10 ) ? '0'+x : x)+':';
 	x = this.getMinutes();
 	a += (( x < 10 ) ? '0'+x : x)+':';
@@ -142,7 +141,7 @@ if (!Date.prototype.fromsql) Date.prototype.fromsql = function(s) {
 	if ( AS.test.str(s) && s.match(/^([0-9]{4})/ ) ) {
 		this.setMonth(0); 
 		this.setDate(10);
-		var x = parseInt(s.match(/^([0-9]{4})/)[1]);
+		let x = parseInt(s.match(/^([0-9]{4})/)[1]);
 		if ( ! isNaN(x) ) {
 			this.setFullYear( x );
 			x = parseInt( s.match(/^[0-9]{4}[^0-9]?([0-9]{2})/)[1] );
@@ -171,14 +170,14 @@ if (!Date.prototype.fromsql) Date.prototype.fromsql = function(s) {
 	return this;
 };
 if (!Date.prototype.getWeek) Date.prototype.getWeek = function() {
-	var target  = new Date(this.valueOf()); // Create a copy of this date object
-	var dayNr   = (this.getDay() + 6) % 7; // ISO week date weeks start on monday, so correct the day number
+	let target  = new Date(this.valueOf()); // Create a copy of this date object
+	let dayNr   = (this.getDay() + 6) % 7; // ISO week date weeks start on monday, so correct the day number
 	target.setDate(target.getDate() - dayNr + 3); // Set the target to the thursday of this week so the target date is in the right year
-	var jan4 = new Date(target.getFullYear(), 0, 4); // ISO 8601 states that week 1 is the week with january 4th in it
-	var dayDiff = (target - jan4) / 86400000; // Number of days between target date and january 4th
+	let jan4 = new Date(target.getFullYear(), 0, 4); // ISO 8601 states that week 1 is the week with january 4th in it
+	let dayDiff = (target - jan4) / 86400000; // Number of days between target date and january 4th
 	// Calculate week number: Week 1 (january 4th) plus the number of weeks between target date and january 4th
 	// jan 4th is on the next week (so next week is week 1)
-	var firstWeekNumber = (new Date(target.getFullYear(), 0, 1).getDay() < 5) ? 1 : 0;
+	let firstWeekNumber = (new Date(target.getFullYear(), 0, 1).getDay() < 5) ? 1 : 0;
 	return firstWeekNumber + Math.ceil(dayDiff / 7);
 }; 
 Date.prototype.jcparser = function(d) {
@@ -187,7 +186,7 @@ Date.prototype.jcparser = function(d) {
 		return this;
 	} else if ( AS.test.str(d) ) {
 		if ( d.match(/^2[0-9]{3}/) ) return this.fromsql( d );
-		var k = new Date( d );
+		let k = new Date( d );
 		if ( AS.test.date(k) ) {
 			this.setTime( k.getTime() );
 			return this;
@@ -577,7 +576,7 @@ jc.URI = {
 		}
 		if (window.location.href.indexOf(jc.prop.uriPrefixOfbs)>=0) parsitems = window.atob(parsitems);
 		parsitems = parsitems.split(',');
-		var pars={ page: decodeURIComponent(parsitems.shift()) };
+		let pars={ page: decodeURIComponent(parsitems.shift()) };
 		if ( pars.page == '' ) return {};
 		if ( parsitems.length ) {
 			pars.data = {};
@@ -599,7 +598,7 @@ jc.URI = {
 	},
 	encode : o=>{
 		if ( ! AS.test.str(o.page) ) return '/';
-		var uri = '';
+		let uri = '';
 		if ( AS.test.obj(o.data) ) {
 			uri += encodeURIComponent(o.page);
 			if ( o.id ) {
@@ -607,7 +606,7 @@ jc.URI = {
 			} else if ( o.data && o.data.id ) {
 				uri += o.data.id;
 			} else {
-				var parts = [];
+				let parts = [];
 				for (const [key, value] of Object.entries(o.data)) {
 					let v = false;
 					if ( AS.test.str(value) && (! isNaN(parseInt(value))) ) {
@@ -634,12 +633,12 @@ jc.URI = {
 		return uri;
 	},
 	push : title => {
-		var uriparams = {};
+		let uriparams = {};
 		if ( jc.page.current() ) {
 			uriparams.page = jc.page.current();
 			if ( AS.test.obj( jc.page.data() ) ) uriparams.data = jc.page.data();
 		}
-		var up = jc.URI.encode( uriparams );
+		let up = jc.URI.encode( uriparams );
 		if ( AS.test.udef(title)) title = $('#appAction').html() || document.title;
 		if ( up != jc.prop.lastHiEntry ) {
 			jc.prop.lastHiEntry = up;
@@ -654,9 +653,9 @@ jc.URI = {
 };
 
 jc.def = {
-	arr : x=>{ var d = AS.test.def(x); return ( d && AS.test.arr(x) ) ? x : ( d ? [x] : [] ); },
+	arr : x=>{ let d = AS.test.def(x); return ( d && AS.test.arr(x) ) ? x : ( d ? [x] : [] ); },
 	bool: x=>{ return AS.test.bool(x) ? x : false; },
-	num : x=>{ var d = AS.test.def(x); return ( d && AS.test.num(x) ) ? x : ( d ? parseFloat(x) : 0 ); },
+	num : x=>{ let d = AS.test.def(x); return ( d && AS.test.num(x) ) ? x : ( d ? parseFloat(x) : 0 ); },
 	obj : x=>{ return AS.test.obj(x) ? x : {}; },
 	str : x=>{ return AS.test.def(x) ? String(x) : ''; },
 };
@@ -665,14 +664,14 @@ jc.vault = {
 	commit : ()=>{
 		if ( ! AS.test.str(jc.vault.storageKey) ) jc.vault.init();
 		if ( AS.test.def(window.Storage) ) {
-			var stor = {};
-			for ( var key in  jc.vault.prop ) {
+			let stor = {};
+			Object.keys( jc.vault.prop ).forEach( key => {
 				if ( key.match(/^global::/) ) {
 					localStorage.setItem( key , JSON.stringify( jc.vault.prop[key] ) );
 				} else {
 					stor[key] = jc.vault.prop[key];
 				}
-			}
+			} );
 			if ( AS.test.str(jc.vault.storageKey) ) localStorage.setItem( jc.vault.storageKey , JSON.stringify(stor) );
 		}
 	},
@@ -695,11 +694,11 @@ jc.vault = {
 	},
 	list : ctx => {
 		if ( ! AS.test.str(jc.vault.storageKey) ) jc.vault.init();
-		var ans = [];
+		let ans = [];
 		if ( AS.test.str( ctx ) && ( ctx !== '' ) ) {
-			if ( AS.test.obj( jc.vault.prop[ctx] ) ) for ( var i in jc.vault.prop[ctx] ) ans.push(i);
+			if ( AS.test.obj( jc.vault.prop[ctx] ) ) Object.keys(jc.vault.prop[ctx]).forEach( i => { ans.push(i) } );
 		} else {
-			for ( var i in jc.vault.prop ) ans.push(i);
+			Object.keys( jc.vault.prop ).forEach( i => { ans.push(i); } );
 		}
 		return ans;
 	},
@@ -711,23 +710,14 @@ jc.vault = {
 		}
 	},
 	init : ()=>{
-		var id = 'user';//jc.user.getId();
-		if ( AS.test.udef( id ) ) {
-			jc.vault.prop = {};
-			return;
-		}
-		jc.vault.storageKey = 'jc::vault::' + id;
+		jc.vault.storageKey = 'jc::vault::user';
 		if ( AS.test.def(window.Storage) ) {
-			var s = window.localStorage.getItem(jc.vault.storageKey);
+			let s = window.localStorage.getItem(jc.vault.storageKey);
 			jc.vault.prop = AS.test.str(s) ? JSON.parse( s ) : {};
-			var len = window.localStorage.length;
-			for( var i=0; i < len; i++ ) {
-				var key = window.localStorage.key(i);
-				if ( key.match(/^global::/) ) {
-					var s = window.localStorage.getItem(key);
-					jc.vault.prop[key] = AS.test.str(s) ? JSON.parse( s ) : {};
-				}
-			}
+			Object.keys(window.localStorage).filter( k=>(k.indexOf('global::')==0)).forEach( key => {
+				let s = window.localStorage.getItem(key);
+				jc.vault.prop[key] = AS.test.str(s) ? JSON.parse( s ) : {};
+			} );
 		} else {
 			jc.vault.prop = {};
 		}
@@ -738,10 +728,10 @@ jc.vault = {
 				jc.vault.prop[ctx][k] = undefined;
 			} else {
 				jc.vault.prop[ctx] = undefined;
-				if ( ctx.match(/^global::/) && window.localStorage ) window.localStorage.removeItem(ctx);
+				if ( (ctx.indexOf('global::')==0) && window.localStorage ) window.localStorage.removeItem(ctx);
 			}
 		} else {
-			for ( var i in jc.vault.prop ) if ( i.match(/^global::/) && window.localStorage ) window.localStorage.removeItem(i);
+			Object.keys(jc.vault.prop).filter( k=>(k.indexOf('global::')==0) ).forEach( k => { window.localStorage.removeItem(k) } );
 			jc.vault.prop = {};
 		}
 		jc.vault.commit();
@@ -784,10 +774,10 @@ jc.prefs = {
 		jc.vault.purge('jc::prefs',k);
 	},
 	commit : () => {
-		for ( k in jc.prop.prefs ) {
+		Object.keys(jc.prop.prefs).forEach( k => {
 			jc.vault.key('jc::prefs',k,jc.prop.prefs[k]);
 			jc.prop[k] = jc.prop.prefs[k];
-		}
+		} );
 	},
 	debugLevel : x => {
 		if ( AS.test.def(x)) {
@@ -806,8 +796,8 @@ jc.prefs = {
 };
 
 jc.console = ( ...args ) => {
-	var e;
-	var dl = jc.prefs.debugLevel();
+	let e;
+	let dl = jc.prefs.debugLevel();
 	if ( dl > 2 ) {
 		jc.debug.apply( window, args );
 	} else if ( dl > 0 ) try {
@@ -885,7 +875,7 @@ jc.page = {
 		if ( AS.test.def( s ) ) {
 			jc.page.prop.changed = !! s;
 			if ( AS.test.obj(tp) && AS.test.func(tp.formChanged)) {
-				var e;
+				let e;
 				try {
 					tp.formChanged.call(window,jc.page.prop.changed);
 				} catch(e) {};
@@ -908,7 +898,7 @@ jc.page = {
 	},
 	open : ( page, id, data, infokey ) => {
 		if ( ! AS && AS.labels && AS.labels.loaded ) return setTimeout( ()=>{ jc.page.open(page, id, data, infokey) }, 100);
-		var initialargs = JSON.parse(JSON.stringify([page,data]));
+		let initialargs = JSON.parse(JSON.stringify([page,data]));
 		if ( ! page ) page = 'index';
 		if ( AS.test.str(data) ) data = $.parseParams( data );
 		if ( data && AS.test.str(data.template) ) {

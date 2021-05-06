@@ -61,10 +61,11 @@ h { display: none; }
 .jcMenu .jcUser { color: #696; }
 .jcMenu:hover .jcUser { color: #090; }
 .jcEditable, .jcEditable * { box-sizing: border-box; }
-.jcEditable { border: #ccc dashed 1px; clear: right; margin: 2px 0; min-height: 30px; overflow: auto; overflow: visible; }
-.jcEditMenu { background: #fff; border: #ccc solid 1px; float: right; height: 28px; margin: -1px -1px 0 0; padding: 0; }
+.jcEditable { border: #ccc dashed 1px; margin: 2px 0; min-height: 30px; min-width: 30px; overflow: auto; overflow: visible; position: relative; }
+.jcEditMenu { background: #fff; border: #ccc solid 1px; line-height: 8px; padding: 0; position: absolute; right: -1px; top: -1px; }
+.appContextHighlight .jcEditMenu { display: none; }
 .jcEditMenu span { display: inline-block; fill: #999; margin: 0; padding: 0; }
-.jcEditable:hover .jcEditMenu { box-shadow: 1px 1px 3px #ccc; border-color: #999; }
+.jcEditable:hover .jcEditMenu { border-color: #999; box-shadow: 1px 1px 3px #ccc; }
 .jcEditable:hover .jcEditMenu span { fill: #333; }
 .jcEditMenu span + span { margin-left: 2px; }
 .jcEditable .jcEditMenu span:hover { background-color: #336; cursor: pointer; fill: #ffc; }

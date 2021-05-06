@@ -19,8 +19,8 @@ jc.edit = {
 			$d.addClass('jcEditableParsed');
 			let $em = $(`<div class="jcEditMenu"></div>`);
 			if ( AS.test.def(data.idx) ) {
-				if ( data.idx ) $em.append('<span class="jcEditMoveUp" onclick="jc.edit.moveup(event)">'+AS.icon('moveUp')+'</span>');
 				if ( data.idx < (data.qt -1) ) $em.append('<span class="jcEditMoveDown" onclick="jc.edit.movedown(event)">'+AS.icon('moveDown')+'</span>');
+				if ( data.idx ) $em.append('<span class="jcEditMoveUp" onclick="jc.edit.moveup(event)">'+AS.icon('moveUp')+'</span>');
 				$em.append('<span class="jcEditDropdown">'+AS.icon('menu')+'</span>');
  			} else if ( data.subtype == 'mixed' )  {
  				$em.append('<span class="jcEditDropdown">'+AS.icon('editAdd')+'</span>');
