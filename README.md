@@ -38,10 +38,16 @@ of (personal) ordinary sites with a few users and only one administrator.
 
 * A server with some operating system (this excludes Windows)
 * Apache  2.x web server (possibly ≥ 2.4)
-* Apache modules: `auth_basic`, `rewrite`, `include`, `dav`, `dav_fs`
+* Apache modules: `auth_basic`, `rewrite`, `include`, `dav`, `dav_fs`, `cgi`
 * It’s strongly suggested to use Apache module `deflate`
 
-Virtual site configuration will look like:
+You may have noticed that `cgi` module… It’s required to perform a few (simple and minimal) SSI “exec”:
+only authenticated, only minimal (e.g.: list files name in data directory matching some pattern).
+
+It’s done through few script lines (sh or vanilla perl), parameters are accurately “sanitized” and
+the script can’t act (read or write) outside jscms directory.
+
+Virtual site configuration will look like this:
 
 ```
 	RewriteEngine On
@@ -75,7 +81,7 @@ Virtual site configuration will look like:
 	</Directory>
 	
 	<Directory "/path/to/document-root/jscms/login">
-		Options +Includes -Indexes
+		Options Includes FollowSymLinks ExecCGI
 	</Directory>
 	
 ```
