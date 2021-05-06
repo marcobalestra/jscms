@@ -39,6 +39,7 @@ of (personal) ordinary sites with a few users and only one administrator.
 * A server with some operating system (this excludes Windows)
 * Apache  2.x web server (possibly ≥ 2.4)
 * Apache modules: `auth_basic`, `rewrite`, `include`, `dav`, `dav_fs`
+* It’s strongly suggested to use Apache module `deflate`
 
 Virtual site configuration will look like:
 
