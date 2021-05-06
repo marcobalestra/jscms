@@ -1041,6 +1041,7 @@ jc.page = {
 					jc.page.checkJcMenu($tgt);
 					$tgt.toggle(!e.hidden);
 					if ( jc.page.prop.editMode && jc.edit ) jc.edit.start();
+					document.body.style.overflow= 'auto';
 				});
 			} );
 		},
@@ -1276,6 +1277,14 @@ jc.page = {
 		if ( AS.test.udef(data)) data = jc.edit.data();
 		if ( AS.test.udef(page)) page = jc.page.current();
 		if ( AS.test.udef(id) ) id = (jc.page.data()||{}).id;
+		Object.keys(data).forEach( k => {
+			if ( AS.test.arr(data[k])) data[k].forEach( i => {
+				if ( AS.test.obj(i) && ! AS.test.arr(i) ) {
+					delete i.idx;
+					delete i.qt;
+				}
+			} );
+		} );
 		let edata = JSON.stringify(data);
 		let url = AS.path('jsdataroot') + page + ( id ? id : '') + '.js';
 		let ok = false;

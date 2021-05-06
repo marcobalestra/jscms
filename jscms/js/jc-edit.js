@@ -19,12 +19,14 @@ jc.edit = {
 			$d.addClass('jcEditableParsed');
 			let $em = $(`<div class="jcEditMenu"></div>`);
 			if ( AS.test.def(data.idx) ) {
+				$d.on('dblclick',jc.edit.edit);
 				if ( data.idx < (data.qt -1) ) $em.append('<span class="jcEditMoveDown" onclick="jc.edit.movedown(event)">'+AS.icon('moveDown')+'</span>');
 				if ( data.idx ) $em.append('<span class="jcEditMoveUp" onclick="jc.edit.moveup(event)">'+AS.icon('moveUp')+'</span>');
 				$em.append('<span class="jcEditDropdown">'+AS.icon('menu')+'</span>');
- 			} else if ( data.subtype == 'mixed' )  {
- 				$em.append('<span class="jcEditDropdown">'+AS.icon('editAdd')+'</span>');
+			} else if ( data.subtype == 'mixed' )  {
+				$em.append('<span class="jcEditDropdown">'+AS.icon('editAdd')+'</span>');
 			} else {
+				$d.on('dblclick',jc.edit.edit);
 				$em.append('<span class="jcEditDropdown">'+AS.icon('edit')+'</span>');
 			}
 			$d.prepend($em);
@@ -76,7 +78,7 @@ jc.edit = {
 		let d = jc.edit.data();
 		if ( Array.isArray( d[b.prop]) ) {
 			d[b.prop].splice( b.idx -1, 2, d[b.prop][b.idx], d[b.prop][b.idx -1]);
-			jc.edit.data(d);
+			jc.edit.fixBlocks(b,d);
 			jc.page.reload();
 		}
 	},
@@ -85,7 +87,7 @@ jc.edit = {
 		let d = jc.edit.data();
 		if ( Array.isArray( d[b.prop]) ) {
 			d[b.prop].splice( b.idx, 2, d[b.prop][b.idx +1], d[b.prop][b.idx]);
-			jc.edit.data(d);
+			jc.edit.fixBlocks(b,d);
 			jc.page.reload();
 		}
 	},
@@ -97,7 +99,7 @@ jc.edit = {
 		jc.edit.getModal().on('shown.bs.modal',()=>{ AS.form.create( jc.edit.form[t].call(window,b,d) ); }).modal('show');
 	},
 	form : {
-		_ : (b,d)=>{
+		_base : (b,d)=>{
 			let $mod = jc.edit.getModal(true);
 			let t = b.subtype||b.type;
 			$('.modal-dialog',$mod).append(`<div class="modal-content">
@@ -122,10 +124,11 @@ jc.edit = {
 						jc.edit.noModal();
 						if ( b.qt ) {
 							d[b.prop][b.idx] = fd;
+							jc.edit.fixBlocks(b,d);
 						} else {
 							d[b.prop] = fd[t];
+							jc.edit.data(d);
 						}
-						jc.edit.data(d);
 						jc.page.reload();
 					}
 				},
@@ -141,7 +144,7 @@ jc.edit = {
 			};
 		},
 		text : (b,d) => {
-			let o = jc.edit.form._(b,d);
+			let o = jc.edit.form._base(b,d);
 			if ( b.qt ) {
 				o.fields.push(
 					["type",'select',{asLabel:'blockType',default:'text',options:[{label:AS.label('HTML'),value:'html'},{label:AS.label('Text'),value:'text'}],onchange:(x,fo)=>{
@@ -170,7 +173,7 @@ jc.edit = {
 			return o;
 		},
 		html : (b,d) => {
-			let o = jc.edit.form._(b,d);
+			let o = jc.edit.form._base(b,d);
 			o.fields.push(
 				["type",'select',{asLabel:'blockType',default:'html',options:[{label:AS.label('HTML'),value:'html'},{label:AS.label('Text'),value:'text'}],onchange:(x,fo)=>{
 					let f = fo.getForm();
@@ -191,7 +194,31 @@ jc.edit = {
 		},
 	},
 	add : (e) => {
-		
+		let ob = jc.edit.itemdata(e);
+		let d = jc.edit.data();
+		if ( jc.edit.prop.blockTypes.length == 1 ) {
+			jc.edit.addType( ob, d, jc.edit.prop.blockTypes[0] );
+		} else {
+			// choose block type
+		}
+	},
+	addType : (b,d,t) => {
+		let nb = {prop:b.prop,qt:b.qt,idx:AS.label('New')};
+		let fopt = jc.edit.form[t].call(window,nb,d);
+		fopt.options.jsaction = (fd,fo) => {
+			fo.destroy();
+			jc.edit.noModal();
+			d[b.prop].splice( b.idx, 1, d[b.prop][b.idx], fd );
+			jc.edit.fixBlocks(b,d);
+			jc.page.reload();
+		};
+		fopt.callback = (f) => { f.setValue('type',d[b.prop][b.idx].type); };
+		jc.edit.getModal().on('shown.bs.modal',()=>{ AS.form.create( fopt ); }).modal('show');
+	},
+	fixBlocks : (b,d) => {
+		let qt = d[b.prop].length;
+		d[b.prop].forEach( (x,i) => { x.idx = i; x.qt = qt } );
+		jc.edit.data(d);
 	},
 	rm : (e) => {
 		let b = jc.edit.itemdata(e);
