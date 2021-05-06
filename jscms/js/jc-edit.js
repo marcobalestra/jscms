@@ -1,3 +1,9 @@
+AS.addEvent(document,'as:tinyMceInited',e=>{
+	let h = parseInt(window.innerHeight) - 200;
+	h = String( h > 600 ? 600 : h )+'px';
+	e.detail.getWrap().querySelector('.tox-tinymce').style.height=h;
+});
+
 jc.edit = {
 	prop : {
 		blockTypes : ['text'],
