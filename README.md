@@ -3,7 +3,11 @@ Javascript CMS, JSON-driven and DB-free
 
 The idea is to create a CMS as a SPA (Single-page application) that is entirely javascript-driven.
 
-A first preview is available on https://casadelcuoco.it
+## Under development
+
+JSCMS is currently under development.
+
+A first preview of the state of the art is available on https://casadelcuoco.it
 
 ## Key factors
 
