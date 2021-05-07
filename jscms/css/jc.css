@@ -37,7 +37,7 @@ h { display: none; }
 .dropdown-menu.appContextMenuContent li a:hover { background-color: #eee; }
 .dropdown-menu.appContextMenuContent li a i { float: left; margin: 0 16px 0 0; top: 2px; }
 .dropdown-menu.appContextMenuContent li .jcicon svg { display: inline; height: 20px; vertical-align: -1px; width: 20px; }
-.dropdown-menu.appContextMenuContent li a i.rIcon { color: #ccc; float: right; margin: 0 0 0 16px; }
+.dropdown-menu.appContextMenuContent li a i.rIcon { color: #ccc; float: right; margin: 0 0 0 16px; fill:#ccc; }
 .dropdown-menu.appContextMenuContent li ul { display: block; margin: 0; padding: 0; }
 .dropdown-menu.appContextMenuContent li ul li a { padding: 8px 16px 8px 40px; }
 .dropdown-menu.appContextMenuContent hr { margin: 0; padding: 0; }
@@ -62,7 +62,7 @@ h { display: none; }
 .jcMenu:hover .jcUser { color: #090; }
 .jcEditable, .jcEditable * { box-sizing: border-box; }
 .jcEditable { border: #ccc dashed 1px; margin: 2px 0; min-height: 30px; min-width: 30px; overflow: auto; overflow: visible; position: relative; }
-.jcEditMenu { background: #fff; border: #ccc solid 1px; line-height: 8px; padding: 0; position: absolute; right: -1px; top: -1px; }
+.jcEditMenu { background: #fff; border: #ccc solid 1px; line-height: 8px; padding: 0; position: absolute; right: -1px; top: -1px; z-index:90; }
 .appContextHighlight .jcEditMenu { display: none; }
 .jcEditMenu span { display: inline-block; fill: #999; margin: 0; padding: 0; }
 .jcEditable:hover .jcEditMenu { border-color: #999; box-shadow: 1px 1px 3px #ccc; }
@@ -70,4 +70,3 @@ h { display: none; }
 .jcEditMenu span + span { margin-left: 2px; }
 .jcEditable .jcEditMenu span:hover { background-color: #336; cursor: pointer; fill: #ffc; }
 .jcEditMenu span svg { display: block; height: 18px; margin: 4px; padding: 0; width: 18px; }
-svg { vertical-align: unset; }

@@ -437,14 +437,14 @@ jc.menu = (ev,menu)=>{
 		}
 		$parent.addClass('appContextActive');
 	} else {  /* menu.type == 'context' */
-		left = menu.x || (ev.pageX -10);
-		top = menu.y || (ev.pageY -10);
+		left = menu.x || (ev.pageX -20);
+		top = menu.y || (ev.pageY -20);
 		if ( (top - $(window).scrollTop() + cmh) >= $(window).height() ) {
-			top -= (cmh -30);
+			top -= (cmh -40);
 			$('ul.appContextMenuContent',$cm).append( Array.from($('ul.appContextMenuContent>li',$cm)).reverse() );
 		}
 		if ( (left - $(window).scrollLeft() + cmw) >= $(window).width() ) {
-			left -= (cmw -20);
+			left -= (cmw -40);
 		}
 	}
 	let hl = false;

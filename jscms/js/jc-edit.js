@@ -60,11 +60,12 @@ jc.edit = {
 			} else if (canAdd) {
 				acts.push('-',{icon:'jcicon danger',iconKey:'editRemove',label:AS.label('blockDeleteContent'),action:jc.edit.rm},'-');
 			}
-			if (canAdd) acts.push({icon:'jcicon',iconKey:'editAdd',label:AS.label('blockAddContent'),action:jc.edit.add});
+			if (canAdd) acts.push({icon:'jcicon',iconKey:'editAdd',ricon:'jcicon',riconKey:'arrow-down',label:AS.label('blockAddContent'),action:jc.edit.add});
 		}
 		if ( ! acts.length ) return;
-		else if ( acts.length == 1 ) acts[0].action.call(window,e);
-		else jc.menu(e, { content: acts, highlight: hl });
+		else if ( acts.length == 1 ) return acts[0].action.call(window,e);
+		acts.unshift(data.subtype||data.type);
+		jc.menu(e, { content: acts, highlight: hl });
 	},
 	itemdata : (e) => {
 		e.preventDefault();
@@ -104,7 +105,7 @@ jc.edit = {
 			let $mod = jc.edit.getModal(true);
 			let t = b.subtype||b.type;
 			$('.modal-dialog',$mod).append(`<div class="modal-content">
-				<div class="modal-header" style="background-color:#eee;padding:16px 20px;">
+				<div class="modal-header" style="background-color:#eee;">
 					<p class="modal-title">
 						<span class="jcicon">${ AS.icon('edit') }</span> 
 						<b>
@@ -112,7 +113,7 @@ jc.edit = {
 							${ b.prop }${ b.qt ? ' ['+(b.idx +1)+'/'+b.qt+']':'' }
 						</b>
 					</p>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
 						<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>
 					</button>
 				</div>
@@ -259,7 +260,13 @@ jc.edit.meta = {
 		let ed = jc.edit.data();
 		if ( AS.test.udef(ed.metadata) ) ed.metadata = { type: jc.page.current(), id: pd.id };
 		let $mod = jc.edit.getModal(true);
-		$('.modal-dialog',$mod).append(`<div class="modal-content"><div class="modal-body" id="jcPageEditor"></div></div>`);
+		$('.modal-dialog',$mod).append(`<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
+					<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>
+				</button>
+			</div>
+			<div class="modal-body" id="jcPageEditor"></div></div>`);
 		fp = JSON.parse(JSON.stringify(pd.template.metadata.form));
 		fp.callback = f=> { f.parse(ed.metadata) };
 		fp.options.title = `${ AS.label('Properties') }: “${ ed.metadata.type }”${ ed.metadata.id ? ' ID: '+ed.metadata.id : '' }`;
