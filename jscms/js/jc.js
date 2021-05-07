@@ -859,6 +859,102 @@ jc.debugURI = x => {
 	return jc.prop.prefs.debugURI;
 };
 
+/* jc.template */
+
+jc.template = {
+	prop : {
+		info : {},
+		html : {},
+		part : {}
+	},
+	info : {
+		get: ( template, callback ) => {
+			let v = jc.template.prop.info[template];
+			if ( ! v ) {
+				let url = AS.path('jstemplates') + 'info/'+ template + '.js';
+				jc.console('jc.template.info.get :',url);
+				jc.template.prop.info[template] = '_loading_';
+				jc.springLoadJs(url);
+				setTimeout( ()=>{ jc.template.info.get(template,callback) }, 100 );
+			} else if ( v == '_loading_') {
+				setTimeout( ()=>{ jc.template.info.get(template,callback) }, 100 );
+			} else if ( AS.test.func(callback) ) {
+				callback.call( window, v );
+			} else {
+				return v;
+			}
+		},
+		set : ( template, obj ) => {
+			if ( ! obj.html ) obj.html = 'index';
+			jc.template.prop.info[template] = obj;
+		},
+	},
+	html : {
+		get : ( key, callback ) => {
+			let v = jc.template.prop.html[key];
+			if ( ! v ) {
+				let url = AS.path('jstemplates') + 'html/'+ key + '.html';
+				jc.console('jc.template.html.get :',url);
+				jc.template.html.set(key,'_loading_');
+				$.ajax( url, {
+					cache: true,
+					method: 'GET',
+					dataType: 'html',
+					error: jc.getError,
+					success: h => {
+						jc.template.html.set(key,h);
+						jc.template.html.get( key, callback );
+					},
+				});
+				return;
+			} else if ( v == '_loading_' ) {
+				setTimeout( ()=>{ jc.template.html.get(key,callback) }, 100 );
+			} else if ( AS.test.func(callback) ) {
+				callback.call( window, v );
+			} else {
+				return v;
+			}
+		},
+		set : ( key, value ) => { jc.template.prop.html[key] = value; },
+		current : ( key ) => {
+			if ( AS.test.str(key) ) jc.template.prop.currentInfo = key;
+			return jc.template.prop.currentInfo;
+		},
+	},
+	part : {
+		get : ( key, callback ) => {
+			let v = jc.template.prop.part[key];
+			if ( ! v ) {
+				let ext='.js',dataType='json';
+				if ( key.match(/\.x?html?$/) ) {
+					ext = '';
+					dataType='html';
+				}
+				let url = AS.path('jstemplates') + 'parts/'+ key + ext;
+				jc.console('jc.template.part.get :',url);
+				jc.template.part.set(key,'_loading_');
+				$.ajax( url, {
+					method: 'GET',
+					dataType: dataType,
+					error: jc.getError,
+					success: j => {
+						jc.template.part.set(key,j);
+						jc.template.part.get(key,callback);
+					},
+				});
+				return;
+			} else if ( v == '_loading_' ) {
+				setTimeout( ()=>{ jc.template.part.get(key,callback) }, 100 );
+			} else if ( AS.test.func(callback) ) {
+				callback.call( window, v );
+			} else {
+				return v;
+			}
+		},
+		set : ( key, value ) => { jc.template.prop.part[key] = value },
+	},
+};
+
 /* jc page */
 
 jc.page = {
@@ -871,6 +967,46 @@ jc.page = {
 		current : false,
 		changed : false
 	},
+// 	getTemplateInfo: ( template, callback ) => {
+// 		if ( ! jc.page.prop.templateInfo[template] ) {
+// 			let url = AS.path('jstemplates') + 'info/'+ template + '.js';
+// 			jc.page.prop.templateInfo[template] = 'loading';
+// 			jc.springLoadJs(url);
+// 			setTimeout( ()=>{ jc.page.getTemplateInfo(template,callback) }, 100 );
+// 		} else if ( jc.page.prop.templateInfo[template] == 'loading') {
+// 			setTimeout( ()=>{ jc.page.getTemplateInfo(template,callback) }, 100 );
+// 		} else if ( AS.test.func(callback) ) {
+// 			callback.call( window, jc.page.prop.templateInfo[template] );
+// 		} else {
+// 			return jc.page.prop.templateInfo[template];
+// 		}
+// 	},
+// 	setTemplateInfo : ( template, obj ) => {
+// 		if ( ! obj.html ) obj.html = 'index';
+// 		jc.page.prop.templateInfo[template] = obj;
+// 	},
+// 	getTemplateHtml : ( html, callback ) => {
+// 		if ( ! jc.page.prop.templateHtml[html] ) {
+// 			let url = AS.path('jstemplates') + 'html/'+ html + '.html';
+// 			jc.console('getTemplateHtml:',url);
+// 			jc.page.prop.templateHtml[html] = '_loading_';
+// 			$.ajax( url, {
+// 				cache: true,
+// 				method: 'GET',
+// 				dataType: 'html',
+// 				error: jc.getError,
+// 				success: h => {
+// 					jc.page.prop.templateHtml[html] = h;
+// 					jc.page.getTemplateHtml( html, callback );
+// 				},
+// 			});
+// 			return;
+// 		} else if ( jc.page.prop.templateHtml[html] == '_loading_' ) {
+// 			setTimeout( ()=>{ jc.page.getTemplateHtml(html,callback) }, 100 );
+// 		} else if ( AS.test.func(callback) ) {
+// 			callback.call( window, jc.page.prop.templateHtml[html] );
+// 		}
+// 	},
 	changed : s => {
 		if ( AS.test.def( s ) ) {
 			jc.page.prop.changed = !! s;
@@ -910,54 +1046,7 @@ jc.page = {
 		jc.page.changed( false );
 		jc.console('Opening page:'+page, id, data, infokey );
 		jc.page.data( data );
-		jc.page.getTemplateInfo( page, id, data, infokey );
-	},
-	getTemplateInfo : ( page, id, data, infokey ) => {
-		if ( ! jc.page.prop.templateInfo[infokey] ) {
-			let url = AS.path('jstemplates') + 'pages/'+ infokey + '.js';
-			jc.console('getTemplateInfo:',url);
-			$.ajax( url, {
-				cache: true,
-				method: 'GET',
-				dataType: 'json',
-				error: jc.getError,
-				success: d => {
-					d.key = infokey;
-					if ( ! d.html ) d.html = 'index';
-					jc.page.prop.templateInfo[infokey] = d;
-					jc.page.getTemplateInfo( page, id, data, infokey );
-				},
-			});
-			return;
-		}
-		if ( ! data ) data = {};
-		if ( ! data.template ) data.template = jc.page.prop.templateInfo[infokey];
-		jc.page.getTemplateHtml( page, id, data );
-	},
-	getTemplateHtml : ( page, id, data ) => {
-		if ( ! jc.page.prop.templateHtml[data.template.html] ) {
-			let url = AS.path('jstemplates') + 'pages/'+ data.template.html + '.html';
-			jc.console('getTemplateHtml:',url);
-			$.ajax( url, {
-				cache: true,
-				method: 'GET',
-				dataType: 'html',
-				error: jc.getError,
-				success: h => {
-					jc.page.prop.templateHtml[data.template.html] = h;
-					jc.page.getTemplateHtml( page, id, data );
-				},
-			});
-			return;
-		}
-		jc.page.current( page );
-		if ( AS.test.obj(data) ) jc.page.addData( data );
-		jc.page.addData( { id: id } );
-		if ( data.template.html != jc.page.prop.currentTemplateHtml ) {
-			jc.page.prop.currentTemplateHtml = data.template.html;
-			$('#'+jc.prop.mainContainerId).html( jc.page.prop.templateHtml[data.template.html] );
-		}
-		jc.page.getPageData( page, id );
+		jc.page.step.info( page, id, data, infokey );
 	},
 	loadData : ( page, id, callback ) => {
 		if ( jc.page.prop.editMode && jc.edit && jc.edit.data() ) {
@@ -977,15 +1066,36 @@ jc.page = {
 			success: j => { if ( AS.test.func(callback) ) callback.call( window, j ); },
 		});
 	},
-	reload : () => { jc.page.getPageData( jc.page.current(), jc.page.data().id ); },
-	getPageData : ( page, id ) => {
-		jc.page.loadData( page, id, j => {
-			window.tp = {};
-			let data = jc.page.data();
-			jc.page.addData( { pageContent: j } );
-			if ( data.template.content ) jc.page.render.main(data.template.content);
-		});
-		jc.URI.push();
+	reload : () => { jc.page.step.data( jc.page.current(), jc.page.data().id ); },
+	step : {
+		info : ( page, id, data, infokey ) => {
+			jc.template.info.get( infokey, ( tdata )=>{
+				if ( ! data ) data = {};
+				if ( ! data.template ) data.template = tdata;
+				jc.page.step.html( page, id, data );
+			});
+		},
+		html : ( page, id, data ) => {
+			jc.page.current( page );
+			if ( AS.test.obj(data) ) jc.page.addData( data );
+			jc.page.addData( { id: id } );
+			jc.template.html.get( data.template.html, ( html )=>{
+				if ( data.template.html != jc.template.html.current() ) {
+					jc.template.html.current( data.template.html );
+					$('#'+jc.prop.mainContainerId).html( html );
+				}
+				jc.page.step.data( page, id );
+			});
+		},
+		data : ( page, id ) => {
+			jc.page.loadData( page, id, j => {
+				window.tp = {};
+				let data = jc.page.data();
+				jc.page.addData( { pageContent: j } );
+				jc.URI.push();
+				if ( data.template.content ) jc.page.render.main(data.template.content);
+			});
+		},
 	},
 	render : {
 		main : data => {
@@ -1104,30 +1214,13 @@ jc.page = {
 			jc.page.render.main(o);
 		},
 		part : ( o ) => {
-			if ( ! jc.page.prop.parts[o.content] ) {
-				let ext='.js',dataType='json';
-				if ( o.content.match(/\.x?html?$/) ) {
-					ext = '';
-					dataType='html';
-				}
-				let url = AS.path('jstemplates') + 'parts/'+ o.content + ext;
-				jc.console('Loading part:',url);
-				$.ajax( url, {
-					method: 'GET',
-					dataType: dataType,
-					error: jc.getError,
-					success: j => {
-						jc.page.prop.parts[o.content] = j;
-						jc.page.render.part( o );
-					},
-				});
-				return;
-			}
 			if ( $(o.selector).data('jc_part_label') != o.content ) {
-				$(o.selector).data('jc_part_label',o.content);
-				o.rendered = jc.page.prop.parts[o.content];
-				if ( AS && AS.labels ) o.rendered = AS.labels.labelize( o.rendered );
-				jc.page.render.main(o);
+				jc.template.part.get( o.content, (partcontent) => {
+					$(o.selector).data('jc_part_label',o.content);
+					o.rendered = partcontent;
+					if ( AS && AS.labels ) o.rendered = AS.labels.labelize( o.rendered );
+					jc.page.render.main(o);
+				});
 			}
 		},
 		blocks : (o,pdata,pfull) => {
