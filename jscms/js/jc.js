@@ -1053,6 +1053,13 @@ jc.page = {
 				let data = jc.page.data();
 				jc.page.addData( { pageContent: j } );
 				jc.URI.push();
+				if ( j.metadata ) {
+					const h = document.documentElement.querySelector('head');
+					const md = j.metadata;
+					if ( md.title ) $('title',h).html(md.title);
+					if ( md.keywords ) $('meta[name="keywords"]',h).attr('content',md.keywords);
+					if ( md.description ) $('meta[name="description"]',h).attr('content',md.description);
+				}
 				if ( data.template.content ) jc.page.render.main(data.template.content);
 			});
 		},
@@ -1330,6 +1337,7 @@ jc.page = {
 		if ( AS.test.udef(data)) data = jc.edit.data();
 		if ( AS.test.udef(page)) page = jc.page.current();
 		if ( AS.test.udef(id) ) id = (jc.page.data()||{}).id;
+		delete( data.template );
 		Object.keys(data).forEach( k => {
 			if ( AS.test.arr(data[k])) data[k].forEach( i => {
 				if ( AS.test.obj(i) && ! AS.test.arr(i) ) {
@@ -1374,10 +1382,13 @@ jc.page = {
 jc.actionsMenu = (e) => {
 	let acts = [AS.label('menuActionsTitle')];
 	if ( jc.page.prop.editMode ) {
-		acts.push({label:AS.label('menuEditOver'),content:[
-			{icon:'jcicon',iconKey:'done',label:AS.label('menuEditOverSave'),action:()=>{jc.page.edit(false,true);} },
-			{icon:'jcicon',iconKey:'editRemove',label:AS.label('menuEditOverDiscard'),action:()=>{jc.page.edit(false,false);} }
-		]});
+		acts.push(
+			{icon:'jcicon',iconKey:'metadata',label:AS.label('Properties'),action:()=>{jc.edit.meta.edit();} },
+			{label:AS.label('menuEditOver'),content:[
+				{icon:'jcicon',iconKey:'done',label:AS.label('menuEditOverSave'),action:()=>{jc.page.edit(false,true);} },
+				{icon:'jcicon',iconKey:'editRemove',label:AS.label('menuEditOverDiscard'),action:()=>{jc.page.edit(false,false);} }
+			]}
+		);
 	} else {
 		acts.push({icon:'jcicon',iconKey:'edit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit(true);} });
 	}

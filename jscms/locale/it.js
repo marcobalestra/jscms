@@ -5,6 +5,7 @@ AS.labels.load('it',[{
 	'blockEditContent' : 'Modifica il contenuto',
 	'blockTextAspect' : 'Aspetto',
 	'blockType' : 'Tipo di contenuto',
+	'Cancel' : 'Annulla',
 	'Edit' : 'Modifica',
 	'editYetItBody' : 'Continui la modifica precedente o riparti ricaricando il contenuto?',
 	'editYetItCancel' : 'Riparti',
@@ -13,6 +14,7 @@ AS.labels.load('it',[{
 	'headerTag' : 'I cuochi scrivono, tutti possono leggere',
 	'LoginDoneBody':'La login attuale è “{{user}}”.\nPer uscire (logout) fai quit del browser.',
 	'LoginDoneTitle':'Autenticazione effettuata',
+	'Main' : 'Principale',
 	'menuActionsTitle' : 'Azioni disponibili',
 	'menuEditOver' : 'Fine modifica:',
 	'menuEditOverDiscard' : 'Annulla i cambiamenti',
@@ -20,6 +22,7 @@ AS.labels.load('it',[{
 	'menuEditStart' : 'Modifica la pagina',
 	'PageSavedBody' : 'La pagina di tipo “{{page|unknown}}” ID: {{id|(nessuno)}} è stata salvata.',
 	'PageSavedTitle' : 'Pagina salvata',
+	'Properties': 'Proprietà',
 	'Text' : 'Testo',
 }]);
 

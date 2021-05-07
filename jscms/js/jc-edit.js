@@ -1,7 +1,5 @@
 AS.addEvent(document,'as:tinyMceInited',e=>{
-	let h = parseInt(window.innerHeight) - 200;
-	h = String( h > 600 ? 600 : h )+'px';
-	e.detail.getWrap().querySelector('.tox-tinymce').style.height=h;
+	e.detail.getWrap().querySelector('.tox-tinymce').style.height = String(Math.min(Math.max((parseInt(window.innerHeight)-240),300),640))+'px';
 });
 
 jc.edit = {
@@ -118,6 +116,8 @@ jc.edit = {
 			return {
 				requires : ['basic','pikaday','tinymce','iro','slider'],
 				options : {
+					effectduration : 0,
+					theme: 'transparent',
 					subforms: [],
 					jsaction: (fd,fo) => {
 						fo.destroy();
@@ -132,7 +132,7 @@ jc.edit = {
 						jc.page.reload();
 					}
 				},
-				fields : [ ['btns','buttons',{position:'bottom',list:[{label:'Exit',icon:AS.icon('circleClose'),onclick:jc.edit.noModal},{btype:'reset'},{btype:'submit'}]}] ],
+				fields : [ ['btns','buttons',{position:'bottom',list:[{label:AS.label('Cancel'),icon:AS.icon('circleClose'),onclick:jc.edit.noModal},{btype:'reset'},{btype:'submit'}]}] ],
 				target: 'jcPageEditor',
 				callback : (f) => {
 					if ( b.qt ) {
@@ -246,4 +246,24 @@ jc.edit = {
 		mod.hide();
 		mod.remove();
 	},
+};
+
+jc.edit.meta = {
+	edit: () => {
+		let pd = jc.page.data();
+		let ed = jc.edit.data();
+		if ( AS.test.udef(ed.metadata) ) ed.metadata = { type: jc.page.current(), id: pd.id };
+		let $mod = jc.edit.getModal(true);
+		$('.modal-dialog',$mod).append(`<div class="modal-content"><div class="modal-body" id="jcPageEditor"></div></div>`);
+		fp = JSON.parse(JSON.stringify(pd.template.metadata.form));
+		fp.callback = f=> { f.parse(ed.metadata) };
+		fp.options.title = `${ AS.label('Properties') }: “${ ed.metadata.type }”${ ed.metadata.id ? ' ID: '+ed.metadata.id : '' }`;
+		fp.options.jsaction = (fd,f) => {
+			f.destroy();
+			jc.edit.noModal();
+			ed.metadata = fd;
+			jc.edit.data(ed);
+		};
+		$mod.on('shown.bs.modal',()=>{ AS.form.create(fp); }).modal('show');
+	}
 };
