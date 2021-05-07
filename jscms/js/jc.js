@@ -967,46 +967,6 @@ jc.page = {
 		current : false,
 		changed : false
 	},
-// 	getTemplateInfo: ( template, callback ) => {
-// 		if ( ! jc.page.prop.templateInfo[template] ) {
-// 			let url = AS.path('jstemplates') + 'info/'+ template + '.js';
-// 			jc.page.prop.templateInfo[template] = 'loading';
-// 			jc.springLoadJs(url);
-// 			setTimeout( ()=>{ jc.page.getTemplateInfo(template,callback) }, 100 );
-// 		} else if ( jc.page.prop.templateInfo[template] == 'loading') {
-// 			setTimeout( ()=>{ jc.page.getTemplateInfo(template,callback) }, 100 );
-// 		} else if ( AS.test.func(callback) ) {
-// 			callback.call( window, jc.page.prop.templateInfo[template] );
-// 		} else {
-// 			return jc.page.prop.templateInfo[template];
-// 		}
-// 	},
-// 	setTemplateInfo : ( template, obj ) => {
-// 		if ( ! obj.html ) obj.html = 'index';
-// 		jc.page.prop.templateInfo[template] = obj;
-// 	},
-// 	getTemplateHtml : ( html, callback ) => {
-// 		if ( ! jc.page.prop.templateHtml[html] ) {
-// 			let url = AS.path('jstemplates') + 'html/'+ html + '.html';
-// 			jc.console('getTemplateHtml:',url);
-// 			jc.page.prop.templateHtml[html] = '_loading_';
-// 			$.ajax( url, {
-// 				cache: true,
-// 				method: 'GET',
-// 				dataType: 'html',
-// 				error: jc.getError,
-// 				success: h => {
-// 					jc.page.prop.templateHtml[html] = h;
-// 					jc.page.getTemplateHtml( html, callback );
-// 				},
-// 			});
-// 			return;
-// 		} else if ( jc.page.prop.templateHtml[html] == '_loading_' ) {
-// 			setTimeout( ()=>{ jc.page.getTemplateHtml(html,callback) }, 100 );
-// 		} else if ( AS.test.func(callback) ) {
-// 			callback.call( window, jc.page.prop.templateHtml[html] );
-// 		}
-// 	},
 	changed : s => {
 		if ( AS.test.def( s ) ) {
 			jc.page.prop.changed = !! s;
