@@ -94,7 +94,10 @@ jc.edit = {
 		let d = jc.edit.data();
 		let t = b.subtype||b.type;
 		if ( ! jc.edit.form[t] ) return;
-		jc.edit.getModal().on('shown.bs.modal',()=>{ AS.form.create( jc.edit.form[t].call(window,b,d) ); }).modal('show');
+		let $mod = jc.edit.getModal();
+		$mod.on('shown.bs.modal',()=>{ AS.form.create( jc.edit.form[t].call(window,b,d) ); });
+		console.log( $mod );
+		$mod.modal('show');
 	},
 	form : {
 		_base : (b,d)=>{
@@ -102,14 +105,16 @@ jc.edit = {
 			let t = b.subtype||b.type;
 			$('.modal-dialog',$mod).append(`<div class="modal-content">
 				<div class="modal-header" style="background-color:#eee;padding:16px 20px;">
-					<p style="margin:0;padding:0;">
-						<span class="jcicon modalCloser" style="float:right;cursor:pointer;" onclick="jc.edit.noModal()">${ AS.icon('circleClose') }</span>
+					<p class="modal-title">
 						<span class="jcicon">${ AS.icon('edit') }</span> 
 						<b>
 							${ AS.label('Edit') } “${ jc.page.current() }”${ jc.page.data().id ? ' ID: '+jc.page.data().id : '' },
 							${ b.prop }${ b.qt ? ' ['+(b.idx +1)+'/'+b.qt+']':'' }
 						</b>
 					</p>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>
+					</button>
 				</div>
 				<div class="modal-body" id="jcPageEditor"></div>
 			</div>`);
@@ -235,9 +240,9 @@ jc.edit = {
 			if (empty) $('.modal-dialog',mod).html('');
 			return mod;
 		}
-		mod = $('<div id="jcEditModalLg" class="modal" data-backdrop="static"><div class="modal-dialog modal-lg"></div></div>');
+		mod = $('<div id="jcEditModalLg" class="modal" tabindex="-1"><div class="modal-dialog modal-lg"></div></div>');
 		$(document.body).append( mod );
-		return mod;
+		return $('#jcEditModalLg',document.body);
 	},
 	noModal : () => {
 		let mod = jc.edit.getModal();

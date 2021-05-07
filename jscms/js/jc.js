@@ -563,10 +563,11 @@ jc.autoAdjustFields = ( d ) => {
 jc.URI = {
 	decode : ()=>{
 		let parsitems,fakepath='';
-		if ( window.location.href.indexOf(jc.prop.uriPrefixPlain)>=0) {
-			parsitems =  window.location.href.substr(window.location.href.indexOf(jc.prop.uriPrefixPlain)+jc.prop.uriPrefixPlain.length);
-		} else if (window.location.href.indexOf(jc.prop.uriPrefixOfbs)>=0) {
-			parsitems =  window.location.href.substr(window.location.href.indexOf(jc.prop.uriPrefixOfbs)+jc.prop.uriPrefixOfbs.length);
+		let l = window.location.href.replace(/#.*/,'');
+		if ( l.indexOf(jc.prop.uriPrefixPlain)>=0) {
+			parsitems =  l.substr(window.location.href.indexOf(jc.prop.uriPrefixPlain)+jc.prop.uriPrefixPlain.length);
+		} else if (l.indexOf(jc.prop.uriPrefixOfbs)>=0) {
+			parsitems =  l.substr(window.location.href.indexOf(jc.prop.uriPrefixOfbs)+jc.prop.uriPrefixOfbs.length);
 		} else {
 			return {};
 		}
@@ -1366,9 +1367,38 @@ jc.page = {
 		}).then( retdata => {
 			// retdata is empty for PUT
 			// console.log('RETURNED-DATA',retdata);
-			if ( ok ) window.setTimeout(()=>{ jc.page.saved.call(window,data,page,id); },500);
+			if ( ok ) if ( ok ) window.setTimeout(()=>{ jc.page.updatePagelist.call( window, data, page, id ); },10);
 		}).catch( error => {
 			console.log('PUT ERROR', error);
+		});
+	},
+	updatePagelist : ( data, page, id ) => {
+		let md = data.metadata;
+		let url = AS.path('jsdataroot') + 'struct/pagelist.js';
+		let ok = false;
+		fetch(
+			url, { method: 'GET'}
+		).then(
+			response => response.json()
+		).then( pl => {
+			if ( AS.test.udef(pl[md.type]) ) pl[md.type] = {};
+			pl[md.type]['id'+(md.id?md.id:'')] = {title:md.title};
+			fetch(
+				url,
+				{
+					method: 'PUT',
+					headers: { 'Content-type': 'application/json; charset=UTF-8' },
+					body: JSON.stringify(pl)
+				}
+			).then( response => {
+				ok = !!( response.ok && response.type );
+			}).then( retdata => {
+				if ( ok ) window.setTimeout(()=>{ jc.page.saved.call(window,data,page,id); },500);
+			}).catch( error => {
+				console.log('PUT ERROR', error);
+			});
+		}).catch( error => {
+			console.log('GET ERROR', error);
 		});
 	},
 	saved : ( data, page, id ) => {

@@ -56,3 +56,7 @@ body {
                 position : relative;
                 border: solid 1px #ccc;
 }
+#topNavbar {
+	margin: -10px -10px 10px -10px;
+}
+#topNavbar a[onclick] { cursor: pointer; }

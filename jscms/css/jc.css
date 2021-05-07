@@ -6,7 +6,7 @@ body .dataTable thead .sorting_asc, body .dataTable thead .sorting_desc { color:
 body .dataTable thead .sorting:after, body .dataTable thead .sorting_asc_disabled:after, body .dataTable thead .sorting_desc_disabled:after { color: #666; content: "◇"; }
 body .dataTable thead .sorting.sorting_asc:after { color: #36c; content: "△"; }
 body .dataTable thead .sorting.sorting_desc:after { color: #36c; content: "▽"; }
-.jcicon svg { display: inline-block; height: 32px; margin: 0; padding: 0; width: 32px; }
+.jcicon svg { display: inline-block; height: 24px; margin: 0; padding: 0; width: 24px; }
 .jcicon.danger svg { fill: #c00; }
 .jcicon.warning svg { fill: #c90; }
 p .jcicon svg { display: inline; height: 18px; line-height: 1px; vertical-align: -2px; width: 18px; }
@@ -70,3 +70,4 @@ h { display: none; }
 .jcEditMenu span + span { margin-left: 2px; }
 .jcEditable .jcEditMenu span:hover { background-color: #336; cursor: pointer; fill: #ffc; }
 .jcEditMenu span svg { display: block; height: 18px; margin: 4px; padding: 0; width: 18px; }
+svg { vertical-align: unset; }
