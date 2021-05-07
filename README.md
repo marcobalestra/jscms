@@ -43,7 +43,8 @@ of (personal) ordinary sites with a few users and only one administrator.
 * A server with some operating system (this excludes Windows)
 * Apache  2.x web server (possibly ≥ 2.4)
 * Apache modules: `auth_basic`, `rewrite`, `include`, `dav`, `dav_fs`, `cgi`
-* It’s strongly suggested to use Apache module `deflate`
+* It’s strongly suggested to use Apache module `deflate`<br />
+Given the nature of the traffic (mainly JSON and JS) `deflate` makes site navigation light-speed fast.
 
 You may have noticed that `cgi` module… It’s required to perform a few (simple and minimal) SSI “exec”:
 only authenticated, only minimal (e.g.: list files name in data directory matching some pattern).
