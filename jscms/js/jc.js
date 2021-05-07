@@ -997,6 +997,13 @@ jc.page = {
 		if ( ! AS && AS.labels && AS.labels.loaded ) return setTimeout( ()=>{ jc.page.open(page, id, data, infokey) }, 100);
 		let initialargs = JSON.parse(JSON.stringify([page,data]));
 		if ( ! page ) page = 'index';
+		if ( page == jc.page.current() ) {
+			if ( id ) {
+				if ( jc.page.data() && ( id == jc.page.data().id )) return;
+			} else {
+				return;
+			}
+		}
 		if ( AS.test.str(data) ) data = $.parseParams( data );
 		if ( data && AS.test.str(data.template) ) {
 			if (! infokey) infokey = String(data.template);
@@ -1217,9 +1224,11 @@ jc.page = {
 		$menu.html('');
 		$menu.addClass('jcMenuParsed');
 		if ( jc.prop.authUser ) {
+			$(document.body).addClass('jcUserAuth');
 			$menu.append(`<div class="jcicon jcAuth">${ AS.icon('user') }</div><div class="jcUser">${ jc.prop.authUser }</div>`);
 			$menu.on('click contextmenu',jc.actionsMenu);
 		} else {
+			$(document.body).removeClass('jcUserAuth');
 			$menu.append(`<span class="jcicon jcUnauth">${ AS.icon('lock') }</span>`);
 			$('.jcUnauth',$menu).on('click',jc.page.login);
 		}
