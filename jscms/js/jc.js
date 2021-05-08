@@ -321,6 +321,28 @@ jc.fileSize = (n) => {
 	return String(n)+'B';
 };
 
+jc.jdata = {
+	get : ( url, callback ) => {
+		$.ajax( AS.path('jsdataroot') + url, {
+			method: 'GET',
+			cache: false,
+			dataType: 'json',
+			error: (...errs) => { callback.call(window,false,errs); },
+			success : (data) => { callback.call(window,data); }
+		});
+	},
+	put : ( url, data, callback ) => {
+		$.ajax( AS.path('jsdataroot') + url, {
+			method: 'PUT',
+			dataType: 'json',
+			contentType: 'application/json; charset=UTF-8',
+			data: AS.test.obj(data) ? JSON.stringify(data) : data,
+			error: (...errs) => { callback.call(window,false,errs); },
+			success : () => { callback.call(window,true); }
+		});
+	},
+};
+
 jc.menu = (ev,menu)=>{
 	ev.preventDefault();
 	ev.stopPropagation();
@@ -1343,11 +1365,37 @@ jc.page = {
 			jc.page.reload();
 		}
 	},
-	save : ( data, page, id ) => {
+	create : ( data, page ) => { jc.page.save( data, page, 'new' ); },
+	save : ( data, page, id, typelist, fulllist ) => {
 		if ( AS.test.udef(data)) data = jc.edit.data();
 		if ( AS.test.udef(page)) page = jc.page.current();
 		if ( AS.test.udef(id) ) id = (jc.page.data()||{}).id;
-		delete( data.template );
+		if ( AS.test.udef(typelist)) {
+			jc.jdata.get('struct/type-'+page+'-list.js',(l)=>{
+				jc.page.save( data, page, id, (l||{}), fulllist );
+			})
+			return;
+		}
+		if ( AS.test.udef(fulllist)) {
+			jc.jdata.get('struct/whole-list.js',(l)=>{
+				jc.page.save( data, page, id, typelist, (l||{}) );
+			})
+			return;
+		}
+		let isNew = (id=='new');
+		if ( isNew ) {
+			if ( Object.keys(typelist).length ) {
+				let max = 0;
+				Object.keys(typelist).forEach( k => {
+					let n = parseInt(k);
+					if ( (!isNaN(n)) && ( n >= max )) max = n+1;
+				} );
+				if ( max > 0 ) id = max;
+			} else {
+				id = 1;
+			}
+		}
+		if ( AS.test.udef(data.metadata) ) data.metadata = {};
 		Object.keys(data).forEach( k => {
 			if ( AS.test.arr(data[k])) data[k].forEach( i => {
 				if ( AS.test.obj(i) && ! AS.test.arr(i) ) {
@@ -1356,66 +1404,35 @@ jc.page = {
 				}
 			} );
 		} );
-		let edata = JSON.stringify(data);
-		let url = AS.path('jsdataroot') + page + ( id ? id : '') + '.js';
-		let ok = false;
-		fetch(
-			url,
-			{
-				method: 'PUT', // Method itself
-				headers: {
-					'Content-type': 'application/json; charset=UTF-8' // Indicates the content
-				},
-				body: edata // We send data in JSON format
-			}
-		).then( response => {
-			// console.log('RESPONSE',response);
-			// can chek for response.ok => true
-			// console.log('SAVED!');
-			ok = !!( response.ok && response.type );
-		}).then( retdata => {
-			// retdata is empty for PUT
-			// console.log('RETURNED-DATA',retdata);
-			if ( ok ) if ( ok ) window.setTimeout(()=>{ jc.page.updatePagelist.call( window, data, page, id ); },10);
-		}).catch( error => {
-			console.log('PUT ERROR', error);
-		});
-	},
-	updatePagelist : ( data, page, id ) => {
-		let md = data.metadata;
-		let url = AS.path('jsdataroot') + 'struct/pagelist.js';
-		let ok = false;
-		fetch(
-			url, { method: 'GET'}
-		).then(
-			response => response.json()
-		).then( pl => {
-			if ( AS.test.udef(pl[md.type]) ) pl[md.type] = {};
-			pl[md.type]['id'+(md.id?md.id:'')] = {title:md.title};
-			fetch(
-				url,
-				{
-					method: 'PUT',
-					headers: { 'Content-type': 'application/json; charset=UTF-8' },
-					body: JSON.stringify(pl)
-				}
-			).then( response => {
-				ok = !!( response.ok && response.type );
-			}).then( retdata => {
-				if ( ok ) window.setTimeout(()=>{ jc.page.saved.call(window,data,page,id); },500);
-			}).catch( error => {
-				console.log('PUT ERROR', error);
+		if ( id ) {
+			data.id = id;
+			data.metadata.id = id;
+		}
+		let tpd = {
+			title: data.metadata.title || page,
+			desc: data.metadata.description || '',
+			upd: (new Date()).getTime(),
+			user: jc.prop.authUser
+		};
+		jc.jdata.put( page + ( id ? id : '') + '.js', data, ()=>{
+			if ( AS.test.udef(fulllist[page]) ) fulllist[page] = {};
+			fulllist[page][String(id?id:0)] = tpd;
+			jc.jdata.put('struct/whole-list.js',fulllist,()=>{
+				typelist[String(id?id:0)] = tpd;
+				jc.jdata.put('struct/type-'+page+'-list.js',typelist,()=>{
+					if ( jc.edit ) jc.edit.data(false);
+					if ( isNew ) {
+						jc.springLoad('module:edit');
+						jc.page.prop.editMode = true;
+					} else {
+						swal({ title: AS.label('PageSavedTitle'), text: AS.label('PageSavedBody',{page:page,id:id}), type: "success" });
+						window.setTimeout(()=>{ swal.close() },2000);
+					}
+					jc.page.open( page, id );
+				});
 			});
-		}).catch( error => {
-			console.log('GET ERROR', error);
 		});
-	},
-	saved : ( data, page, id ) => {
-		swal({ title: AS.label('PageSavedTitle'), text: AS.label('PageSavedBody',{page:page,id:id}), type: "success" });
-		window.setTimeout(()=>{ swal.close() },2000);
-		jc.edit.data(false);
-		jc.page.reload();
-	},
+	}
 };
 
 jc.actionsMenu = (e) => {
