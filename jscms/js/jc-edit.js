@@ -269,6 +269,9 @@ jc.edit.meta = {
 			<div class="modal-body" id="jcPageEditor"></div></div>`);
 		fp = JSON.parse(JSON.stringify(pd.template.metadata.form));
 		fp.callback = f=> { f.parse(ed.metadata) };
+		fp.target = 'jcPageEditor';
+		fp.options.effectduration = 0;
+		fp.options.theme = 'light';
 		fp.options.title = `${ AS.label('Properties') }: “${ ed.metadata.type }”${ ed.metadata.id ? ' ID: '+ed.metadata.id : '' }`;
 		fp.options.jsaction = (fd,f) => {
 			f.destroy();
