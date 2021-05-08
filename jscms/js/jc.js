@@ -1271,6 +1271,7 @@ jc.page = {
 				$('.jcMenu').removeClass('jcMenuParsed');
 				jc.page.checkJcMenu();
 				let ep = (new Date()).getTime();
+				jc.springLoad('module:edit');
 				if ( (ep - sp) > 2000 ) {
 					swal({ title: AS.label('LoginDoneTitle'), text: AS.label('LoginDoneBody',{user:jc.prop.authUser}), type: "success" });
 				}

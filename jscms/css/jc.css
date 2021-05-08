@@ -70,3 +70,6 @@ h { display: none; }
 .jcEditMenu span + span { margin-left: 2px; }
 .jcEditable .jcEditMenu span:hover { background-color: #336; cursor: pointer; fill: #ffc; }
 .jcEditMenu span svg { display: block; height: 18px; margin: 4px; padding: 0; width: 18px; }
+
+/* Bootstrap enhancements */
+.text-white { fill: #fff; }

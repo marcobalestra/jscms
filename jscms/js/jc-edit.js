@@ -105,7 +105,7 @@ jc.edit = {
 			let $mod = jc.edit.getModal(true);
 			let t = b.subtype||b.type;
 			$('.modal-dialog',$mod).append(`<div class="modal-content">
-				<div class="modal-header" style="background-color:#eee;">
+				<div class="modal-header bg-light">
 					<p class="modal-title">
 						<span class="jcicon">${ AS.icon('edit') }</span> 
 						<b>
@@ -261,7 +261,11 @@ jc.edit.meta = {
 		if ( AS.test.udef(ed.metadata) ) ed.metadata = { type: jc.page.current(), id: pd.id };
 		let $mod = jc.edit.getModal(true);
 		$('.modal-dialog',$mod).append(`<div class="modal-content">
-			<div class="modal-header">
+			<div class="modal-header bg-info text-white">
+				<p class="modal-title">
+					<span class="jcicon">${ AS.icon('metadata') }</span> 
+					<b>${ AS.label('Properties') }</b>
+				</p>
 				<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
 					<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>
 				</button>
@@ -272,7 +276,7 @@ jc.edit.meta = {
 		fp.target = 'jcPageEditor';
 		fp.options.effectduration = 0;
 		fp.options.theme = 'light';
-		fp.options.title = `${ AS.label('Properties') }: “${ ed.metadata.type }”${ ed.metadata.id ? ' ID: '+ed.metadata.id : '' }`;
+		fp.options.title = `“${ ed.metadata.type }”${ ed.metadata.id ? ' ID: '+ed.metadata.id : '' }`;
 		fp.options.jsaction = (fd,f) => {
 			f.destroy();
 			jc.edit.noModal();
