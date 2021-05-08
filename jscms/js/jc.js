@@ -1425,9 +1425,11 @@ jc.page = {
 						jc.springLoad('module:edit');
 						jc.page.prop.editMode = true;
 					} else {
+						jc.page.prop.editMode = false;
 						swal({ title: AS.label('PageSavedTitle'), text: AS.label('PageSavedBody',{page:page,id:id}), type: "success" });
 						window.setTimeout(()=>{ swal.close() },2000);
 					}
+					jc.page.current('-');
 					jc.page.open( page, id );
 				});
 			});
