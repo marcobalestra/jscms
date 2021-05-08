@@ -1386,6 +1386,8 @@ jc.page = {
 		}
 		let isNew = (id=='new');
 		if ( isNew ) {
+			jc.springLoad('module:edit');
+			jc.page.prop.editMode = true;
 			if ( Object.keys(typelist).length ) {
 				let max = 0;
 				Object.keys(typelist).forEach( k => {
@@ -1422,31 +1424,42 @@ jc.page = {
 			fulllist[page][String(id?id:0)] = tpd;
 			jc.jdata.put('struct/whole-list.js',fulllist,()=>{
 				typelist[String(id?id:0)] = tpd;
-				let lasts = [];
-				Object.keys(typelist).forEach( k => { lasts.push( typelist[k] ); } );
-				lasts.sort( (a,b) => { b.upd - a.upd });
-				lasts.splice(99);
-				jc.jdata.put('struct/last100-'+page+'-list.js',lasts);
-				lasts.splice(49);
-				jc.jdata.put('struct/last50-'+page+'-list.js',lasts);
-				lasts.splice(9);
-				jc.jdata.put('struct/last10-'+page+'-list.js',lasts);
 				jc.jdata.put('struct/type-'+page+'-list.js',typelist,()=>{
-					if ( jc.edit ) jc.edit.data(false);
-					if ( isNew ) {
-						jc.springLoad('module:edit');
-						jc.page.prop.editMode = true;
-					} else {
-						jc.page.prop.editMode = false;
-						swal({ title: AS.label('PageSavedTitle'), text: AS.label('PageSavedBody',{page:page,id:id}), type: "success" });
-						window.setTimeout(()=>{ swal.close() },2000);
-					}
-					jc.page.current('-');
-					jc.page.open( page, id );
+					jc.page.makeLasts( page, typelist, ()=>{
+						if ( jc.edit ) jc.edit.data(false);
+						if ( ! isNew ) {
+							jc.page.prop.editMode = false;
+							swal({ title: AS.label('PageSavedTitle'), text: AS.label('PageSavedBody',{page:page,id:id}), type: "success" });
+							window.setTimeout(()=>{ swal.close() },2000);
+						}
+						jc.page.current('-');
+						jc.page.open( page, id );
+					});
 				});
 			});
 		});
-	}
+	},
+	makeLasts : ( page, list, callback ) => {
+		if ( AS.test.udef(list) ) {
+			jc.jdata.get('struct/type-'+page+'-list.js',(l)=>{
+				jc.page.makeLasts( page, (l||{}), callback );
+			})
+			return;
+		}
+		let lasts = [];
+		Object.keys(list).forEach( k => { lasts.push( list[k] ); } );
+		lasts.sort( (a,b) => { b.upd - a.upd });
+		lasts.splice(99);
+		jc.jdata.put('struct/last100-'+page+'-list.js',lasts,()=>{
+			lasts.splice(49);
+			jc.jdata.put('struct/last50-'+page+'-list.js',lasts,()=>{
+				lasts.splice(9);
+				jc.jdata.put('struct/last10-'+page+'-list.js',lasts,()=>{
+					if (AS.test.func(callback)) callback.call(window);
+				});
+			});
+		});
+	},
 };
 
 jc.actionsMenu = (e) => {
