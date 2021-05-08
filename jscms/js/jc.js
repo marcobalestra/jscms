@@ -1259,6 +1259,7 @@ jc.page = {
 		} else {
 			$(document.body).removeClass('jcUserAuth');
 			$menu.append(`<span class="jcicon jcUnauth">${ AS.icon('lock') }</span>`);
+			$menu.off('click contextmenu',jc.actionsMenu);
 			$('.jcUnauth',$menu).on('click',jc.page.login);
 		}
 	},
