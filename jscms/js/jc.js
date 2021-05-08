@@ -323,6 +323,7 @@ jc.fileSize = (n) => {
 
 jc.jdata = {
 	get : ( url, callback ) => {
+		if (! AS.test.func(callback)) callback = ()=>{};
 		$.ajax( AS.path('jsdataroot') + url, {
 			method: 'GET',
 			cache: false,
@@ -332,6 +333,7 @@ jc.jdata = {
 		});
 	},
 	put : ( url, data, callback ) => {
+		if (! AS.test.func(callback)) callback = ()=>{};
 		$.ajax( AS.path('jsdataroot') + url, {
 			method: 'PUT',
 			dataType: 'json',
@@ -1414,11 +1416,21 @@ jc.page = {
 			upd: (new Date()).getTime(),
 			user: jc.prop.authUser
 		};
+		if ( id ) tpd.id = parseInt(id);
 		jc.jdata.put( page + ( id ? id : '') + '.js', data, ()=>{
 			if ( AS.test.udef(fulllist[page]) ) fulllist[page] = {};
 			fulllist[page][String(id?id:0)] = tpd;
 			jc.jdata.put('struct/whole-list.js',fulllist,()=>{
 				typelist[String(id?id:0)] = tpd;
+				let lasts = [];
+				Object.keys(typelist).forEach( k => { lasts.push( typelist[k] ); } );
+				lasts.sort( (a,b) => { b.upd - a.upd });
+				lasts.splice(99);
+				jc.jdata.put('struct/last100-'+page+'-list.js',lasts);
+				lasts.splice(49);
+				jc.jdata.put('struct/last50-'+page+'-list.js',lasts);
+				lasts.splice(9);
+				jc.jdata.put('struct/last10-'+page+'-list.js',lasts);
 				jc.jdata.put('struct/type-'+page+'-list.js',typelist,()=>{
 					if ( jc.edit ) jc.edit.data(false);
 					if ( isNew ) {
