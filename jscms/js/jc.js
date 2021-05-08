@@ -621,7 +621,7 @@ jc.URI = {
 		jc.console('Decoded location:',pars);
 		return pars;
 	},
-	encode : o=>{
+	encode : (o,title)=>{
 		if ( ! AS.test.str(o.page) ) return '/';
 		let uri = '';
 		if ( AS.test.obj(o.data) ) {
@@ -653,7 +653,8 @@ jc.URI = {
 		} else {
 			uri = jc.prop.uriPrefixPlain + uri;
 		}
-		if ( o.data && o.data._fakepath ) uri += '/' + o.data._fakepath;
+		if ( AS.test.def(title) )  uri += '/' + title.toLowerCase().replace(/[^a-z0-9._]+/g,' ').trim().replace(/ +/g,'-');
+		else if ( o.data && o.data._fakepath ) uri += '/' + o.data._fakepath;
 		jc.console('Encoded location:',uri);
 		return uri;
 	},
@@ -661,10 +662,14 @@ jc.URI = {
 		let uriparams = {};
 		if ( jc.page.current() ) {
 			uriparams.page = jc.page.current();
-			if ( AS.test.obj( jc.page.data() ) ) uriparams.data = jc.page.data();
+			let data = jc.page.data();
+			if ( AS.test.obj( jc.page.data() ) ) uriparams.data = data;
+			if ( AS.test.udef(title) )  {
+				if ( data.pageContent.metadata.url ) title = data.pageContent.metadata.url;
+				else if ( data.id && data.pageContent.metadata.title ) title = data.pageContent.metadata.title;
+			}
 		}
-		let up = jc.URI.encode( uriparams );
-		if ( AS.test.udef(title)) title = $('#appAction').html() || document.title;
+		let up = jc.URI.encode( uriparams, title );
 		if ( up != jc.prop.lastHiEntry ) {
 			jc.prop.lastHiEntry = up;
 			history.pushState({},title, up );

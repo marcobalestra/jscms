@@ -1,1 +1,1 @@
-{"index":{"0":{"title":"JSCMS is here","desc":"JSCMS: preview, still under development","upd":1620469964884,"user":"marco"}}}
+{"index":{"0":{"title":"JSCMS is here!","desc":"JSCMS home page (preview, still under development): the CMS without DB and without server-side languages.","upd":1620473025997,"user":"marco"}}}
