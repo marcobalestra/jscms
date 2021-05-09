@@ -1570,22 +1570,27 @@ jc.page = {
 		if ( AS.test.udef(list) ) {
 			jc.jdav.get('struct/type-'+page+'-list.json',(l)=>{
 				jc.page.makeLasts( page, (l||{}), callback );
-			})
+			});
 			return;
 		}
 		let lasts = [];
-		Object.keys(list).forEach( k => { lasts.push( list[k] ); } );
-		lasts.sort( (a,b) => { b.upd - a.upd });
-		lasts.splice(99);
-		jc.jdav.put('struct/last100-'+page+'-list.json',lasts,()=>{
-			lasts.splice(49);
-			jc.jdav.put('struct/last50-'+page+'-list.json',lasts,()=>{
-				lasts.splice(9);
-				jc.jdav.put('struct/last10-'+page+'-list.json',lasts,()=>{
-					if (AS.test.func(callback)) callback.call(window);
-				});
-			});
+		Object.keys(list).forEach( k => {
+			const pm = list[k];
+			if (!pm.hidden) lasts.push( pm );
 		});
+		lasts.sort( (a,b) => { b.upd - a.upd });
+		qts = [100,50,25,10];
+		let proc = () => {
+			if ( qts.length ) {
+				const qt = qts.shift();
+				lasts.splice(qt -1);
+				jc.jdav.put('struct/last'+qt+'-'+page+'-list.json',lasts,proc);
+				return;
+			} else if (AS.test.func(callback)) {
+				callback.call(window);
+			}
+		}
+		proc();
 	},
 };
 
