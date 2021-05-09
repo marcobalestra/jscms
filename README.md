@@ -57,7 +57,7 @@ the scripts can’t act (read or write) outside jscms directory.
 The use of such scripts (again: small and only authenticated) could be avoided, too bad there is some
 issue in Apache2 WebDAV and PROPFIND method (returning a 403).
 
-### Virtual site configuration
+## Virtual site configuration
 
 Virtual site configuration file will look like this:
 
