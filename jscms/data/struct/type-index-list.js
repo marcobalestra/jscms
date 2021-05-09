@@ -1,1 +1,0 @@
-{"0":{"title":"JSCMS is here!","desc":"JSCMS home page (preview, still under development): the CMS without DB and without server-side languages.","upd":1620473025997,"user":"marco"}}

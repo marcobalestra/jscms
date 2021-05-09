@@ -4,6 +4,7 @@ var jc = { prop : {
 	uriPrefixOfbs: '/_jscms/',
 	useObsUri: false,
 	mainContainerId : 'jcToplevelContainer',
+	absUriMatcher : ( new RegExp("^([^a-z]+:/)?/","i") ),
 	prefs: {
 		debugURI : false,
 		debugLevel : 0,
@@ -33,6 +34,11 @@ jc.prop.loadModules = {
 		AS.path('jsroot') + '/js/jc-edit.js',
 		'https://cdn.altersoftware.org/js-as-form/as-form.js',
 		'wait:()=>( jc.edit && AS.form )',
+		'https://cdn.altersoftware.org/js-as-form/plugin/as-form-basic.js',
+		'https://cdn.altersoftware.org/js-as-form/plugin/as-form-pikaday.js',
+		'https://cdn.altersoftware.org/js-as-form/plugin/as-form-tinymce.js',
+		'https://cdn.altersoftware.org/js-as-form/plugin/as-form-iro.js',
+		'https://cdn.altersoftware.org/js-as-form/plugin/as-form-slider.js',
 	],
 	'datatables': [
 		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
@@ -321,28 +327,174 @@ jc.fileSize = (n) => {
 	return String(n)+'B';
 };
 
-jc.jdata = {
-	get : ( url, callback ) => {
-		if (! AS.test.func(callback)) callback = ()=>{};
-		$.ajax( AS.path('jsdataroot') + url, {
+jc.evalFunc = (f) => {
+	if ( AS.test.func(f) ) return f;
+	if ( AS.test.str(f)) {
+		let exc;
+		try {
+			let ft = eval(f);
+			if ( AS.test.func(ft) ) return ft;
+		} catch(exc) {}
+	}
+	return false;
+};
+
+jc.login = ( success, fail ) => {
+	fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
+	success = jc.evalFunc(success)||(()=>{});
+	jc.jdav.get(
+		AS.path('jsauth') + 'auth/username',
+		(d,err) => {
+			jc.prop.authUser = d ? d.username : undefined;
+			if ( d ) success.call(window,d);
+			else fail.call(window,d,err);
+		}
+	);
+};
+
+jc.dav = {
+	get : ( url, success, fail ) => {
+		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
+		success = jc.evalFunc(success)||(()=>{});
+		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
+		jc.console('jc.dav.get',url);
+		$.ajax( url, {
+			method: 'GET',
+			cache: false,
+			dataType: 'text',
+			error: (...errs) => { fail.call(window,false,errs); },
+			success : (data) => { success.call(window,data); }
+		});
+	},
+	put : ( url, data, success, fail ) => {
+		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
+		success = jc.evalFunc(success)||(()=>{});
+		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
+		if ( ! AS.test.str(data) ) data = String(data);
+		jc.console('jc.dav.put',url,data);
+		$.ajax( url, {
+			method: 'PUT',
+			dataType: 'text',
+			contentType: 'text/plain; charset=UTF-8',
+			data: data,
+			error: (...errs) => { fail.call(window,false,errs); },
+			success : () => { success.call(window,true); }
+		});
+	},
+	mkdir : ( url, success, fail ) => {
+		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
+		success = jc.evalFunc(success)||(()=>{});
+		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
+		jc.console('jc.dav.mkdir',url);
+		$.ajax( url, {
+			method: 'MKCOL',
+			cache: false,
+			dataType: 'text',
+			error: (...errs) => { fail.call(window,false,errs); },
+			success : () => { success.call(window,true); }
+		});
+	},
+	info : ( url, success, fail ) => {
+		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
+		success = jc.evalFunc(success)||(()=>{});
+		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
+		jc.console('jc.dav.info',url);
+		$.ajax( url, {
+			method: 'PROPFIND',
+			cache: false,
+			contentType: 'text/xml; charset=UTF-8',
+			dataType: 'text',
+			error: (...errs) => { fail.call(window,false,errs); },
+			success : (xt) => {
+				let data = { uri: url };
+				xt = xt.replace(/[\r\n]+/g,' ');
+				data.href = xt.replace(/^.+:href>([^<]+)<\/[^:]+:href>.+$/,"$1");
+				data.size = parseInt(xt.replace(/^.+:getcontentlength>([0-9]+)<\/[^:]+:getcontentlength>.+$/,"$1"));
+				success.call(window,data);
+			}
+		});
+	},
+	rm : ( url, success, fail ) => {
+		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
+		success = jc.evalFunc(success)||(()=>{});
+		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
+		jc.console('jc.dav.rm',url);
+		$.ajax( url, {
+			method: 'DELETE',
+			cache: false,
+			contentType: 'text/xml; charset=UTF-8',
+			dataType: 'text',
+			error: (...errs) => { fail.call(window,false,errs); },
+			success : (xt) => { success.call(window,xt); }
+		});
+	},
+	ls : ( ...args ) => {
+		let success,fail,options={};
+		args.forEach( (a) => {
+			if ( AS.test.obj(a)) {
+				if ( a.dir ) options.dir = a.dir;
+				if ( a.ext ) options.ext = a.ext;
+				if ( a.match ) options.match = a.match;
+				return;
+			}
+			let f = jc.evalFunc(a);
+			if ( AS.test.func(f) ) {
+				if ( success ) fail = f;
+				else success = f;
+			}
+			if ( AS.test.str(a) ) {
+				options.dir = a;
+			}
+		} );
+		fail = fail||success||jc.getError;
+		success = success||(()=>{});
+		let url = AS.path('jsauth') + 'auth/lsdata';
+		jc.console('jc.dav.ls',url);
+		$.ajax( url, {
 			method: 'GET',
 			cache: false,
 			dataType: 'json',
-			error: (...errs) => { callback.call(window,false,errs); },
-			success : (data) => { callback.call(window,data); }
+			data : options,
+			error: (...errs) => { fail.call(window,false,errs); },
+			success : (data) => {
+				Object.keys( options ).forEach( k => {
+					if ( options[k] ) data[k] = options[k];
+				} );
+				success.call(window,data);
+			}
 		});
 	},
-	put : ( url, data, callback ) => {
-		if (! AS.test.func(callback)) callback = ()=>{};
-		$.ajax( AS.path('jsdataroot') + url, {
-			method: 'PUT',
-			dataType: 'json',
-			contentType: 'application/json; charset=UTF-8',
-			data: AS.test.obj(data) ? JSON.stringify(data) : data,
-			error: (...errs) => { callback.call(window,false,errs); },
-			success : () => { callback.call(window,true); }
-		});
-	},
+};
+
+jc.jdav = {};
+Object.keys( jc.dav ).forEach( (k) => { jc.jdav[k] = jc.dav[k]; } );
+
+jc.jdav.get = ( url, success, fail ) => {
+	fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
+	success = jc.evalFunc(success)||(()=>{});
+	if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
+	jc.console('jc.jdav.get',url);
+	$.ajax( url, {
+		method: 'GET',
+		cache: false,
+		dataType: 'json',
+		error: (...errs) => { fail.call(window,false,errs); },
+		success : (data) => { success.call(window,data); }
+	});
+};
+jc.jdav.put = ( url, data, success, fail ) => {
+	fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
+	success = jc.evalFunc(success)||(()=>{});
+	if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
+	jc.console('jc.jdav.put',url,data);
+	$.ajax( url, {
+		method: 'PUT',
+		dataType: 'json',
+		contentType: 'application/json; charset=UTF-8',
+		data: AS.test.obj(data) ? JSON.stringify(data) : data,
+		error: (...errs) => { fail.call(window,false,errs); },
+		success : () => { success.call(window,true); }
+	});
 };
 
 jc.menu = (ev,menu)=>{
@@ -960,7 +1112,7 @@ jc.template = {
 					ext = '';
 					dataType='html';
 				}
-				let url = AS.path('jstemplates') + 'parts/'+ key + ext;
+				let url = AS.path('jsdataroot') + 'parts/'+ key + ext;
 				jc.console('jc.template.part.get :',url);
 				jc.template.part.set(key,'_loading_');
 				$.ajax( url, {
@@ -1050,9 +1202,7 @@ jc.page = {
 			if ( AS.test.func(callback) ) callback.call( window, jc.edit.data() );
 			return;
 		}
-		let url = AS.path('jsdataroot') + page;
-		if ( id ) url += id;
-		url += '.js';
+		let url = AS.path('jsdataroot') + page + ( id ? id : '') + '.json';
 		jc.console('loadData',url);
 		$.ajax( url, {
 			method: 'POST',
@@ -1160,16 +1310,9 @@ jc.page = {
 			} );
 		},
 		prepare : ( c, $scope ) => {
-			if ( AS.test.str(c) ) {
-				let exc;
-				try {
-					let f = eval(c);
-					if ( AS.test.func(f)) c = { type:'func', func: f };
-				} catch(exc) {
-					c = { rendered: c };
-				}
-			} else if ( AS.test.func(c) ) {
-				c = { type:'func', func: c };
+			if ( AS.test.str(c) || AS.test.func(c) ) {
+				let ev = jc.evalFunc(c);
+				c = ev ? { type:'func', func: ev } : { rendered: c };
 			}
 			if ( AS.test.obj(c) ) {
 				if ( ! c.type ) {
@@ -1265,25 +1408,16 @@ jc.page = {
 	},
 	login : () => {
 		let sp = (new Date()).getTime();
-		let url = AS.path('jsauth') + 'auth/username';
-		$.ajax( url, {
-			cache: true,
-			method: 'GET',
-			dataType: 'json',
-			error: jc.getError,
-			success: d => {
-				if ( ! d ) return;
-				jc.prop.authUser = d.username;
-				$('.jcMenu').removeClass('jcMenuParsed');
-				jc.page.checkJcMenu();
-				let ep = (new Date()).getTime();
-				jc.springLoad('module:edit');
-				if ( (ep - sp) > 2000 ) {
-					swal({ title: AS.label('LoginDoneTitle'), text: AS.label('LoginDoneBody',{user:jc.prop.authUser}), type: "success" });
-				}
-			},
+		jc.login( (d,err) => {
+			if ( err ) return;
+			$('.jcMenu').removeClass('jcMenuParsed');
+			jc.page.checkJcMenu();
+			let ep = (new Date()).getTime();
+			jc.springLoad('module:edit');
+			if ( (ep - sp) > 2000 ) {
+				swal({ title: AS.label('LoginDoneTitle'), text: AS.label('LoginDoneBody',{user:jc.prop.authUser}), type: "success" });
+			}
 		});
-		return;
 	},
 	blocks : {
 		text : (b,d)=>{
@@ -1317,9 +1451,10 @@ jc.page = {
 	},
 	edit : ( status, savePolicy ) => {
 		let oe = (jc.edit && jc.edit.data())||false;
-		if ( jc.page.prop.editMode = !! status ) {
+		if ( status ) {
 			jc.springLoad('module:edit');
-			if ( ! jc.edit ) return window.setTimeout( ()=>{ jc.page.edit(true) }, 100 );
+			if ( ! jc.edit ) return window.setTimeout( ()=>{ jc.page.edit(status,savePolicy) }, 100 );
+			jc.page.prop.editMode = status;
 			if ( oe ) {
 				swal(
 					{
@@ -1353,7 +1488,6 @@ jc.page = {
 			return;
 		}
 		if ( AS.test.udef(savePolicy)) {
-			jc.page.prop.editMode = true;
 			swal(
 				{
 					title: AS.label('SaveChangesTitle'),
@@ -1363,14 +1497,16 @@ jc.page = {
 					closeOnConfirm: true,
 					closeOnCancel: true,
 				},
-				function (ok) { jc.page.edit(false,ok); }
+				function (ok) { jc.page.edit(status,ok); }
 			);
 			return;
 		}
 		if (savePolicy) {
 			jc.page.save( oe );
+			jc.page.prop.editMode = status;
 		} else {
 			jc.edit.data(false);
+			jc.page.prop.editMode = status;
 			jc.page.reload();
 		}
 	},
@@ -1380,13 +1516,13 @@ jc.page = {
 		if ( AS.test.udef(page)) page = jc.page.current();
 		if ( AS.test.udef(id) ) id = (jc.page.data()||{}).id;
 		if ( AS.test.udef(typelist)) {
-			jc.jdata.get('struct/type-'+page+'-list.js',(l)=>{
+			jc.jdav.get('struct/type-'+page+'-list.json',(l)=>{
 				jc.page.save( data, page, id, (l||{}), fulllist );
 			})
 			return;
 		}
 		if ( AS.test.udef(fulllist)) {
-			jc.jdata.get('struct/whole-list.js',(l)=>{
+			jc.jdav.get('struct/whole-list.json',(l)=>{
 				jc.page.save( data, page, id, typelist, (l||{}) );
 			})
 			return;
@@ -1426,12 +1562,12 @@ jc.page = {
 			user: jc.prop.authUser
 		};
 		if ( id ) tpd.id = parseInt(id);
-		jc.jdata.put( page + ( id ? id : '') + '.js', data, ()=>{
+		jc.jdav.put( page + ( id ? id : '') + '.json', data, ()=>{
 			if ( AS.test.udef(fulllist[page]) ) fulllist[page] = {};
 			fulllist[page][String(id?id:0)] = tpd;
-			jc.jdata.put('struct/whole-list.js',fulllist,()=>{
+			jc.jdav.put('struct/whole-list.json',fulllist,()=>{
 				typelist[String(id?id:0)] = tpd;
-				jc.jdata.put('struct/type-'+page+'-list.js',typelist,()=>{
+				jc.jdav.put('struct/type-'+page+'-list.json',typelist,()=>{
 					jc.page.makeLasts( page, typelist, ()=>{
 						if ( jc.edit ) jc.edit.data(false);
 						if ( ! isNew ) {
@@ -1448,7 +1584,7 @@ jc.page = {
 	},
 	makeLasts : ( page, list, callback ) => {
 		if ( AS.test.udef(list) ) {
-			jc.jdata.get('struct/type-'+page+'-list.js',(l)=>{
+			jc.jdav.get('struct/type-'+page+'-list.json',(l)=>{
 				jc.page.makeLasts( page, (l||{}), callback );
 			})
 			return;
@@ -1457,11 +1593,11 @@ jc.page = {
 		Object.keys(list).forEach( k => { lasts.push( list[k] ); } );
 		lasts.sort( (a,b) => { b.upd - a.upd });
 		lasts.splice(99);
-		jc.jdata.put('struct/last100-'+page+'-list.js',lasts,()=>{
+		jc.jdav.put('struct/last100-'+page+'-list.json',lasts,()=>{
 			lasts.splice(49);
-			jc.jdata.put('struct/last50-'+page+'-list.js',lasts,()=>{
+			jc.jdav.put('struct/last50-'+page+'-list.json',lasts,()=>{
 				lasts.splice(9);
-				jc.jdata.put('struct/last10-'+page+'-list.js',lasts,()=>{
+				jc.jdav.put('struct/last10-'+page+'-list.json',lasts,()=>{
 					if (AS.test.func(callback)) callback.call(window);
 				});
 			});
@@ -1480,7 +1616,7 @@ jc.actionsMenu = (e) => {
 			]}
 		);
 	} else {
-		acts.push({icon:'jcicon',iconKey:'edit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit(true);} });
+		acts.push({icon:'jcicon',iconKey:'edit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} });
 	}
 	jc.menu(e, { content: acts, highlight: false });
 };

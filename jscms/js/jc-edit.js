@@ -97,7 +97,6 @@ jc.edit = {
 		if ( ! jc.edit.form[t] ) return;
 		let $mod = jc.edit.getModal();
 		$mod.on('shown.bs.modal',()=>{ AS.form.create( jc.edit.form[t].call(window,b,d) ); });
-		console.log( $mod );
 		$mod.modal('show');
 	},
 	form : {
