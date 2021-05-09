@@ -82,6 +82,7 @@ Virtual site configuration will look like this:
 	
 	<Directory "/path/to/document-root/jscms/data">
 		Dav On
+		Options -Indexes
 		<LimitExcept GET POST OPTIONS>
 			Require valid-user
 		</LimitExcept>
