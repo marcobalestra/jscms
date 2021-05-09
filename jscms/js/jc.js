@@ -110,10 +110,11 @@ var tp = {};
 /* Global changes */
 
 window.onpopstate = () => {
+	if ( jc.page.prop.editMode ) return;
 	let sp = jc.URI.decode();
 	if ( AS.test.str(sp.page) ) {
 		jc.prop.lastHiEntry = jc.URI.encode( sp );
-		jc.page.open(sp.page,sp.data);
+		jc.page.open(sp.page,sp.id,sp.data);
 	}
 };
 
@@ -207,7 +208,7 @@ if (!Date.prototype.fromita) Date.prototype.fromita = function(s) {
 	return this.fromsql( jc.date2sql(s) );
 };
 
-jc.getError = (jqXHR,status,e) => { console.log(jqXHR,status,e); };
+jc.getError = (jqXHR,status,e) => { jc.console(jqXHR,status,e); };
 
 jc.sql2date = d => ( AS.test.date(d) ? d : (new Date()).fromsql(d) );
 
@@ -259,7 +260,7 @@ jc.springLoad = ( ...sources ) => {
 		if ( ! src ) return undefined;
 		if ( src.match(/\.css$/i ) ) return jc.springLoadCss( src );
 		if ( src.match(/\.js$/i ) ) return jc.springLoadJs( src );
-		console.log( 'jc.springLoad unknown element: '+src);
+		jc.console( 'jc.springLoad unknown element: '+src);
 	} );
 	if ( wait && (ps.length > 0) ) {
 		let waiter = () => {
@@ -578,7 +579,7 @@ jc.menu = (ev,menu)=>{
 		$cm.append($ul);
 	} else {
 		$cm.remove();
-		console.log('jc.menu error',e,menu);
+		jc.console('jc.menu error',e,menu);
 		return undefined;
 	}
 	let left, top;
@@ -751,7 +752,7 @@ jc.URI = {
 			fakepath = parsitems.replace(/^.+\/(.*)$/,"$1");
 			parsitems = parsitems.replace(/\/.*$/,'');
 		}
-		if (window.location.href.indexOf(jc.prop.uriPrefixOfbs)>=0) parsitems = window.atob(parsitems);
+		if (l.indexOf(jc.prop.uriPrefixOfbs)>=0) parsitems = window.atob(parsitems);
 		parsitems = parsitems.split(',');
 		let pars={ page: decodeURIComponent(parsitems.shift()) };
 		if ( pars.page == '' ) return {};
@@ -1076,18 +1077,8 @@ jc.template = {
 			let v = jc.template.prop.html[key];
 			if ( ! v ) {
 				let url = AS.path('jstemplates') + 'html/'+ key + '.html';
-				jc.console('jc.template.html.get :',url);
 				jc.template.html.set(key,'_loading_');
-				$.ajax( url, {
-					cache: true,
-					method: 'GET',
-					dataType: 'html',
-					error: jc.getError,
-					success: h => {
-						jc.template.html.set(key,h);
-						jc.template.html.get( key, callback );
-					},
-				});
+				jc.dav.get( url, (h)=>{ jc.template.html.set(key,h); jc.template.html.get( key, callback ); }, jc.getError);
 				return;
 			} else if ( v == '_loading_' ) {
 				setTimeout( ()=>{ jc.template.html.get(key,callback) }, 100 );
@@ -1112,18 +1103,11 @@ jc.template = {
 					ext = '';
 					dataType='html';
 				}
-				let url = AS.path('jsdataroot') + 'parts/'+ key + ext;
-				jc.console('jc.template.part.get :',url);
 				jc.template.part.set(key,'_loading_');
-				$.ajax( url, {
-					method: 'GET',
-					dataType: dataType,
-					error: jc.getError,
-					success: j => {
-						jc.template.part.set(key,j);
-						jc.template.part.get(key,callback);
-					},
-				});
+				jc.dav.get( 'parts/'+ key + ext, j =>{
+					jc.template.part.set(key,j);
+					jc.template.part.get(key,callback);
+				},jc.getError);
 				return;
 			} else if ( v == '_loading_' ) {
 				setTimeout( ()=>{ jc.template.part.get(key,callback) }, 100 );
@@ -1345,13 +1329,13 @@ jc.page = {
 							let f = eval(t);
 							t = f;
 						} catch(e) {
-							console.log('Error evaluating external JS render',url,o,e);
+							jc.console('Error evaluating external JS render',url,o,e);
 						}
 						if ( AS.test.func(t) ) {
 							jc.page.prop.renderers[o.render] = t;
 							jc.page.render.customJs( o );
 						} else {
-							console.log('External JS render not a function',url,o,t);
+							jc.console('External JS render not a function',url,o,t);
 						}
 					},
 				});
