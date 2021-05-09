@@ -46,13 +46,6 @@ of (personal) ordinary sites with a few users and only one administrator.
 * It’s strongly suggested to use Apache module `deflate`<br />
 Given the nature of the traffic (mainly JSON and JS) `deflate` makes site navigation light-speed fast.
 
-<small>You may have noticed that `cgi` module… It’s required to perform a few (simple and minimal) SSI “exec”:
-only authenticated, only minimal (e.g.: list files name in data directory matching some pattern).<br />
-It’s done through few script lines (sh or vanilla perl), parameters are accurately “sanitized” and
-the scripts can’t act (read or write) outside jscms directory.<br />
-The use of such scripts (again: small and only authenticated) could be avoided, too bad there is some
-issue in Apache2 WebDAV and PROPFIND method (returning a 403).</small>
-
 Virtual site configuration will look like this:
 
 ```
@@ -92,3 +85,14 @@ Virtual site configuration will look like this:
 	</Directory>
 	
 ```
+
+### Note
+
+You may have noticed that `cgi` module… It’s required to perform a few (simple and minimal) SSI “exec”:
+only authenticated, only minimal (e.g.: list files name in data directory matching some pattern).
+
+It’s done through few script lines (sh or vanilla perl), parameters are accurately “sanitized” and
+the scripts can’t act (read or write) outside jscms directory.
+
+The use of such scripts (again: small and only authenticated) could be avoided, too bad there is some
+issue in Apache2 WebDAV and PROPFIND method (returning a 403).
