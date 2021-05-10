@@ -363,7 +363,7 @@ jc.progress = ( msg ) => {
 	let first = false;
 	if ( mod.length == 0 ) {
 		first = true;
-		mod = $('<div id="jcProgressIndicator" class="modal" tabindex="-1"><div class="modal-dialog"><div class="modal-body"></div></div></div>');
+		mod = $('<div id="jcProgressIndicator" class="modal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"></div></div></div></div>');
 		$(document.body).append( mod );
 		mod = $('#jcProgressIndicator',document.body);
 	}
