@@ -365,12 +365,12 @@ jc.progress = ( msg ) => {
 	let first = false;
 	if ( mod.length == 0 ) {
 		first = true;
-		mod = $('<div id="jcProgressIndicator" class="modal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"></div></div></div></div>');
+		mod = $(AS.label('modalProgress'));
 		$(document.body).append( mod );
 		mod = $('#jcProgressIndicator',document.body);
 	}
 	if ( AS.test.str(msg) ) {
-		$('.modal-body',mod).html(msg);
+		$('.progressMessage',mod).html(msg);
 		mod.modal('handleUpdate');
 		if ( first || (! mod.hasClass('in')) ) mod.modal({backdrop:'static',keyboard:false,show:true});
 	} else {
@@ -1634,6 +1634,7 @@ jc.page = {
 									showCancelButton:false,
 									showConfirmButton:false,
 									timer: 2000,
+									timerProgressBar: true,
 								});
 							},100);
 						}

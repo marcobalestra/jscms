@@ -17,6 +17,7 @@ AS.labels.load('en',[{
 	'menuEditOverDiscard' : 'Discard changes',
 	'menuEditOverSave' : 'Save changes',
 	'menuEditStart' : 'Edit page',
+	'modalProgress' : '<div id="jcProgressIndicator" class="modal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><span class="jcicon progressIcon">{{icon:progress}}</span><span class="progressMessage"></span></div></div></div></div>',
 	'NewPage' : 'Create page',
 	'onlyNonEmptyFields' : 'Field not included if empty',
 	'PageDescription' : 'Description',
