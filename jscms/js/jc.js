@@ -1531,11 +1531,11 @@ jc.page = {
 		if ( AS.test.udef(params.page)) params.page = jc.page.current();
 		if ( AS.test.udef(params.id) ) params.id = (jc.page.data()||{}).id;
 		if ( AS.test.udef(params.typelist)) {
-			jc.jdav.get('struct/type-'+params.page+'-list.json',(l)=>{ params.typelist = l||{}; jc.page.save( params ); })
+			jc.jdav.get('struct/'+params.page+'-list.json',(l)=>{ params.typelist = l||{}; jc.page.save( params ); })
 			return;
 		}
 		if ( AS.test.udef(params.fulllist)) {
-			jc.jdav.get('struct/whole-list.json',(l)=>{ params.fulllist = l||{}; jc.page.save( params ); })
+			jc.jdav.get('struct/_all-list.json',(l)=>{ params.fulllist = l||{}; jc.page.save( params ); })
 			return;
 		}
 		let isNew = (params.id=='new');
@@ -1561,24 +1561,28 @@ jc.page = {
 			} );
 		} );
 		if ( params.id ) {
-			params.data.id = id;
-			params.data.metadata.id = id;
+			params.data.id = params.id;
+			params.data.metadata.id = params.id;
 		}
 		let tpd = {
-			title: params.data.metadata.title || page,
+			title: params.data.metadata.title||'',
 			desc: params.data.metadata.description || '',
 			upd: (new Date()).getTime(),
 			user: jc.prop.authUser
 		};
 		if ( params.data.metadata.hidden ) tpd.hidden = true;
+		if ( params.data.blogdate ) tpd.date = params.data.blogdate;
 		if ( params.id ) tpd.id = parseInt(params.id);
+		if (( ! tpd.title.length) && AS.test.str( params.data.title)) tpd.title = params.data.title.dehtml().shorten(48);
+		if ( ! tpd.title.length ) tpd.title = params.page + ( params.id ? ' '+params.id : '');
+		if (( ! tpd.desc.length) && AS.test.str( params.data.abstract)) tpd.desc = params.data.abstract.dehtml().shorten(256);
 		jc.jdav.put( params.page + ( params.id || '') + '.json', params.data, ()=>{
 			if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
 			params.fulllist[params.page][String(params.id?params.id:0)] = tpd;
 			jc.progress(AS.label('SavingArticleList'));
-			jc.jdav.put('struct/whole-list.json',params.fulllist,()=>{
+			jc.jdav.put('struct/_all-list.json',params.fulllist,()=>{
 				params.typelist[String(params.id?params.id:0)] = tpd;
-				jc.jdav.put('struct/type-'+params.page+'-list.json',params.typelist,()=>{
+				jc.jdav.put('struct/'+params.page+'-list.json',params.typelist,()=>{
 					jc.progress(AS.label('SavingLasts'));
 					jc.page.makeLasts( params.page, params.typelist, ()=>{
 						jc.progress(false);
@@ -1608,7 +1612,7 @@ jc.page = {
 	},
 	makeLasts : ( page, list, callback ) => {
 		if ( AS.test.udef(list) ) {
-			jc.jdav.get('struct/type-'+page+'-list.json',(l)=>{
+			jc.jdav.get('struct/'+page+'-list.json',(l)=>{
 				jc.page.makeLasts( page, (l||{}), callback );
 			});
 			return;
@@ -1625,7 +1629,45 @@ jc.page = {
 			if ( qts.length ) {
 				const qt = qts.shift();
 				lasts.splice(qt -1);
-				jc.jdav.put('struct/last'+qt+'-'+page+'-list.json',lasts,proc);
+				jc.jdav.put('struct/'+page+'-last'+qt+'.json',lasts,proc);
+				return;
+			} else {
+				jc.page.makeDateEntries(page,list,callback);
+			}
+		}
+		proc();
+	},
+	makeDateEntries : ( page, list, callback ) => {
+		if ( AS.test.udef(list) ) {
+			jc.jdav.get('struct/'+page+'-list.json',(l)=>{
+				jc.page.makeDateEntries( page, (l||{}), callback );
+			});
+			return;
+		}
+		let aggr = {};
+		Object.keys(list).forEach( k => {
+			const pm = list[k];
+			if (pm.hidden) return;
+			if ( ! AS.test.str(pm.date) ) return;
+			const dp = pm.date.split('-');
+			if ( dp.length != 3 ) return;
+			aggr[dp[0]] = AS.def.arr(aggr[dp[0]]);
+			aggr[dp[0]].push(pm);
+			aggr[dp[0]+'-'+dp[1]] = AS.def.arr(aggr[dp[0]+'-'+dp[1]]);
+			aggr[dp[0]+'-'+dp[1]].push( pm );
+		});
+		let flist = Object.keys(aggr).map( sel => {
+			let mlist = aggr[sel];
+			mlist.sort( (a,b)=>{
+				if ( a.date == b.date ) return ( a.upd < b.ud ? -1 : 1);
+				return (a.date < b.date ? -1 : 1 );
+			});
+			return {prefix: sel, list: mlist };
+		});
+		let proc = () => {
+			if ( flist.length ) {
+				let f = flist.shift();
+				jc.jdav.put('struct/'+page+'-bydate-'+f.prefix+'.json',f.list,proc);
 				return;
 			} else if (AS.test.func(callback)) {
 				callback.call(window);
