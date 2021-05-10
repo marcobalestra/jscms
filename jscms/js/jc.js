@@ -1460,7 +1460,7 @@ jc.page = {
 		},
 		date : (b,d) => {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
-			return '<p>'+d[b.prop]+'</p>';
+			return '<div class="date">'+(new Date()).fromsql(d[b.prop]).toString().replace(/ *[0-9]{2}:[0-9]{2}:[0-9]{2}.*/,"")+'</div>';
 		},
 		mixed : (b,d) => {
 			if ( ! d[b.prop] ) return '';
@@ -1655,6 +1655,8 @@ jc.page = {
 			params.data.id = params.id;
 			params.data.metadata.id = params.id;
 		}
+		if (( ! params.data.metadata.description ) && AS.test.str( params.data.abstract)) params.data.metadata.description = params.data.abstract.dehtml().shorten(256);
+		if (( ! params.data.metadata.title ) && AS.test.str( params.data.title)) params.data.metadata.title = params.data.title.dehtml().shorten(48);
 		let tpd = {
 			title: params.data.metadata.title||'',
 			desc: params.data.metadata.description || '',
@@ -1666,7 +1668,6 @@ jc.page = {
 		if ( params.id ) tpd.id = parseInt(params.id);
 		if (( ! tpd.title.length) && AS.test.str( params.data.title)) tpd.title = params.data.title.dehtml().shorten(48);
 		if ( ! tpd.title.length ) tpd.title = params.page + ( params.id ? ' '+params.id : '');
-		if (( ! tpd.desc.length) && AS.test.str( params.data.abstract)) tpd.desc = params.data.abstract.dehtml().shorten(256);
 		jc.jdav.put( params.page + ( params.id || '') + '.json', params.data, ()=>{
 			if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
 			params.fulllist[params.page][String(params.id?params.id:0)] = tpd;

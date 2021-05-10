@@ -127,7 +127,7 @@ jc.edit = {
 					jsaction: (fd,fo) => {
 						fo.destroy();
 						jc.edit.noModal();
-						if ( b.qt ) {
+						if ( AS.test.def(b.qt) ) {
 							d[b.prop][b.idx] = fd;
 							jc.edit.fixBlocks(b,d);
 						} else {
@@ -147,6 +147,11 @@ jc.edit = {
 					}
 				},
 			};
+		},
+		date : (b,d) => {
+			let o = jc.edit.form._base(b,d);
+			o.fields.push( ["date","date",{asLabel:'Date',skypempty:true,asTitle:'onlyNonEmptyFields',format:'YYYY-MM-DD',default:(new Date()).tosqldate()}] );
+			return o;
 		},
 		text : (b,d) => {
 			let o = jc.edit.form._base(b,d);
