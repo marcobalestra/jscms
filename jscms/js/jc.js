@@ -360,14 +360,16 @@ jc.login = ( success, fail ) => {
 
 jc.progress = ( msg ) => {
 	let mod = $('#jcProgressIndicator');
+	let first = false;
 	if ( mod.length == 0 ) {
+		first = true;
 		mod = $('<div id="jcProgressIndicator" class="modal" tabindex="-1"><div class="modal-dialog"><div class="modal-body"></div></div></div>');
 		$(document.body).append( mod );
 		mod = $('#jcProgressIndicator',document.body);
 	}
 	if ( AS.test.str(msg) ) {
 		$('.modal-body',mod).html(msg);
-		if ( ! mod.hasClass('in') ) mod.modal('show');
+		if ( first || (! mod.hasClass('in')) ) mod.modal('show');
 	} else {
 		mod.removeClass("in");
 		$(".modal-backdrop").remove();
