@@ -370,7 +370,7 @@ jc.progress = ( msg ) => {
 	if ( AS.test.str(msg) ) {
 		$('.modal-body',mod).html(msg);
 		mod.modal('handleUpdate');
-		if ( first || (! mod.hasClass('in')) ) mod.modal('show');
+		if ( first || (! mod.hasClass('in')) ) mod.modal({backdrop:'static',keyboard:false,show:true});
 	} else {
 		mod.removeClass("in");
 		$(".modal-backdrop").remove();
