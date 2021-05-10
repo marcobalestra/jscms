@@ -1,25 +1,30 @@
-var jc = { prop : {
-	lastHiEntry : '',
-	uriPrefixPlain: '/-jscms/',
-	uriPrefixOfbs: '/_jscms/',
-	useObsUri: false,
-	mainContainerId : 'jcToplevelContainer',
-	absUriMatcher : ( new RegExp("^([^a-z]+:/)?/","i") ),
-	prefs: {
-		debugURI : false,
-		debugLevel : 0,
-		prefsVersion : 1,
+/* jc.prop integrate defaults */
+jc.prop.lastHiEntry = '';
+jc.prop.absUriMatcher = ( new RegExp("^([^a-z]+:/)?/","i") );
+if ( AS.test.udef(jc.prop.uriPrefixPlain)) jc.prop.uriPrefixPlain = '/-jscms/';
+if ( AS.test.udef(jc.prop.uriPrefixOfbs)) jc.prop.uriPrefixOfbs = '/_jscms/';
+if ( AS.test.udef(jc.prop.useObsUri)) jc.prop.useObsUri = false;
+if ( AS.test.udef(jc.prop.mainContainerId)) jc.prop.mainContainerId = 'jcToplevelContainer';
+if ( ! AS.test.arr(jc.prop.lastChangedQuantities)) jc.prop.lastChangedQuantities =  [10,25,50,100];
+/* jc.prop.prefs integrate defaults */
+if ( AS.test.udef(jc.prop.prefs)) jc.prop.prefs = {};
+if ( AS.test.udef(jc.prop.prefs.debugURI)) jc.prop.prefs.debugURI = false;
+if ( AS.test.udef(jc.prop.prefs.debugLevel)) jc.prop.prefs.debugLevel = 0;
+if ( AS.test.udef(jc.prop.prefs.prefsVersion)) jc.prop.prefs.prefsVersion = 1;
+/* paths integrate defaults */
+( ()=>{
+	let bp = AS.path('jsroot');
+	if ( AS.test.udef(bp) ) {
+		bp = '/jscms/';
+		AS.path({jsroot:bp});
 	}
-}};
-AS.path({
-	jsroot : '/jscms/',
-	jstemplates : '/jscms/templates/',
-	jsrenderers : '/jscms/templates/renderers/',
-	jsextensions : '/jscms/templates/extensions/',
-	jsdataroot : '/jscms/data/',
-	jsreporoot : '/jscms/repository/',
-	jsauth : '/jscms/login/',
-});
+	if ( AS.test.udef(AS.path('jstemplates'))) AS.path({jstemplates:bp+'templates/'});
+	if ( AS.test.udef(AS.path('jsrenderers'))) AS.path({jsrenderers:AS.path('jstemplates')+'renderers/'});
+	if ( AS.test.udef(AS.path('jsextensions'))) AS.path({jsextensions:AS.path('jstemplates')+'extensions/'});
+	if ( AS.test.udef(AS.path('jsdataroot'))) AS.path({jsdataroot:bp+'data/'});
+	if ( AS.test.udef(AS.path('jsauth'))) AS.path({jsauth:bp+'login/'});
+	if ( AS.test.udef(AS.path('jsreporoot'))) AS.path({jsreporoot:bp+'repository/'});
+})()
 
 jc.prop.loadModules = {
 	'basic' : [
@@ -1486,79 +1491,92 @@ jc.page = {
 			return;
 		}
 		if (savePolicy) {
-			jc.page.save( oe );
-			jc.page.prop.editMode = status;
-		} else {
-			jc.edit.data(false);
-			jc.page.prop.editMode = status;
-			jc.page.reload();
+			jc.page.save( { data: oe, callback: ()=>{ jc.page.edit(status,false)} } );
+			return;
 		}
+		jc.edit.data(false);
+		jc.page.prop.editMode = status;
+		jc.page.reload();
 	},
 	create : ( data, page ) => { jc.page.save( data, page, 'new' ); },
-	save : ( data, page, id, typelist, fulllist ) => {
-		if ( AS.test.udef(data)) data = jc.edit.data();
-		if ( AS.test.udef(page)) page = jc.page.current();
-		if ( AS.test.udef(id) ) id = (jc.page.data()||{}).id;
-		if ( AS.test.udef(typelist)) {
-			jc.jdav.get('struct/type-'+page+'-list.json',(l)=>{
-				jc.page.save( data, page, id, (l||{}), fulllist );
+	save : ( params ) => {
+		if ( AS.test.udef(params)) params = {};
+		else if ( AS.test.func(params)) params = { callback: params };
+		if ( AS.test.udef(params.data)) params.data = jc.edit.data();
+		if ( AS.test.udef(params.page)) params.page = jc.page.current();
+		if ( AS.test.udef(params.id) ) params.id = (jc.page.data()||{}).id;
+		if ( AS.test.udef(params.typelist)) {
+			jc.jdav.get('struct/type-'+params.page+'-list.json',(l)=>{
+				params.typelist = l||{};
+				jc.page.save( params );
 			})
 			return;
 		}
-		if ( AS.test.udef(fulllist)) {
+		if ( AS.test.udef(params.fulllist)) {
 			jc.jdav.get('struct/whole-list.json',(l)=>{
-				jc.page.save( data, page, id, typelist, (l||{}) );
+				params.fulllist = l||{};
+				jc.page.save( params );
 			})
 			return;
 		}
-		let isNew = (id=='new');
+		let isNew = (params.id=='new');
 		if ( isNew ) {
 			jc.springLoad('module:edit');
-			jc.page.prop.editMode = true;
-			if ( Object.keys(typelist).length ) {
+			if ( Object.keys(params.typelist).length ) {
 				let max = 0;
-				Object.keys(typelist).forEach( k => {
+				Object.keys(params.typelist).forEach( k => {
 					let n = parseInt(k);
 					if ( (!isNaN(n)) && ( n >= max )) max = n+1;
 				} );
-				if ( max > 0 ) id = max;
+				if ( max > 0 ) params.id = max;
 			} else {
-				id = 1;
+				params.id = 1;
 			}
 		}
-		if ( AS.test.udef(data.metadata) ) data.metadata = {};
-		Object.keys(data).forEach( k => {
-			if ( AS.test.arr(data[k])) data[k].forEach( i => {
+		if ( AS.test.udef(params.data.metadata) ) params.data.metadata = {};
+		Object.keys(params.data).forEach( k => {
+			if ( AS.test.arr(params.data[k])) params.data[k].forEach( i => {
 				if ( AS.test.obj(i) && ! AS.test.arr(i) ) {
 					delete i.idx;
 					delete i.qt;
 				}
 			} );
 		} );
-		if ( id ) {
-			data.id = id;
-			data.metadata.id = id;
+		if ( params.id ) {
+			params.data.id = id;
+			params.data.metadata.id = id;
 		}
 		let tpd = {
-			title: data.metadata.title || page,
-			desc: data.metadata.description || '',
+			title: params.data.metadata.title || page,
+			desc: params.data.metadata.description || '',
 			upd: (new Date()).getTime(),
 			user: jc.prop.authUser
 		};
+		if ( params.data.metadata.hidden ) tpd.hidden = true;
 		if ( id ) tpd.id = parseInt(id);
-		jc.jdav.put( page + ( id ? id : '') + '.json', data, ()=>{
-			if ( AS.test.udef(fulllist[page]) ) fulllist[page] = {};
-			fulllist[page][String(id?id:0)] = tpd;
-			jc.jdav.put('struct/whole-list.json',fulllist,()=>{
-				typelist[String(id?id:0)] = tpd;
-				jc.jdav.put('struct/type-'+page+'-list.json',typelist,()=>{
-					jc.page.makeLasts( page, typelist, ()=>{
-						if ( jc.edit ) jc.edit.data(false);
-						if ( ! isNew ) {
+		jc.jdav.put( params.page + ( params.id || '') + '.json', params.data, ()=>{
+			if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
+			params.fulllist[params.page][String(params.id?params.id:0)] = tpd;
+			jc.jdav.put('struct/whole-list.json',params.fulllist,()=>{
+				params.typelist[String(params.id?params.id:0)] = tpd;
+				jc.jdav.put('struct/type-'+params.page+'-list.json',params.typelist,()=>{
+					jc.page.makeLasts( params.page, params.typelist, ()=>{
+						if ( (! isNew) && (! params.noDialog) ) {
 							jc.page.prop.editMode = false;
-							swal({ title: AS.label('PageSavedTitle'), text: AS.label('PageSavedBody',{page:page,id:id}), type: "success", showCancelButton:false, showConfirmButton:false });
+							swal({
+								title: AS.label('PageSavedTitle'),
+								text: AS.label('PageSavedBody',{page:params.page,id:params.id}),
+								type: "success",
+								showCancelButton:false,
+								showConfirmButton:false
+							});
 							window.setTimeout(()=>{ swal.close() },2000);
 						}
+						if ( AS.test.func(params.callback) ) {
+							params.callback.call(window,params.page,params.id,params.data);
+							return;
+						}
+						if ( jc.edit ) jc.edit.data(false);
 						jc.page.current('-');
 						jc.page.open( page, id );
 					});
@@ -1578,8 +1596,9 @@ jc.page = {
 			const pm = list[k];
 			if (!pm.hidden) lasts.push( pm );
 		});
-		lasts.sort( (a,b) => { b.upd - a.upd });
-		qts = [100,50,25,10];
+		lasts.sort( (a,b) =>(b.upd - a.upd));
+		qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) );
+		qts.sort( (a,b)=>( b - a ) );
 		let proc = () => {
 			if ( qts.length ) {
 				const qt = qts.shift();
