@@ -369,6 +369,7 @@ jc.progress = ( msg ) => {
 	}
 	if ( AS.test.str(msg) ) {
 		$('.modal-body',mod).html(msg);
+		mod.modal('handleUpdate');
 		if ( first || (! mod.hasClass('in')) ) mod.modal('show');
 	} else {
 		mod.removeClass("in");
