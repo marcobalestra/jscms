@@ -61,6 +61,7 @@ h { display: none; }
 .jcMenu .jcUser { color: #696; }
 .jcMenu:hover .jcUser { color: #090; }
 .jcEditable, .jcEditable * { box-sizing: border-box; }
+.jcEditable .placeHolder { font-weight: bold; font-style: italic; color: #ccc; }
 .jcEditable { border: #ccc dashed 1px; margin: 2px 0; min-height: 30px; min-width: 30px; overflow: auto; overflow: visible; position: relative; }
 .jcEditMenu { background: #fff; border: #ccc solid 1px; line-height: 8px; padding: 0; position: absolute; right: -1px; top: -1px; z-index:90; }
 .appContextHighlight .jcEditMenu { display: none; }

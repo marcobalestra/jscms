@@ -109,7 +109,7 @@ jc.edit = {
 						<span class="jcicon">${ AS.icon('edit') }</span> 
 						<b>
 							${ AS.label('Edit') } “${ jc.page.current() }”${ jc.page.data().id ? ' ID: '+jc.page.data().id : '' },
-							${ b.prop }${ b.qt ? ' ['+(b.idx +1)+'/'+b.qt+']':'' }
+							${ b.prop }${ AS.test.def(b.qt) ? ' ['+(AS.test.num(b.idx) ? String(b.idx +1)+'/'+b.qt : b.idx)+']':'' }
 						</b>
 					</p>
 					<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
@@ -142,7 +142,7 @@ jc.edit = {
 				callback : (f) => {
 					if ( b.qt ) {
 						f.parse( d[b.prop][b.idx] );
-					} else {
+					} else if (AS.test.def(d[b.prop])) {
 						f.setValue(t,d[b.prop]);
 					}
 				},
@@ -150,7 +150,7 @@ jc.edit = {
 		},
 		text : (b,d) => {
 			let o = jc.edit.form._base(b,d);
-			if ( b.qt ) {
+			if ( AS.test.def(b.qt) ) {
 				o.fields.push(
 					["type",'select',{asLabel:'blockType',default:'text',options:[{label:AS.label('HTML'),value:'html'},{label:AS.label('Text'),value:'text'}],onchange:(x,fo)=>{
 						let f = fo.getForm();
@@ -208,16 +208,29 @@ jc.edit = {
 		}
 	},
 	addType : (b,d,t) => {
-		let nb = {prop:b.prop,qt:b.qt,idx:AS.label('New')};
+		let nb = {prop:b.prop,idx:AS.label('New')};
+		if ( AS.test.udef(b.qt) ) {
+			nb.qt = 0;
+		} else {
+			nb.qt = b.qt;
+		}
 		let fopt = jc.edit.form[t].call(window,nb,d);
 		fopt.options.jsaction = (fd,fo) => {
 			fo.destroy();
 			jc.edit.noModal();
-			d[b.prop].splice( b.idx, 1, d[b.prop][b.idx], fd );
+			if ( AS.test.def(b.qt)) {
+				d[b.prop].splice( b.idx, 1, d[b.prop][b.idx], fd );
+			} else {
+				if ( ! AS.test.arr(d[b.prop])) d[b.prop] = [];
+				d[b.prop].push(fd);
+			}
 			jc.edit.fixBlocks(b,d);
 			jc.page.reload();
 		};
-		fopt.callback = (f) => { f.setValue('type',d[b.prop][b.idx].type); };
+		fopt.callback = (f) => {
+			if ( AS.test.udef(b.qt)) f.setValue('type','html');
+			else f.setValue('type',d[b.prop][b.idx].type);
+		};
 		jc.edit.getModal().on('shown.bs.modal',()=>{ AS.form.create( fopt ); }).modal('show');
 	},
 	fixBlocks : (b,d) => {
@@ -254,9 +267,10 @@ jc.edit = {
 };
 
 jc.edit.meta = {
-	edit: () => {
-		let pd = jc.page.data();
-		let ed = jc.edit.data();
+	edit: ( options ) => {
+		options = AS.def.obj(options);
+		let pd = options.pageData||jc.page.data();
+		let ed = options.editData||jc.edit.data();
 		if ( AS.test.udef(ed.metadata) ) ed.metadata = { type: jc.page.current(), id: pd.id };
 		let $mod = jc.edit.getModal(true);
 		$('.modal-dialog',$mod).append(`<div class="modal-content">
@@ -270,8 +284,8 @@ jc.edit.meta = {
 				</button>
 			</div>
 			<div class="modal-body" id="jcPageEditor"></div></div>`);
-		fp = JSON.parse(JSON.stringify(pd.template.metadata.form));
-		fp.callback = f=> { f.parse(ed.metadata) };
+		fp = JSON.parse(JSON.stringify(options.form||pd.template.metadata.form));
+		fp.callback = f=> { if ( ed.metadata) f.parse(ed.metadata) };
 		fp.target = 'jcPageEditor';
 		fp.options.effectduration = 0;
 		fp.options.theme = 'light';
@@ -281,7 +295,8 @@ jc.edit.meta = {
 			f.destroy();
 			jc.edit.noModal();
 			ed.metadata = fd;
-			jc.edit.data(ed);
+			if ( options.callback ) options.callback.call(window,ed);
+			else jc.edit.data(ed);
 		};
 		$mod.on('shown.bs.modal',()=>{ AS.form.create(fp); }).modal('show');
 	}

@@ -57,11 +57,6 @@ jc.prop.loadModules = {
 		AS.path('jsroot') + '/js/jc-edit.js',
 		'https://cdn.altersoftware.org/js-as-form/as-form.js',
 		'wait:()=>( jc.edit && AS.form )',
-		'https://cdn.altersoftware.org/js-as-form/plugin/as-form-basic.js',
-		'https://cdn.altersoftware.org/js-as-form/plugin/as-form-pikaday.js',
-		'https://cdn.altersoftware.org/js-as-form/plugin/as-form-tinymce.js',
-		'https://cdn.altersoftware.org/js-as-form/plugin/as-form-iro.js',
-		'https://cdn.altersoftware.org/js-as-form/plugin/as-form-slider.js',
 	],
 	'datatables': [
 		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
@@ -1357,7 +1352,9 @@ jc.page = {
 				let w = true;
 				if ( (c.rendered instanceof jQuery)||(c.rendered instanceof NodeList)||(c.rendered instanceof Node) ) w = ! $('.jcEditable',c.rendered).length;
 				else if ( AS.test.str(c.rendered) ) w = ( c.rendered.indexOf('<div class="jcEditable">') < 0 );
-				if ( w ) c.rendered = $('<div class="jcEditable"></div>').data('editable',c.editable).append( c.rendered );
+				if ( w ) {
+					c.rendered = $('<div class="jcEditable"></div>').data('editable',c.editable).append( c.rendered );
+				}
 			}
 			return c;
 		},
@@ -1411,7 +1408,8 @@ jc.page = {
 					else if ( AS.test.str(out) ) w = ( out.indexOf('<div class="jcEditable">') < 0 );
 					if ( w ) {
 						let editable = { prop: b.prop, type: 'block', subtype: b.type };
-						out = $('<div class="jcEditable"></div>').data('editable',editable).append( out||'<span class="placeHolder">Empty</span>' );
+						if ( AS.test.udef(out) || (AS.test.str(out) && (out.length==0)) ) out = '<span class="placeHolder">'+b.prop+'</span>';
+						out = $('<div class="jcEditable"></div>').data('editable',editable).append( out );
 					}
 				}
 				return out;
@@ -1451,12 +1449,18 @@ jc.page = {
 	},
 	blocks : {
 		text : (b,d)=>{
+			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
 			let out = $(b.wrap||d.wrap||'<div></div>');
 			out.append( d[b.prop] );
 			return out;
 		},
 		html : (b,d)=> {
+			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
 			return d[b.prop];
+		},
+		date : (b,d) => {
+			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
+			return '<p>'+d[b.prop]+'</p>';
 		},
 		mixed : (b,d) => {
 			if ( ! d[b.prop] ) return '';
@@ -1544,15 +1548,15 @@ jc.page = {
 		jc.page.prop.editMode = status;
 		jc.page.reload();
 	},
-	create : ( page, metadata ) => {
-		if ( AS.test.udef(page) ) {
+	create : ( options ) => {
+		options = AS.def.obj(options);
+		if ( AS.test.udef(options.page) ) {
 			jc.jdav.get(
 				AS.path('jsauth') + 'auth/lstemplates',
 				(l) => {
 					let opts = {};
 					l.list.sort();
 					l.list.forEach( (k) => { opts[k] = k; } );
-					console.log( opts );
 					Swal.fire({
 						title: AS.label('SelectPageType'),
 						text: AS.label('SelectPageTypeDesc'),
@@ -1572,12 +1576,43 @@ jc.page = {
 								}
 							})
 						},
+					}).then( result => {
+						if ( ! result.isConfirmed ) return;
+						options.page = result.value;
+						jc.page.create( options );
 					});
 				}
 			)
 			return;
 		}
-		//jc.page.save( data, page, 'new' );
+		if ( AS.test.udef(options.template) ) {
+			jc.template.info.get( options.page, ( tdata )=>{
+				options.template = tdata;
+				jc.page.create( options );
+			});
+			return;
+		}
+		if ( AS.test.udef( options.data) ) {
+			options.id = 'new';
+			jc.edit.meta.edit({
+				pageData : {},
+				editData : { metadata: { type: options.page, id:'new' }},
+				form : options.template.metadata.form,
+				callback : pd => {
+					options.data = pd;
+					jc.page.create( options );
+				}
+			});
+			return;
+		}
+		options.noDialog = true;
+		options.noLasts = true;
+		options.callback = (page,id,data) => {
+			jc.page.prop.editMode = 'page';
+			if ( jc.edit ) jc.edit.data(false);
+			jc.page.open(page,id,data);
+		};
+		jc.page.save( options );
 	},
 	save : ( params ) => {
 		jc.progress(AS.label('SavingPage'));
@@ -1636,33 +1671,38 @@ jc.page = {
 			if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
 			params.fulllist[params.page][String(params.id?params.id:0)] = tpd;
 			jc.progress(AS.label('SavingArticleList'));
+			let finalize = () => {
+				jc.progress(false);
+				if ( (! isNew) && (! params.noDialog) ) {
+					window.setTimeout( ()=>{
+						Swal.fire({
+							title: AS.label('PageSavedTitle'),
+							text: AS.label('PageSavedBody',{page:params.page,id:params.id}),
+							icon: "success",
+							showCancelButton:false,
+							showConfirmButton:false,
+							timer: 2000,
+							timerProgressBar: true,
+						});
+					},100);
+				}
+				if ( AS.test.func(params.callback) ) {
+					params.callback.call(window,params.page,params.id,params.data);
+					return;
+				}
+				if ( jc.edit ) jc.edit.data(false);
+				jc.page.current('-');
+				jc.page.open( page, id );
+			};
 			jc.jdav.put('struct/_all-list.json',params.fulllist,()=>{
 				params.typelist[String(params.id?params.id:0)] = tpd;
 				jc.jdav.put('struct/'+params.page+'-list.json',params.typelist,()=>{
-					jc.progress(AS.label('SavingLasts'));
-					jc.page.makeLasts( params.page, params.typelist, ()=>{
-						jc.progress(false);
-						if ( (! isNew) && (! params.noDialog) ) {
-							window.setTimeout( ()=>{
-								Swal.fire({
-									title: AS.label('PageSavedTitle'),
-									text: AS.label('PageSavedBody',{page:params.page,id:params.id}),
-									icon: "success",
-									showCancelButton:false,
-									showConfirmButton:false,
-									timer: 2000,
-									timerProgressBar: true,
-								});
-							},100);
-						}
-						if ( AS.test.func(params.callback) ) {
-							params.callback.call(window,params.page,params.id,params.data);
-							return;
-						}
-						if ( jc.edit ) jc.edit.data(false);
-						jc.page.current('-');
-						jc.page.open( page, id );
-					});
+					if ( params.noLasts ) {
+						finalize();
+					} else {
+						jc.progress(AS.label('SavingLasts'));
+						jc.page.makeLasts( params.page, params.typelist, finalize );
+					}
 				});
 			});
 		});
