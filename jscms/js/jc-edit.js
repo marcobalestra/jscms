@@ -276,6 +276,7 @@ jc.edit.meta = {
 		fp.options.effectduration = 0;
 		fp.options.theme = 'light';
 		fp.options.title = `“${ ed.metadata.type }”${ ed.metadata.id ? ' ID: '+ed.metadata.id : '' }`;
+		fp.fields.push(['btns','buttons',{position:'bottom',list:[{label:AS.label('Cancel'),icon:AS.icon('circleClose'),onclick:'()=>{jc.edit.noModal();}'},{btype:'reset'},{btype:'submit',asLabel:'Done'}]}]);
 		fp.options.jsaction = (fd,f) => {
 			f.destroy();
 			jc.edit.noModal();

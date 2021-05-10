@@ -567,14 +567,6 @@ jc.menu = (ev,menu)=>{
 				else if ( v.icon ) lab += '<i class="'+v.icon+'"></i>';
 				if ( v.label ) lab += v.label;
 				if ( typeof v.title == 'string' ) $li.attr('title',v.title);
-				if ( Array.isArray( v.content ) && v.content.length ) {
-					let $sul = $('<ul></ul>');
-					v.content.forEach( c=>{ $sul.append( parseli(c) ) } );
-					$li.addClass('subMenu')
-					if ( lab && lab.length ) $li.html('<a>'+lab+'</a>');
-					$li.append($sul);
-					return $li;
-				}
 				try {
 					let eva = eval(v.action);
 					if ( typeof eva == 'function' ) v.action = eva;
@@ -587,17 +579,25 @@ jc.menu = (ev,menu)=>{
 						v.action.call(window,ev,lev);
 						zapMenus();
 					});
+					$a.addClass('clickable');
 					$li.append($a);
 				} else if ( typeof v.action == 'string' ) {
 					let $a = $('<a href="'+v.action+'">'+lab+'</a>');
 					if ( v.download ) $a.attr('download',v.download);
 					if ( v.target ) $a.attr('target',v.target);
+					$a.addClass('clickable');
 					$li.append($a);
 				} else {
 					$li.addClass('disabled').append('<a>'+lab+'</a>');
 				}
 			} else {
 				return '';
+			}
+			if ( Array.isArray( v.content ) && v.content.length ) {
+				let $sul = $('<ul></ul>');
+				v.content.forEach( c=>{ $sul.append( parseli(c) ) } );
+				$li.addClass('subMenu')
+				$li.append($sul);
 			}
 			return $li;
 		}
@@ -1262,10 +1262,10 @@ jc.page = {
 		},
 	},
 	render : {
-		main : data => {
+		main : (data,pdata) => {
 			if ( ! Array.isArray(data) ) data = [data];
 			let pfull = jc.page.data();
-			let pdata = AS.test.obj(pfull) ? pfull.pageContent : {};
+			if ( AS.test.udef(pdata)) pdata = AS.test.obj(pfull) ? pfull.pageContent : {};
 			data.forEach( e => {
 				if ( e.internalRecursion ) {
 					e = {
@@ -1290,7 +1290,7 @@ jc.page = {
 				} else if ( e.content ) {
 					if ( ! Array.isArray(e.content) ) e.content = [e.content];
 					e.content.forEach( c => {
-						jc.page.render.prepare( c );
+						jc.page.render.prepare( c, pdata );
 						if ( AS.test.obj(c) ) {
 							if ( ! c.id ) {
 								c.id = AS.generateId('jc-block-');
@@ -1319,7 +1319,7 @@ jc.page = {
 				});
 			} );
 		},
-		prepare : ( c, $scope ) => {
+		prepare : ( c, pdata, $scope ) => {
 			if ( AS.test.str(c) || AS.test.func(c) ) {
 				let ev = jc.evalFunc(c);
 				c = ev ? { type:'func', func: ev } : { rendered: c };
@@ -1329,7 +1329,7 @@ jc.page = {
 					if ( c.blocks ) c.type = 'blocks';
 					else if ( c.render ) c.type = 'customJs';
 				}
-				if ( c.func && (! c.rendered) ) c.rendered =  c.func.call(window,pdata, pfull);
+				if ( c.func && (! c.rendered) ) c.rendered =  c.func.call(window,pdata);
 			}
 		},
 		editable : ( c ) => {
@@ -1396,7 +1396,7 @@ jc.page = {
 				}
 				return out;
 			});
-			jc.page.render.main(o);
+			jc.page.render.main(o,pdata);
 		},
 	},
 	checkJcMenu : ( ctx )=>{
@@ -1460,11 +1460,11 @@ jc.page = {
 		},
 	},
 	edit : ( status, savePolicy ) => {
-		let oe = (jc.edit && jc.edit.data())||false;
 		if ( status ) {
 			jc.springLoad('module:edit');
 			if ( ! jc.edit ) return window.setTimeout( ()=>{ jc.page.edit(status,savePolicy) }, 100 );
 			jc.page.prop.editMode = status;
+			let oe = jc.edit.data()||false;
 			if ( oe ) {
 				swal(
 					{
@@ -1492,12 +1492,7 @@ jc.page = {
 			jc.edit.data( jc.page.data().pageContent );
 			jc.page.reload();
 			return;
-		}
-		if ( ! oe ) {
-			jc.page.reload();
-			return;
-		}
-		if ( AS.test.udef(savePolicy)) {
+		} else if ( AS.test.udef(savePolicy)) {
 			swal(
 				{
 					title: AS.label('SaveChangesTitle'),
@@ -1506,9 +1501,17 @@ jc.page = {
 					showCancelButton: true,
 					closeOnConfirm: true,
 					closeOnCancel: true,
+					cancelButtonText : AS.label('menuEditOverDiscard'),
+					confirmButtonText : AS.label('menuEditOverSave'),
+					hideClass: { popup: '' },
 				},
 				function (ok) { jc.page.edit(status,ok); }
 			);
+			return;
+		}
+		let oe = (jc.edit && jc.edit.data())||false;
+		if ( ! oe ) {
+			jc.page.reload();
 			return;
 		}
 		if (savePolicy) {
@@ -1580,14 +1583,16 @@ jc.page = {
 					jc.page.makeLasts( params.page, params.typelist, ()=>{
 						jc.progress(false);
 						if ( (! isNew) && (! params.noDialog) ) {
-							swal({
-								title: AS.label('PageSavedTitle'),
-								text: AS.label('PageSavedBody',{page:params.page,id:params.id}),
-								type: "success",
-								showCancelButton:false,
-								showConfirmButton:false
-							});
-							window.setTimeout(()=>{ swal.close() },2000);
+							window.setTimeout( ()=>{
+								swal({
+									title: AS.label('PageSavedTitle'),
+									text: AS.label('PageSavedBody',{page:params.page,id:params.id}),
+									type: "success",
+									showCancelButton:false,
+									showConfirmButton:false,
+									timer: 2000,
+								});
+							},100);
 						}
 						if ( AS.test.func(params.callback) ) {
 							params.callback.call(window,params.page,params.id,params.data);
@@ -1635,13 +1640,17 @@ jc.actionsMenu = (e) => {
 	if ( jc.page.prop.editMode ) {
 		acts.push(
 			{icon:'jcicon',iconKey:'metadata',label:AS.label('Properties'),action:()=>{jc.edit.meta.edit();} },
-			{label:AS.label('menuEditOver'),content:[
+			{icon:'jcicon',iconKey:'pageEditOff',label:AS.label('menuEditOver'),action:()=>{jc.page.edit(false);},content:[
 				{icon:'jcicon',iconKey:'done',label:AS.label('menuEditOverSave'),action:()=>{jc.page.edit(false,true);} },
 				{icon:'jcicon',iconKey:'editRemove',label:AS.label('menuEditOverDiscard'),action:()=>{jc.page.edit(false,false);} }
 			]}
 		);
 	} else {
-		acts.push({icon:'jcicon',iconKey:'edit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} });
+		acts.push(
+			{icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} },
+			'-',
+			{icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.add();} },
+		);
 	}
 	jc.menu(e, { content: acts, highlight: false });
 };

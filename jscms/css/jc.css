@@ -43,7 +43,7 @@ h { display: none; }
 .dropdown-menu.appContextMenuContent hr { margin: 0; padding: 0; }
 .dropdown-menu.appContextMenuContent li.disabled > a { cursor: not-allowed; opacity: .5; }
 .dropdown-menu.appContextMenuContent li.disabled a i.rIcon { display: none; }
-.dropdown-menu.appContextMenuContent li.subMenu > a { cursor: default; font-style: italic; opacity: .5; }
+.dropdown-menu.appContextMenuContent li.subMenu > a:not(.clickable) { cursor: default; font-style: italic; opacity: .5; }
 .dropdown-menu.appContextMenuContent li.disabled > a:hover,
 .dropdown-menu.appContextMenuContent li.subMenu > a:hover { background-color: #fff; color: #333; }
 .rotate-90 { transform: rotate(90deg); }

@@ -17,6 +17,7 @@ AS.labels.load('en',[{
 	'menuEditOverDiscard' : 'Discard changes',
 	'menuEditOverSave' : 'Save changes',
 	'menuEditStart' : 'Edit page',
+	'NewPage' : 'Create page',
 	'onlyNonEmptyFields' : 'Field not included if empty',
 	'PageDescription' : 'Description',
 	'PageDescriptionHelp' : 'A short descrition (an abstract) of page content. Can be used to search and/or present the page in lists.',
