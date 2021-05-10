@@ -1579,9 +1579,11 @@ jc.page = {
 		jc.jdav.put( params.page + ( params.id || '') + '.json', params.data, ()=>{
 			if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
 			params.fulllist[params.page][String(params.id?params.id:0)] = tpd;
+			jc.progress(AS.label('SavingArticleList'));
 			jc.jdav.put('struct/whole-list.json',params.fulllist,()=>{
 				params.typelist[String(params.id?params.id:0)] = tpd;
 				jc.jdav.put('struct/type-'+params.page+'-list.json',params.typelist,()=>{
+					jc.progress(AS.label('SavingLasts'));
 					jc.page.makeLasts( params.page, params.typelist, ()=>{
 						jc.progress(false);
 						if ( (! isNew) && (! params.noDialog) ) {
