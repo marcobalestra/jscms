@@ -417,6 +417,7 @@ jc.dav = {
 		$.ajax( url, {
 			method: 'PUT',
 			dataType: 'text',
+			cache: false,
 			contentType: 'text/plain; charset=UTF-8',
 			data: data,
 			error: (...errs) => { fail.call(window,false,errs); },
@@ -531,6 +532,7 @@ jc.jdav.put = ( url, data, success, fail ) => {
 	jc.console('jc.jdav.put',url,data);
 	$.ajax( url, {
 		method: 'PUT',
+		cache: false,
 		dataType: 'json',
 		contentType: 'application/json; charset=UTF-8',
 		data: AS.test.obj(data) ? JSON.stringify(data) : data,
@@ -1272,6 +1274,7 @@ jc.page = {
 					if ( md.keywords ) $('meta[name="keywords"]',h).attr('content',md.keywords);
 					if ( md.description ) $('meta[name="description"]',h).attr('content',md.description);
 				}
+				if (jc.page.prop.editMode == 'page') jc.edit.data( j );
 				if ( data.template.content ) jc.page.render.main(data.template.content);
 			});
 		},
@@ -1607,12 +1610,89 @@ jc.page = {
 		}
 		options.noDialog = true;
 		options.noLasts = true;
+		if ( AS.test.obj(options.template.content) ) {
+			let blocks = options.template.content.find( c => (AS.test.obj(c.content) && AS.test.arr(c.content.blocks)));
+			if ( blocks ) {
+				blocks = blocks.content.blocks;
+				if ( options.data.metadata.title && blocks.find( b =>( AS.test.obj(b) && ( b.prop=='title') )) ) options.data.title = options.data.metadata.title;
+				if ( options.data.metadata.description && blocks.find( b =>( AS.test.obj(b) && ( b.prop=='abstract') )) ) options.data.abstract = options.data.metadata.description;
+			}
+		}
+		console.log( JSON.stringify(options.data) );
 		options.callback = (page,id,data) => {
 			jc.page.prop.editMode = 'page';
-			if ( jc.edit ) jc.edit.data(false);
-			jc.page.open(page,id,data);
+			jc.page.open( page, id );
 		};
 		jc.page.save( options );
+	},
+	rm : ( params ) => {
+		if ( AS.test.udef(params)) params = {};
+		else if ( AS.test.func(params)) params = { callback: params };
+		if ( AS.test.udef(params.page)) params.page = jc.page.current();
+		if ( AS.test.udef(params.id) ) params.id = (jc.page.data()||{}).id;
+		if ( (params.page == 'index') && (! params.id)) {
+			Swal.fire({ title: AS.label('Warning'), text: AS.label('CantDeleteIndex'), icon: "error" });
+			return;
+		}
+		if ( ! params.confirmed ) {
+			Swal.fire({
+				title: AS.label('DeleteThisPage'),
+				html: '<div style="white-space:pre;">'+AS.label('PageEraseBody',{page:params.page,id:params.id})+'</div>',
+				icon: "warning",
+				showDenyButton: false,
+				showCancelButton: true,
+				cancelButtonText: AS.label('Cancel'),
+				confirmButtonText: AS.label('OK'),
+			}).then( result => {
+				if ( result.isConfirmed ) {
+					params.confirmed = true;
+					jc.page.rm( params );
+				}
+			});
+			return;
+		}
+		jc.progress(AS.label('DeletingPage'));
+		if ( AS.test.udef(params.typelist)) {
+			jc.jdav.get('struct/'+params.page+'-list.json',(l)=>{ params.typelist = l||{}; jc.page.rm( params ); })
+			return;
+		}
+		if ( AS.test.udef(params.fulllist)) {
+			jc.jdav.get('struct/_all-list.json',(l)=>{ params.fulllist = l||{}; jc.page.rm( params ); })
+			return;
+		}
+		jc.dav.rm( params.page + ( params.id || '') + '.json', ()=>{
+			delete params.fulllist[params.page][String(params.id?params.id:0)];
+			jc.progress(AS.label('SavingArticleList'));
+			jc.jdav.put('struct/_all-list.json',params.fulllist,()=>{
+				delete params.typelist[String(params.id?params.id:0)];
+				jc.jdav.put('struct/'+params.page+'-list.json',params.typelist,()=>{
+					jc.progress(AS.label('SavingLasts'));
+					jc.page.makeLasts( params.page, params.typelist, ()=>{
+						jc.progress(false);
+						if (! params.noDialog) {
+							window.setTimeout( ()=>{
+								Swal.fire({
+									title: AS.label('PageErasedTitle'),
+									text: AS.label('PageErasedBody',{page:params.page,id:params.id}),
+									icon: "success",
+									showCancelButton:false,
+									showConfirmButton:false,
+									timer: 2000,
+									timerProgressBar: true,
+								});
+							},100);
+						}
+						if ( AS.test.func(params.callback) ) {
+							params.callback.call(window,params.page,params.id,params.data);
+							return;
+						}
+						if ( jc.edit ) jc.edit.data(false);
+						jc.page.current('-');
+						jc.page.open( 'index' );
+					});
+				});
+			});
+		});
 	},
 	save : ( params ) => {
 		jc.progress(AS.label('SavingPage'));
@@ -1786,11 +1866,11 @@ jc.actionsMenu = (e) => {
 			]}
 		);
 	} else {
-		acts.push(
-			{icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} },
-			'-',
-			{icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.create();} },
-		);
+		acts.push({icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} });
+		if ( (jc.page.current()!='index')||AS.test.def(jc.page.data().id)) {
+			acts.push('-',{icon:'jcicon danger',iconKey:'pageRm',label:AS.label('DeleteThisPage')+'…',action:()=>{jc.page.rm();} });
+		}
+		acts.push('-',{icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.create();} });
 	}
 	jc.menu(e, { content: acts, highlight: false });
 };

@@ -6,8 +6,11 @@ AS.labels.load('it',[{
 	'blockTextAspect' : 'Aspetto',
 	'blockType' : 'Tipo di contenuto',
 	'Cancel' : 'Annulla',
+	'CantDeleteIndex' : 'La homepage non può essere cancellata.',
+	'DeleteThisPage' : 'Cancella questa pagina',
 	'Done' : 'Fatto',
 	'Edit' : 'Modifica',
+	'Error' : 'Errore',
 	'editYetItBody' : 'Continui la modifica precedente o riparti ricaricando il contenuto?',
 	'editYetItCancel' : 'Riparti',
 	'editYetItOk' : 'Continua',
@@ -25,6 +28,9 @@ AS.labels.load('it',[{
 	'PageDescription' : 'Descrizione',
 	'PageDescriptionHelp' : 'Una breve descrizione del contenuto della pagina, un abstract. Può essere utilizzato per cercare la pagina, o per presentarla negli elenchi.',
 	'PageDescriptionPlaceholder' : 'Di cosa parla la pagina',
+	'PageErasedBody' : 'La pagina di tipo “{{page|unknown}}” ID: {{id|(nessuno)}} è stata cancellata.',
+	'PageErasedTitle' : 'Pagina eliminata',
+	'PageEraseBody' : 'La pagina di tipo “{{page|unknown}}” ID: {{id|(nessuno)}} verrà cancellata.\n\nSi prega di confermare.',
 	'PageHidden' : 'Pagina nascosta',
 	'PageHiddenHelp' : 'Una pagina nascosta puù essere visualizzata conoscendone l’indirizzo, ma non appare nelle raccolte e negli elenchi degli ultimi aggiornamenti.',
 	'PageKewordPlaceholder' : 'Parole chiave della pagina, separate da virgole',
@@ -42,5 +48,6 @@ AS.labels.load('it',[{
 	'SelectPageType' : 'Scegli un tipo',
 	'SelectPageTypeDesc' : 'Scegli il tipo di pagina che vuoi creare:',
 	'Text' : 'Testo',
+	'Warning' : 'Attenzione',
 }]);
 
