@@ -1512,7 +1512,7 @@ jc.page = {
 			return;
 		}
 		if (savePolicy) {
-			jc.page.save( { data: oe, callback: ()=>{ jc.page.edit(status,false)} } );
+			jc.page.save( { data: oe, callback: ()=>{ jc.page.edit(status,false)} });
 			return;
 		}
 		jc.edit.data(false);
@@ -1528,22 +1528,15 @@ jc.page = {
 		if ( AS.test.udef(params.page)) params.page = jc.page.current();
 		if ( AS.test.udef(params.id) ) params.id = (jc.page.data()||{}).id;
 		if ( AS.test.udef(params.typelist)) {
-			jc.jdav.get('struct/type-'+params.page+'-list.json',(l)=>{
-				params.typelist = l||{};
-				jc.page.save( params );
-			})
+			jc.jdav.get('struct/type-'+params.page+'-list.json',(l)=>{ params.typelist = l||{}; jc.page.save( params ); })
 			return;
 		}
 		if ( AS.test.udef(params.fulllist)) {
-			jc.jdav.get('struct/whole-list.json',(l)=>{
-				params.fulllist = l||{};
-				jc.page.save( params );
-			})
+			jc.jdav.get('struct/whole-list.json',(l)=>{ params.fulllist = l||{}; jc.page.save( params ); })
 			return;
 		}
 		let isNew = (params.id=='new');
 		if ( isNew ) {
-			jc.springLoad('module:edit');
 			if ( Object.keys(params.typelist).length ) {
 				let max = 0;
 				Object.keys(params.typelist).forEach( k => {
@@ -1575,7 +1568,7 @@ jc.page = {
 			user: jc.prop.authUser
 		};
 		if ( params.data.metadata.hidden ) tpd.hidden = true;
-		if ( id ) tpd.id = parseInt(id);
+		if ( params.id ) tpd.id = parseInt(params.id);
 		jc.jdav.put( params.page + ( params.id || '') + '.json', params.data, ()=>{
 			if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
 			params.fulllist[params.page][String(params.id?params.id:0)] = tpd;
@@ -1587,7 +1580,6 @@ jc.page = {
 					jc.page.makeLasts( params.page, params.typelist, ()=>{
 						jc.progress(false);
 						if ( (! isNew) && (! params.noDialog) ) {
-							jc.page.prop.editMode = false;
 							swal({
 								title: AS.label('PageSavedTitle'),
 								text: AS.label('PageSavedBody',{page:params.page,id:params.id}),
