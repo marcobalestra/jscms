@@ -39,6 +39,8 @@ AS.labels.load('it',[{
 	'SavingArticleList' : 'Salvataggio elenco di tutti gli articoli…',
 	'SavingLasts' : 'Salvataggio degli ultimi aggiornamenti…',
 	'SavingPage' : 'Salvataggio pagina…',
+	'SelectPageType' : 'Scegli un tipo',
+	'SelectPageTypeDesc' : 'Scegli il tipo di pagina che vuoi creare:',
 	'Text' : 'Testo',
 }]);
 

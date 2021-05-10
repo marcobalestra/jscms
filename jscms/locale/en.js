@@ -36,6 +36,8 @@ AS.labels.load('en',[{
 	'SavingArticleList' : 'Saving comprehensive article list…',
 	'SavingLasts' : 'Saving list of last updated…',
 	'SavingPage' : 'Saving page…',
+	'SelectPageType' : 'Select page type',
+	'SelectPageTypeDesc' : 'Select which type of page you want to create:',
 	'Text' : 'Text',
 }]);
 

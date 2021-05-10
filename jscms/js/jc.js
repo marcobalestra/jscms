@@ -1492,6 +1492,7 @@ jc.page = {
 					icon: "warning",
 					showDenyButton: true,
 					showCancelButton: true,
+					cancelButtonText: AS.label('Cancel'),
 					confirmButtonText: AS.label('editYetItOk'),
 					denyButtonText: AS.label('editYetItCancel'),
 				}).then( result => {
@@ -1554,22 +1555,24 @@ jc.page = {
 				(l) => {
 					let opts = {};
 					l.list.sort();
-					l.list.forEach( (k) => {
-						opts[k] = k;
-					} );
+					l.list.forEach( (k) => { opts[k] = k; } );
 					console.log( opts );
 					Swal.fire({
-						title: 'Select page type',
+						title: AS.label('SelectPageType'),
+						text: AS.label('SelectPageTypeDesc'),
 						input: 'select',
+						icon: 'question',
 						inputOptions : opts,
 						inputPlaceholder: 'Select',
 						showCancelButton: true,
+						cancelButtonText: AS.label('Cancel'),
+						confirmButtonText: AS.label('OK'),
 						inputValidator : (v) => {
 							return new Promise((resolve) => {
 								if (v.length) {
 									resolve()
 								} else {
-									resolve('Select page type');
+									resolve(AS.label('SelectPageType'));
 								}
 							})
 						},
