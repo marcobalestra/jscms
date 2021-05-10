@@ -1,3 +1,21 @@
+/*
+	This code © 2021 Marco Balestra - balestra@altersoftware.it
+	
+	This code is 100% Microsoft-free, Java-free, Angular-free.
+	Developed on Mac OS X in a 100% Microsoft-free environment.
+	Requires nothing but a modern browser.
+	Releasend under Creative Commons Attribution 4.0 International (CC BY 4.0)
+	license: https://creativecommons.org/licenses/by/4.0/
+	
+	Technologies and credits:
+	* jQuery, © jQuery Foundation
+	* Glyphicons, © 2010-2017 Jan Kovarik, licensed to M. Balestra
+	* TinyMCE, Opensource LGPL
+	* AS core library by M. Balestra (CC BY 4.0) - https://altersoftware.it/products/jslibs/js-as-core/
+	* AS.labels library by M. Balestra (CC BY 4.0) - https://altersoftware.it/products/jslibs/js-as-labels/
+	* AS.form library by M. Balestra (CC BY 4.0) - https://altersoftware.it/products/jslibs/js-as-form/
+*/
+
 /* jc.prop integrate defaults */
 jc.prop.lastHiEntry = '';
 jc.prop.absUriMatcher = ( new RegExp("^([^a-z]+:/)?/","i") );
