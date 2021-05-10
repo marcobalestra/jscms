@@ -4,8 +4,8 @@ my @files = readdir $dir;
 closedir $dir;
 my @l;
 foreach my $f (@files) {
-	next if $d =~ /^\./;
-	next if -d $f;
+	next if $f =~ /^\./;
+	next if -d "$dir/$f";
 	next unless $f =~ s/\.js$//;
 	$f =~ s/"/\\"/g;
 	push @l,'"'.$f.'"';

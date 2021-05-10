@@ -29,11 +29,11 @@ if ( AS.test.udef(jc.prop.prefs.prefsVersion)) jc.prop.prefs.prefsVersion = 1;
 jc.prop.loadModules = {
 	'basic' : [
 		AS.path('jsroot') + 'css/jc.css',
+		{ type:'js', src:'https://cdn.jsdelivr.net/npm/sweetalert2@10'},
+		{ type:'js', src:'https:////cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js'},
 		'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
 		'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
-		AS.path('jsroot') + 'libs/sweetalert/sweetalert.css',
-		AS.path('jsroot') + 'libs/sweetalert/sweetalert.min.js',
-		'wait:()=>( window.swal && jQuery.fn.select2 )',
+		'wait:()=>( window.Swal && jQuery.fn.select2 )',
 	],
 	'edit' : [
 		AS.path('jsroot') + '/js/jc-edit.js',
@@ -53,9 +53,9 @@ jc.prop.loadModules = {
 		'wait:()=>((!! $.fn.dataTable) && (!! $.fn.fancybox) )',
 	],
 	'swal' : [
-		'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css',
-		'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js',
-		'wait:swal',
+		{ type:'js', src:'https://cdn.jsdelivr.net/npm/sweetalert2@10'},
+		{ type:'js', src:'https:////cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js'},
+		'wait:window.Swal',
 	],
 	'webcam' : [
 		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
@@ -93,7 +93,7 @@ $(() => {
 	$.ajaxSetup({ cache: true });
 	jc.springLoad('module:basic');
 	let foo = () => {
-		if ( window.swal && jQuery.fn.select2 ) {
+		if ( window.Swal && jQuery.fn.select2 ) {
 			window.name='jcmain';
 			if ( /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream ) {
 				$(document.body).addClass('iOS');
@@ -240,7 +240,7 @@ jc.date2sql = (d) => {
 jc.springLoad = ( ...sources ) => {
 	let cs=[];
 	sources.forEach( (src) => {
-		if ( src.indexOf('module:')==0) {
+		if ( AS.test.str(src) && (src.indexOf('module:')==0)) {
 			let ms = jc.prop.loadModules[ src.replace(/^module:/,'') ];
 			if ( ! ms ) return;
 			if ( typeof ms == 'string') ms = [ms];
@@ -255,7 +255,7 @@ jc.springLoad = ( ...sources ) => {
 	cs.forEach( (src) => {
 		if ( wait ) {
 			ps.push(src);
-		} else if ( src.indexOf('wait:')==0) {
+		} else if ( AS.test.str(src) && (src.indexOf('wait:')==0)) {
 			wait = src.replace(/^wait:/,'');
 		} else {
 			ns.push(src);
@@ -263,6 +263,8 @@ jc.springLoad = ( ...sources ) => {
 	} );
 	ns.forEach( (src) => {
 		if ( ! src ) return undefined;
+		if ( AS.test.obj(src) && (src.type=='js') && src.src ) return jc.springLoadJs( src.src );
+		if ( AS.test.obj(src) && (src.type=='css') && src.src ) return jc.springLoadCss( src.src );
 		if ( src.match(/\.css$/i ) ) return jc.springLoadCss( src );
 		if ( src.match(/\.js$/i ) ) return jc.springLoadJs( src );
 		jc.console( 'jc.springLoad unknown element: '+src);
@@ -1425,7 +1427,7 @@ jc.page = {
 			let ep = (new Date()).getTime();
 			jc.springLoad('module:edit');
 			if ( (ep - sp) > 2000 ) {
-				swal({ title: AS.label('LoginDoneTitle'), text: AS.label('LoginDoneBody',{user:jc.prop.authUser}), type: "success" });
+				Swal.fire({ title: AS.label('LoginDoneTitle'), text: AS.label('LoginDoneBody',{user:jc.prop.authUser}), icon: "success" });
 			}
 		});
 	},
@@ -1466,47 +1468,57 @@ jc.page = {
 			jc.page.prop.editMode = status;
 			let oe = jc.edit.data()||false;
 			if ( oe ) {
-				swal(
-					{
-						title: AS.label('editYetItTitle'),
-						text: AS.label('editYetItBody'),
-						type: "warning",
-						showCancelButton: true,
-						confirmButtonText: AS.label('editYetItOk'),
-						cancelButtonText: AS.label('editYetItCancel'),
-						closeOnConfirm: true,
-						closeOnCancel: true,
-					},
-					function (ok) {
-						if (ok) {
-							jc.edit.data(oe);
-							jc.page.reload();
-						} else {
-							jc.edit.data( jc.page.data().pageContent );
-							jc.page.reload();
-						}
+				Swal.fire({
+					title: AS.label('editYetItTitle'),
+					text: AS.label('editYetItBody'),
+					icon: "warning",
+					showDenyButton: true,
+					showCancelButton: true,
+					confirmButtonText: AS.label('editYetItOk'),
+					denyButtonText: AS.label('editYetItCancel'),
+					customClass: {
+						cancelButton: 'order-1 right-gap',
+						denyButton: 'order-2',
+						confirmButton: 'order-3',
 					}
-				);
+				}).then( result => {
+					if (result.isConfirmed) {
+						jc.edit.data(oe);
+						jc.page.reload();
+					} else if (result.isDenied) {
+						jc.edit.data( jc.page.data().pageContent );
+						jc.page.reload();
+					} else {
+						jc.page.prop.editMode = false;
+					}
+				});
 				return;
 			}
 			jc.edit.data( jc.page.data().pageContent );
 			jc.page.reload();
 			return;
 		} else if ( AS.test.udef(savePolicy)) {
-			swal(
-				{
-					title: AS.label('SaveChangesTitle'),
-					text: AS.label('SaveChangesBody'),
-					type: "warning",
-					showCancelButton: true,
-					closeOnConfirm: true,
-					closeOnCancel: true,
-					cancelButtonText : AS.label('menuEditOverDiscard'),
-					confirmButtonText : AS.label('menuEditOverSave'),
-					hideClass: { popup: '' },
-				},
-				function (ok) { jc.page.edit(status,ok); }
-			);
+			Swal.fire({
+				title: AS.label('SaveChangesTitle'),
+				text: AS.label('SaveChangesBody'),
+				icon: "warning",
+				showCancelButton: true,
+				showDenyButton: true,
+				denyButtonText : AS.label('menuEditOverDiscard'),
+				confirmButtonText : AS.label('menuEditOverSave'),
+				hideClass: { popup: '' },
+				customClass: {
+					cancelButton: 'order-1 right-gap',
+					denyButton: 'order-2',
+					confirmButton: 'order-3',
+				}
+			}).then( result => {
+				if (result.isConfirmed) {
+					jc.page.edit(status,true)
+				} else if (result.isDenied) {
+					jc.page.edit(status,false)
+				}
+			});
 			return;
 		}
 		let oe = (jc.edit && jc.edit.data())||false;
@@ -1522,7 +1534,37 @@ jc.page = {
 		jc.page.prop.editMode = status;
 		jc.page.reload();
 	},
-	create : ( data, page ) => { jc.page.save( data, page, 'new' ); },
+	create : ( page, metadata ) => {
+		if ( AS.test.udef(page) ) {
+			jc.jdav.get(
+				AS.path('jsauth') + 'auth/lstemplates',
+				(l) => {
+					let opts = {};
+					l.list.forEach( (k) => {
+						opts[k] = k;
+					} );
+					console.log( opts );
+					Swal.fire({
+						title: 'Select page type',
+						input: 'select',
+						inputOptions : opts,
+						inputPlaceholder: 'Select',
+						inputValidator : (v) => {
+							return new Promise((resolve) => {
+								if (v.length) {
+									resolve()
+								} else {
+									resolve('Select page type');
+								}
+							})
+						},
+					});
+				}
+			)
+			return;
+		}
+		//jc.page.save( data, page, 'new' );
+	},
 	save : ( params ) => {
 		jc.progress(AS.label('SavingPage'));
 		if ( AS.test.udef(params)) params = {};
@@ -1588,10 +1630,10 @@ jc.page = {
 						jc.progress(false);
 						if ( (! isNew) && (! params.noDialog) ) {
 							window.setTimeout( ()=>{
-								swal({
+								Swal.fire({
 									title: AS.label('PageSavedTitle'),
 									text: AS.label('PageSavedBody',{page:params.page,id:params.id}),
-									type: "success",
+									icon: "success",
 									showCancelButton:false,
 									showConfirmButton:false,
 									timer: 2000,
@@ -1691,7 +1733,7 @@ jc.actionsMenu = (e) => {
 		acts.push(
 			{icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} },
 			'-',
-			{icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.add();} },
+			{icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.create();} },
 		);
 	}
 	jc.menu(e, { content: acts, highlight: false });

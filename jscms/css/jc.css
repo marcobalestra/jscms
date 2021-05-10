@@ -73,3 +73,7 @@ h { display: none; }
 
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }
+.swal2-actions .order-1 { order: 1; }
+.swal2-actions .order-2 { order: 2; }
+.swal2-actions .order-3 { order: 3; }
+.swal2-actions .right-gap { margin-right: auto; }
