@@ -1515,17 +1515,13 @@ jc.page = {
 			Swal.fire({
 				title: AS.label('SaveChangesTitle'),
 				text: AS.label('SaveChangesBody'),
-				icon: "warning",
+				icon: "question",
 				showCancelButton: true,
 				showDenyButton: true,
 				denyButtonText : AS.label('menuEditOverDiscard'),
 				confirmButtonText : AS.label('menuEditOverSave'),
+				cancelButtonText : AS.label('Cancel'),
 				hideClass: { popup: '' },
-				customClass: {
-					cancelButton: 'order-1 right-gap',
-					denyButton: 'order-2',
-					confirmButton: 'order-3',
-				}
 			}).then( result => {
 				if (result.isConfirmed) {
 					jc.page.edit(status,true)

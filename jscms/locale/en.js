@@ -32,7 +32,7 @@ AS.labels.load('en',[{
 	'PageTitleHelp' : 'Page name that will appear in browser’s title bar (or tabs bar).',
 	'PageUriHelp' : 'A customizable address that will be the leading section of page URI.',
 	'SaveChangesBody' : 'Do you want to save changes to this page?',
-	'SaveChangesTitle': 'Save data?',
+	'SaveChangesTitle': 'Closing editor',
 	'SavingArticleList' : 'Saving comprehensive article list…',
 	'SavingLasts' : 'Saving list of last updated…',
 	'SavingPage' : 'Saving page…',
