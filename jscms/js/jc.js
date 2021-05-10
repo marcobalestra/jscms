@@ -358,6 +358,24 @@ jc.login = ( success, fail ) => {
 	);
 };
 
+jc.progress = ( msg ) => {
+	let mod = $('#jcProgressIndicator');
+	if ( mod.length == 0 ) {
+		mod = $('<div id="jcProgressIndicator" class="modal" tabindex="-1"><div class="modal-dialog"><div class="modal-body"></div></div></div>');
+		$(document.body).append( mod );
+		mod = $('#jcProgressIndicator',document.body);
+	}
+	if ( AS.test.str(msg) ) {
+		$('.modal-body',mod).html(msg);
+		if ( ! mod.hasClass('in') ) mod.modal('show');
+	} else {
+		mod.removeClass("in");
+		$(".modal-backdrop").remove();
+		mod.hide();
+		mod.remove();
+	}
+};
+
 jc.dav = {
 	get : ( url, success, fail ) => {
 		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
@@ -1500,6 +1518,7 @@ jc.page = {
 	},
 	create : ( data, page ) => { jc.page.save( data, page, 'new' ); },
 	save : ( params ) => {
+		jc.progress(AS.label('SavingPage'));
 		if ( AS.test.udef(params)) params = {};
 		else if ( AS.test.func(params)) params = { callback: params };
 		if ( AS.test.udef(params.data)) params.data = jc.edit.data();
@@ -1561,6 +1580,7 @@ jc.page = {
 				params.typelist[String(params.id?params.id:0)] = tpd;
 				jc.jdav.put('struct/type-'+params.page+'-list.json',params.typelist,()=>{
 					jc.page.makeLasts( params.page, params.typelist, ()=>{
+						jc.progress(false);
 						if ( (! isNew) && (! params.noDialog) ) {
 							jc.page.prop.editMode = false;
 							swal({

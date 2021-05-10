@@ -31,5 +31,6 @@ AS.labels.load('en',[{
 	'PageUriHelp' : 'A customizable address that will be the leading section of page URI.',
 	'SaveChangesBody' : 'Do you want to save changes to this page?',
 	'SaveChangesTitle': 'Save data?',
+	'SavingPage' : 'Saving page…',
 }]);
 

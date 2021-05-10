@@ -32,6 +32,9 @@ AS.labels.load('it',[{
 	'PageTitleHelp' : 'Il nome della pagina come comparirà nella barra del titolo (o dei tab) del browser.',
 	'PageUriHelp' : 'Un indirizzo personalizzabile che costituirà l’ultima parte dello URI della pagina.',
 	'Properties': 'Proprietà',
+	'SaveChangesBody' : 'Vuoi registrare i cambiamenti nella pagina?',
+	'SaveChangesTitle': 'Salvare?',
+	'SavingPage' : 'Salvataggio pagina…',
 	'Text' : 'Testo',
 }]);
 
