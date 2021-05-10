@@ -1476,11 +1476,6 @@ jc.page = {
 					showCancelButton: true,
 					confirmButtonText: AS.label('editYetItOk'),
 					denyButtonText: AS.label('editYetItCancel'),
-					customClass: {
-						cancelButton: 'order-1 right-gap',
-						denyButton: 'order-2',
-						confirmButton: 'order-3',
-					}
 				}).then( result => {
 					if (result.isConfirmed) {
 						jc.edit.data(oe);
@@ -1540,6 +1535,7 @@ jc.page = {
 				AS.path('jsauth') + 'auth/lstemplates',
 				(l) => {
 					let opts = {};
+					l.list.sort();
 					l.list.forEach( (k) => {
 						opts[k] = k;
 					} );
@@ -1549,6 +1545,7 @@ jc.page = {
 						input: 'select',
 						inputOptions : opts,
 						inputPlaceholder: 'Select',
+						showCancelButton: true,
 						inputValidator : (v) => {
 							return new Promise((resolve) => {
 								if (v.length) {

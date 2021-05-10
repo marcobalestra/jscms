@@ -73,7 +73,7 @@ h { display: none; }
 
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }
-.swal2-actions .order-1 { order: 1; }
-.swal2-actions .order-2 { order: 2; }
-.swal2-actions .order-3 { order: 3; }
-.swal2-actions .right-gap { margin-right: auto; }
+.swal2-container .swal2-actions button { min-width: 80px; text-align: center; }
+.swal2-container .swal2-actions .swal2-cancel {order: 1; margin-right: auto; }
+.swal2-container .swal2-actions .swal2-deny {order: 2; }
+.swal2-container .swal2-actions .swal2-confirm {order: 3; }
