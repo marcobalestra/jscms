@@ -423,10 +423,10 @@ jc.edit.uploads = {
 			</span>
 		</div>`));
 		let doupload = () => {
+			jc.edit.noModal();
 			jc.page.upload( $('input[type="file"]',$out).get(0), ( newitems )=>{
 				let refresh = (e)=> {
 					$(document.body).off('jc_page_data_loaded',refresh);
-					jc.edit.noModal();
 					if ( params.context=='page') jc.edit.uploads.edit();
 				}
 				$(document.body).on('jc_page_data_loaded',refresh);
@@ -444,9 +444,9 @@ jc.edit.uploads = {
 			let rm = (item) => {
 				if ( (item instanceof Event)||(item.originalEvent) ) item = $(item.target).closest('tr').data();
 				jc.page.rmUpload( item, (newpdata)=>{
+					jc.edit.noModal();
 					let refresh = (e)=> {
 						$(document.body).off('jc_page_data_loaded',refresh);
-						jc.edit.noModal();
 						if ( params.context=='page') jc.edit.uploads.edit();
 					}
 					$(document.body).on('jc_page_data_loaded',refresh);
