@@ -16,6 +16,7 @@ AS.labels.load('it',[{
 	'editYetItOk' : 'Continua',
 	'editYetItTitle' : 'La pagina era già in modifica.',
 	'headerTag' : 'I cuochi scrivono, tutti possono leggere',
+	'LastChangedPages' : 'Ultime pagine modificate',
 	'LoginDoneBody':'La login attuale è “{{user}}”.\nPer uscire (logout) fai quit del browser.',
 	'LoginDoneTitle':'Autenticazione effettuata',
 	'Main' : 'Principale',
@@ -45,9 +46,12 @@ AS.labels.load('it',[{
 	'SavingArticleList' : 'Salvataggio elenco di tutti gli articoli…',
 	'SavingLasts' : 'Salvataggio degli ultimi aggiornamenti…',
 	'SavingPage' : 'Salvataggio pagina…',
+	'SelectBlockType' : 'Scegli un tipo',
+	'SelectBlockTypeDesc' : 'Scegli il tipo di blocco che vuoi aggiungere:',
 	'SelectPageType' : 'Scegli un tipo',
 	'SelectPageTypeDesc' : 'Scegli il tipo di pagina che vuoi creare:',
 	'Text' : 'Testo',
+	'TextOrHtml' : 'Testo o HTML',
 	'Warning' : 'Attenzione',
 }]);
 

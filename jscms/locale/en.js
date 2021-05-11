@@ -12,6 +12,7 @@ AS.labels.load('en',[{
 	'editYetItOk' : 'Resume',
 	'editYetItTitle' : 'Previous edit detected.',
 	'headerTag' : 'Recipes from real Chefs',
+	'LastChangedPages' : 'Last changed pages',
 	'LoginDoneBody':'Login done with user “{{user}}”.\nTo logout quit the browser.',
 	'LoginDoneTitle':'Authenticated',
 	'menuActionsTitle' : 'Available actions',
@@ -41,8 +42,11 @@ AS.labels.load('en',[{
 	'SavingArticleList' : 'Saving comprehensive article list…',
 	'SavingLasts' : 'Saving list of last updated…',
 	'SavingPage' : 'Saving page…',
+	'SelectBlockType' : 'Select block type',
+	'SelectBlockTypeDesc' : 'Select which type of block you want to add:',
 	'SelectPageType' : 'Select page type',
 	'SelectPageTypeDesc' : 'Select which type of page you want to create:',
 	'Text' : 'Text',
+	'TextOrHtml' : 'Text or HTML',
 }]);
 

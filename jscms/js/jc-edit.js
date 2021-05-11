@@ -4,9 +4,10 @@ AS.addEvent(document,'as:tinyMceInited',e=>{
 
 jc.edit = {
 	prop : {
-		blockTypes : ['text'],
+		blockTypes : [{'text':'TextOrHtml'},{'lasts':'LastChangedPages'}],
 	},
 	start : () => {
+		if ( ! jc.edit.pageTypes ) jc.jdav.get(AS.path('jsauth') + 'auth/lstemplates', r => { jc.edit.pageTypes = r.list; });
 		document.querySelectorAll('.jcEditable:not(.jcEditableParsed)').forEach( (d) => {
 			let $d = $(d);
 			let data = $d.data('editable');
@@ -60,7 +61,16 @@ jc.edit = {
 			} else if (canAdd) {
 				acts.push('-',{icon:'jcicon danger',iconKey:'editRemove',label:AS.label('blockDeleteContent'),action:jc.edit.rm},'-');
 			}
-			if (canAdd) acts.push({icon:'jcicon',iconKey:'editAdd',ricon:'jcicon',riconKey:'arrow-down',label:AS.label('blockAddContent'),action:jc.edit.add});
+			if (canAdd) {
+				let addItem = {icon:'jcicon',iconKey:'editAdd',ricon:'jcicon',riconKey:'arrow-down',label:AS.label('blockAddContent'),action:jc.edit.add};
+				if ( jc.edit.prop.blockTypes.length > 1 ) {
+					addItem.content = [];
+					jc.edit.prop.blockTypes.forEach( bt=> { Object.keys(bt).forEach( k=> {
+						addItem.content.push({label:AS.label(bt[k]),action:e=>{jc.edit.add(e,k)}});
+					} ); } );
+				}
+				acts.push(addItem);
+			}
 		}
 		if ( ! acts.length ) return;
 		else if ( acts.length == 1 ) return acts[0].action.call(window,e);
@@ -128,11 +138,16 @@ jc.edit = {
 						fo.destroy();
 						jc.edit.noModal();
 						if ( AS.test.def(b.qt) ) {
+							// block mixed elem
 							d[b.prop][b.idx] = fd;
 							jc.edit.fixBlocks(b,d);
-						} else {
+						} else if ( AS.test.def(fd[t]) ){
+							// single block, single property: one field named like the type
 							d[b.prop] = fd[t];
 							jc.edit.data(d);
+						} else {
+							// multi properties
+							d[b.prop] = fd;
 						}
 						jc.page.reload();
 					}
@@ -147,6 +162,14 @@ jc.edit = {
 					}
 				},
 			};
+		},
+		lasts : (b,d) => {
+			let o = jc.edit.form._base(b,d);
+			o.fields.push(
+				['ptype','select',{asLabel:'PageType',options:jc.edit.pageTypes.clone()}],
+				['qtitems','select',{asLabel:'Max',options:jc.prop.lastChangedQuantities.clone()}],
+			);
+			return o;
 		},
 		date : (b,d) => {
 			let o = jc.edit.form._base(b,d);
@@ -203,13 +226,39 @@ jc.edit = {
 			return o;
 		},
 	},
-	add : (e) => {
+	add : (e,t) => {
 		let ob = jc.edit.itemdata(e);
 		let d = jc.edit.data();
-		if ( jc.edit.prop.blockTypes.length == 1 ) {
-			jc.edit.addType( ob, d, jc.edit.prop.blockTypes[0] );
+		if ( jc.edit.prop.blockTypes.length == 1 ) t = jc.edit.prop.blockTypes[0];
+		if ( AS.test.str(t) ) {
+			jc.edit.addType( ob, d, t );
 		} else {
 			// choose block type
+			let opts={};
+			jc.edit.prop.blockTypes.forEach( t=>{ Object.keys(t).forEach( k=>{ opts[k] = AS.label(t[k]) } ) } );
+			Swal.fire({
+				title: AS.label('SelectBlockType'),
+				text: AS.label('SelectBlockTypeDesc'),
+				input: 'select',
+				icon: 'question',
+				inputOptions : opts,
+				inputPlaceholder: 'Select',
+				showCancelButton: true,
+				cancelButtonText: AS.label('Cancel'),
+				confirmButtonText: AS.label('OK'),
+				inputValidator : (v) => {
+					return new Promise((resolve) => {
+						if (v.length) {
+							resolve()
+						} else {
+							resolve(AS.label('SelectBlockType'));
+						}
+					})
+				},
+			}).then( result => {
+				if ( ! result.isConfirmed ) return;
+				jc.edit.addType( ob, d, result.value );
+			});
 		}
 	},
 	addType : (b,d,t) => {
