@@ -274,7 +274,7 @@ jc.edit = {
 				input: 'select',
 				icon: 'question',
 				inputOptions : opts,
-				inputPlaceholder: 'Select',
+				inputPlaceholder: AS.label('Choose')+'…',
 				showCancelButton: true,
 				cancelButtonText: AS.label('Cancel'),
 				confirmButtonText: AS.label('OK'),
