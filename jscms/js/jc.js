@@ -65,17 +65,6 @@ jc.prop.loadModules = {
 		'https://cdn.datatables.net/v/dt/dt-1.10.24/date-1.0.3/sp-1.2.2/datatables.min.js',
 		'wait:()=>((!! $.fn.dataTable) && (!! $.fn.fancybox) )',
 	],
-	'swal' : [
-		{ type:'js', src:'https://cdn.jsdelivr.net/npm/sweetalert2@10'},
-		{ type:'js', src:'https:////cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js'},
-		'wait:window.Swal',
-	],
-	'webcam' : [
-		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
-		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js',
-		(AS.path('jsroot') + 'js/webcam_modal.js'),
-		'wait:()=>((!! window.wcm) && (!! $.fn.fancybox) )',
-	],
 };
 
 /* Extend jQuery */
