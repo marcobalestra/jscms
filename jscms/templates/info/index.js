@@ -14,7 +14,7 @@
 			editable:true,
 			blocks:[
 				{ type:"text",wrap:"<h3></h3>",prop:"title" },
-				{ type:"mixed",prop:"blocks" }
+				{ type:"mixed",prop:"blocks" },
 			]
 		}},
 	];

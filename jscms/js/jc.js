@@ -412,11 +412,11 @@ jc.dav = {
 		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
 		success = jc.evalFunc(success)||(()=>{});
 		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
-		if ( ! AS.test.str(data) ) data = String(data);
 		jc.console('jc.dav.put',url,data);
 		$.ajax( url, {
 			method: 'PUT',
 			dataType: 'text',
+			processData: false,  // Important!
 			cache: false,
 			contentType: 'text/plain; charset=UTF-8',
 			data: data,
@@ -680,7 +680,6 @@ jc.menu = (ev,menu)=>{
 		$(`<div class="appContextHighlightTent" style="top:${os.top}px;left:${os.left}px;width:${w}px;height:${h}px;"> </div>`).appendTo(document.body);
 		hl.addClass('appContextHighlight');
 	}
-	if ( ! menu.sticky ) $cm.on('mouseleave', zapMenus );
 	$(document.body).on('click contextmenu', zapMenus );
 	$cm.css({
 		transition: `all ${ menu.duration||100 }ms`,
@@ -689,7 +688,10 @@ jc.menu = (ev,menu)=>{
 		top: `${top}px`,
 		display: 'block'
 	});
-	let rmtrans = e=>{ $(e.target).off('transitionend',rmtrans).css({ transition: 'unset', transform: 'unset' }); };
+	let rmtrans = e=>{
+		if ( ! menu.sticky ) $cm.on('mouseleave', zapMenus );
+		$(e.target).off('transitionend',rmtrans).css({ transition: 'unset', transform: 'unset' });
+	};
 	$cm.on('transitionend',rmtrans);
 	window.setTimeout( ()=>{ $cm.css({ transform: 'translateY(0) scaleY(1)' }); }, 0);
 };
@@ -1321,6 +1323,8 @@ jc.page = {
 								delete c.rendered;
 								delete c.internalRecursion;
 								delete c.id;
+								if ( AS.test.func(c.callback)) c.callback.call(window,c);
+								delete c.callback;
 							} else if ( c.type ){
 								c.internalRecursion = true;
 								c.selector = sel;
@@ -1404,8 +1408,9 @@ jc.page = {
 			if ( ! Array.isArray(o.blocks)) o.blocks = [o.blocks];
 			let canedit = o.editable;
 			o.rendered = o.blocks.map( (b,idx) => {
-				let out = jc.page.blocks[b.type] ? jc.page.blocks[b.type].call(window,b,pdata) : '';
-				if ( canedit && jc.page.prop.editMode ) {
+				let blockEditable = !( AS.test.def(b.editable) && (!b.editable));
+				let out = jc.page.blocks[b.type] ? jc.page.blocks[b.type].call(window,b,pdata,o) : '';
+				if ( canedit && blockEditable && jc.page.prop.editMode ) {
 					let w = true;
 					if ( (out instanceof jQuery)||(out instanceof NodeList)||(out instanceof Node) ) w = ! $('.jcEditable',out).length;
 					else if ( AS.test.str(out) ) w = ( out.indexOf('<div class="jcEditable">') < 0 );
@@ -1430,10 +1435,12 @@ jc.page = {
 			$(document.body).addClass('jcUserAuth');
 			$menu.append(`<div class="jcicon jcAuth">${ AS.icon('user') }</div><div class="jcUser">${ jc.prop.authUser }</div>`);
 			$menu.on('click contextmenu',jc.actionsMenu);
+			$(document.body).on('contextmenu',jc.actionsMenu);
 		} else {
 			$(document.body).removeClass('jcUserAuth');
 			$menu.append(`<span class="jcicon jcUnauth">${ AS.icon('lock') }</span>`);
 			$menu.off('click contextmenu',jc.actionsMenu);
+			$(document.body).off('contextmenu',jc.actionsMenu);
 			$('.jcUnauth',$menu).on('click',jc.page.login);
 		}
 	},
@@ -1484,6 +1491,20 @@ jc.page = {
 				}
 			} );
 			return out;
+		},
+		part : (b,d,p) => {
+			let id = AS.generateId('blockPart');
+			let div = $('<div></div>');
+			div.attr('id',id);
+			let nb = {
+				selector: '#'+id,
+				type: 'part',
+				content: b.content||d[b.prop],
+				internalRecursion : true,
+				callback : ()=>{ div.removeAttr('id'); }
+			}
+			window.setTimeout(()=>{jc.page.render.main(nb,d)},10);
+			return div;
 		},
 	},
 	edit : ( status, savePolicy ) => {
@@ -1853,12 +1874,66 @@ jc.page = {
 		}
 		proc();
 	},
+	upload : (fld,callback) => {
+		const page = jc.page.current();
+		let pdata = jc.page.data().pageContent;
+		const id = pdata.id;
+		const prefix = page + ( id||'');
+		let uploads = AS.def.arr( pdata.uploads );
+		let news = [];
+		const max = fld.files.length;
+		let idx = 0;
+		const process = () => {
+			let tf = fld.files[idx];
+			let oname = tf.name;
+			jc.progress( oname );
+			let ext = oname.replace(/.*\.([^.]+)$/,"$1").toLowerCase();
+			let newname = AS.generateId(prefix)+'.'+ext;
+			let url = AS.path('jsdataroot') + 'uploads/' + newname;
+			tf.arrayBuffer().then( buffer => {
+				let binary = new DataView(buffer);
+				jc.dav.put( url, binary, (result)=>{
+					if ( result ) {
+						let no = { name: oname, ext: ext, uri: url, size: tf.size, type: tf.type };
+						if ( no.type && no.type.length ) {
+							if (no.type.indexOf('image/')==0) no.img = true;
+						} else {
+							no.type = 'application/octet-stream';
+						}
+						uploads.push( no );
+						news.push( no );
+					}
+					idx++;
+					if ( idx < max ) {
+						process();
+						return;
+					}
+					fld.value = '';
+					pdata.uploads = uploads;
+					let params = {
+						data : pdata,
+						page: page,
+						noLasts : true,
+						noDialog : true,
+						callback : ()=>{
+							jc.progress();
+							if ( AS.test.func(callback)) callback.call(window,news,uploads);
+						}
+					}
+					if (AS.test.def(id)) params.id = id;
+					jc.page.save( params );
+				});
+			});
+		};
+		process();
+	},
 };
 
 jc.actionsMenu = (e) => {
-	let acts = [AS.label('menuActionsTitle')];
+	let acts = [];
 	if ( jc.page.prop.editMode ) {
 		acts.push(
+			AS.label('ThisPage')+':',
 			{icon:'jcicon',iconKey:'metadata',label:AS.label('Properties'),action:()=>{jc.edit.meta.edit();} },
 			{icon:'jcicon',iconKey:'pageEditOff',label:AS.label('menuEditOver'),action:()=>{jc.page.edit(false);},content:[
 				{icon:'jcicon',iconKey:'done',label:AS.label('menuEditOverSave'),action:()=>{jc.page.edit(false,true);} },
@@ -1866,11 +1941,14 @@ jc.actionsMenu = (e) => {
 			]}
 		);
 	} else {
-		acts.push({icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} });
+		let tp = {label:AS.label('ThisPage')+':',content:[]};
+		let ws = {label:AS.label('WholeSite')+':',content:[]};
+		tp.content.push({icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} });
 		if ( (jc.page.current()!='index')||AS.test.def(jc.page.data().id)) {
-			acts.push('-',{icon:'jcicon danger',iconKey:'pageRm',label:AS.label('DeleteThisPage')+'…',action:()=>{jc.page.rm();} });
+			tp.content.push('-',{icon:'jcicon danger',iconKey:'pageRm',label:AS.label('DeleteThisPage')+'…',action:()=>{jc.page.rm();} });
 		}
-		acts.push('-',{icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.create();} });
+		ws.content.push({icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.create();} });
+		acts.push(AS.label('menuActionsTitle'),tp,ws);
 	}
 	jc.menu(e, { content: acts, highlight: false });
 };

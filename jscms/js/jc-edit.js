@@ -1,13 +1,28 @@
-AS.addEvent(document,'as:tinyMceInited',e=>{
-	e.detail.getWrap().querySelector('.tox-tinymce').style.height = String(Math.min(Math.max((parseInt(window.innerHeight)-240),300),640))+'px';
-});
 
 jc.edit = {
 	prop : {
-		blockTypes : [{'text':'TextOrHtml'},{'lasts':'LastChangedPages'}],
+		blockTypes : [{type:'text',label:'TextOrHtml',menu:true},{type:'lasts',label:'LastChangedPages'},{type:'part',label:'IncludePagePart'}],
+	},
+	onload : () => {
+		AS.addEvent(document,'as:tinyMceInited',e=>{
+			e.detail.getWrap().querySelector('.tox-tinymce').style.height = String(Math.min(Math.max((parseInt(window.innerHeight)-240),300),640))+'px';
+		});
+		jc.edit.loadPageTypes();
+		jc.edit.loadPageParts();
+	},
+	loadPageTypes : ( force )=>{
+		if ( force || (! jc.edit.prop.pageTypes) ) {
+			jc.edit.prop.pageTypes = true;
+			jc.jdav.get(AS.path('jsauth') + 'auth/lstemplates', r => { jc.edit.prop.pageTypes = r.list; });
+		}
+	},
+	loadPageParts : ( force )=>{
+		if ( force || (! jc.edit.prop.pageParts) ) {
+			jc.edit.prop.pageParts = true;
+			jc.jdav.get(AS.path('jsauth') + 'auth/lsparts', r => { jc.edit.prop.pageParts = r.list; });
+		}
 	},
 	start : () => {
-		if ( ! jc.edit.pageTypes ) jc.jdav.get(AS.path('jsauth') + 'auth/lstemplates', r => { jc.edit.pageTypes = r.list; });
 		document.querySelectorAll('.jcEditable:not(.jcEditableParsed)').forEach( (d) => {
 			let $d = $(d);
 			let data = $d.data('editable');
@@ -64,17 +79,18 @@ jc.edit = {
 			if (canAdd) {
 				let addItem = {icon:'jcicon',iconKey:'editAdd',ricon:'jcicon',riconKey:'arrow-down',label:AS.label('blockAddContent'),action:jc.edit.add};
 				if ( jc.edit.prop.blockTypes.length > 1 ) {
-					addItem.content = [];
-					jc.edit.prop.blockTypes.forEach( bt=> { Object.keys(bt).forEach( k=> {
-						addItem.content.push({label:AS.label(bt[k]),action:e=>{jc.edit.add(e,k)}});
-					} ); } );
+					addItem.label += '…';
+					let vt = jc.edit.prop.blockTypes.filter( t =>(t.menu) );
+					if ( vt.length ) {
+						addItem.content = vt.map( t=>{ return {label:AS.label(t.label),action:e=>{jc.edit.add(e,t.type)}}; } );
+					}
 				}
 				acts.push(addItem);
 			}
 		}
 		if ( ! acts.length ) return;
 		else if ( acts.length == 1 ) return acts[0].action.call(window,e);
-		acts.unshift(data.subtype||data.type);
+		acts.unshift('Block: '+(data.subtype||data.type));
 		jc.menu(e, { content: acts, highlight: hl });
 	},
 	itemdata : (e) => {
@@ -166,7 +182,7 @@ jc.edit = {
 		lasts : (b,d) => {
 			let o = jc.edit.form._base(b,d);
 			o.fields.push(
-				['ptype','select',{asLabel:'PageType',options:jc.edit.pageTypes.clone()}],
+				['ptype','select',{asLabel:'PageType',options:jc.edit.prop.pageTypes.clone()}],
 				['qtitems','select',{asLabel:'Max',options:jc.prop.lastChangedQuantities.clone()}],
 			);
 			return o;
@@ -174,6 +190,17 @@ jc.edit = {
 		date : (b,d) => {
 			let o = jc.edit.form._base(b,d);
 			o.fields.push( ["date","date",{asLabel:'Date',skypempty:true,asTitle:'onlyNonEmptyFields',format:'YYYY-MM-DD',default:(new Date()).tosqldate()}] );
+			return o;
+		},
+		part : (b,d) => {
+			let o = jc.edit.form._base(b,d);
+			let opts = jc.edit.prop.pageParts.clone();
+			opts.sort();
+			opts.unshift({label:AS.label('Choose')+'…',value:''});
+			o.fields.push(
+				['part','select',{asLabel:'PageType',options:opts,mandatory:true}],
+				['type','hidden',{value:'part'}],
+			);
 			return o;
 		},
 		text : (b,d) => {
@@ -234,8 +261,13 @@ jc.edit = {
 			jc.edit.addType( ob, d, t );
 		} else {
 			// choose block type
+			let ml = AS.label('Mains')+':';
+			let ol = AS.label('Others')+':';
 			let opts={};
-			jc.edit.prop.blockTypes.forEach( t=>{ Object.keys(t).forEach( k=>{ opts[k] = AS.label(t[k]) } ) } );
+			opts[ml]={};
+			jc.edit.prop.blockTypes.filter(t=>(t.menu)).forEach( t=>{ opts[ml][t.type] = AS.label(t.label) } );
+			opts[ol]={};
+			jc.edit.prop.blockTypes.filter(t=>(!t.menu)).forEach( t=>{ opts[ol][t.type] = AS.label(t.label) } );
 			Swal.fire({
 				title: AS.label('SelectBlockType'),
 				text: AS.label('SelectBlockTypeDesc'),
@@ -282,7 +314,8 @@ jc.edit = {
 			jc.page.reload();
 		};
 		fopt.callback = (f) => {
-			if ( AS.test.udef(b.qt)) f.setValue('type','html');
+			if ( AS.test.def(t)) f.setValue('type',t);
+			else if ( AS.test.udef(b.qt)) f.setValue('type','html');
 			else f.setValue('type',d[b.prop][b.idx].type);
 		};
 		jc.edit.getModal().on('shown.bs.modal',()=>{ AS.form.create( fopt ); }).modal('show');
@@ -355,3 +388,26 @@ jc.edit.meta = {
 		$mod.on('shown.bs.modal',()=>{ AS.form.create(fp); }).modal('show');
 	}
 };
+
+jc.edit.uploads = {
+	edit : () => {
+		let pdata = jc.page.data().pageContent;
+		
+	},
+};
+
+jc.edit.loadPageTypes = ( force )=>{
+	if ( force || (! jc.edit.prop.pageTypes) ) {
+		jc.edit.prop.pageTypes = true;
+		jc.jdav.get(AS.path('jsauth') + 'auth/lstemplates', r => { jc.edit.prop.pageTypes = r.list; });
+	}
+};
+
+jc.edit.loadPageParts = ( force )=>{
+	if ( force || (! jc.edit.prop.pageParts) ) {
+		jc.edit.prop.pageParts = true;
+		jc.jdav.get(AS.path('jsauth') + 'auth/lsparts', r => { jc.edit.prop.pageParts = r.list; });
+	}
+};
+
+$( ()=>{ jc.edit.onload(); });
