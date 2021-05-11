@@ -350,6 +350,7 @@ jc.edit = {
 		$(".modal-backdrop").remove();
 		mod.hide();
 		mod.remove();
+		$(document.body).removeClass( 'modal-open' );
 	},
 };
 
@@ -392,7 +393,97 @@ jc.edit.meta = {
 jc.edit.uploads = {
 	edit : () => {
 		let pdata = jc.page.data().pageContent;
-		
+		let $mod = jc.edit.getModal(true);
+		$('.modal-dialog',$mod).append(`<div class="modal-content">
+			<div class="modal-header bg-info text-white">
+				<p class="modal-title">
+					<span class="jcicon">${ AS.icon('uploads') }</span> 
+					<b>${ AS.label('Uploads') }</b>
+				</p>
+				<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
+					<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>
+				</button>
+			</div>
+			<div class="modal-body" id="jcPageUploads"></div></div>`);
+		let params = { target: $('#jcPageUploads',$mod), context: 'page' };
+		$mod.on('shown.bs.modal',()=>{ jc.edit.uploads.render( params); }).modal({show:true,keyboard:false});
+	},
+	render : ( params ) => {
+		if ( AS.test.func(params)) params = { callback: params };
+		params = AS.def.obj( params );
+		if ( ! params.pageData ) params.pageData = jc.page.data().pageContent;
+		if ( ! params.uploads ) params.uploads = params.pageData.uploads;
+		params.uploads = AS.def.arr(params.uploads);
+		if ( AS.test.udef(params.select) ) params.select = AS.test.arr(params.selected);
+		let $out = $('<div></div>');
+		$out.append($(`<div class="jcUploadsAdders text-center mb-4">
+			<input type="file" multiple="multiple" style="display:none" />
+			<span class="btn-group">
+				<button type="button" class="btn btn-sm btn-primary jcImageUpload">${ AS.icon('upload')} ${AS.label('Upload')}</button>
+			</span>
+		</div>`));
+		let doupload = () => {
+			jc.page.upload( $('input[type="file"]',$out).get(0), ( newitems )=>{
+				let refresh = (e)=> {
+					$(document.body).off('jc_page_data_loaded',refresh);
+					jc.edit.noModal();
+					if ( params.context=='page') jc.edit.uploads.edit();
+				}
+				$(document.body).on('jc_page_data_loaded',refresh);
+				jc.page.reload();
+			});
+		};
+		$('.jcImageUpload',$out).on('click',()=>{ $('input[type="file"]',$out).trigger('click'); });
+		$('input[type="file"]',$out).on('change',(e)=>{ doupload() });
+		if ( params.uploads.length ) {
+			let $tbl = $('<table class="jcUploads"><thead><tr></tr></thead><tbody></tbody></table>');
+			if ( params.select ) $('thead tr',$tbl).append('<th></th>');
+			$('thead tr',$tbl).append(`<th>${ AS.label('FileName')}</th><th>${ AS.label('FileSize')}</th><th></th>`);
+			let onchange = ()=>{
+			};
+			let rm = (item) => {
+				if ( (item instanceof Event)||(item.originalEvent) ) item = $(item.target).closest('tr').data();
+				jc.page.rmUpload( item, (newpdata)=>{
+					let refresh = (e)=> {
+						$(document.body).off('jc_page_data_loaded',refresh);
+						jc.edit.noModal();
+						if ( params.context=='page') jc.edit.uploads.edit();
+					}
+					$(document.body).on('jc_page_data_loaded',refresh);
+					jc.page.reload();
+				});
+			};
+			params.uploads.forEach( u=>{
+				let $tr = $('<tr></tr>')
+				$tr.data(u);
+				if ( params.select ) {
+					let $i = $('<input type="ceckbox" />');
+					if ( params.selected && params.selected.find( k=>( k.name == u.name) ) ) $i.attr('checked',true);
+					$i.on('click change',onchange);
+					$tr.append('<td></td>');
+					$('td',$tr).append($i);
+				}
+				if ( u.img ) {
+					$tr.append(`<td><a href="${u.uri}" data-fancybox="uploads" onclick="this.blur()" data-caption="${u.name.escape()}">${u.name.escape()}</a></td>`);
+				} else {
+					$tr.append('<td>'+u.name.escape()+'</td>');
+				}
+				$tr.append('<td>'+parseInt(u.size).smartSize()+'</td>');
+				let $acts = $('<td class="btn-group"></td>') ;
+				$acts.append(`<a class="btn btn-primary btn-icon btn-sm legitRipple" title="${ AS.label('Download') }" href="${u.uri}" download="${ u.name.escape() }"><i>${ AS.icon('download') }</i></a>`);
+				let $del = $(`<a class="btn btn-danger btn-icon btn-sm legitRipple" title="${ AS.label('Delete') }">${ AS.icon('editRemove') }</a>`);
+				$del.on('click',rm);
+				$acts.append($del);
+				$tr.append($acts);
+				$('tbody',$tbl).append($tr);
+			} );
+			$out.append( $tbl );
+		} else {
+			$out.append( '<div class="jcPlaceHolder text-center">'+AS.label('NoItemsFound')+'</div>' );
+		}
+		if ( params.target ) $(params.target).append($out);
+		if ( AS.test.func(params.callback) ) params.callback.call( window, $out );
+		return $out;
 	},
 };
 

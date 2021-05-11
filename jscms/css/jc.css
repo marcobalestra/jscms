@@ -61,7 +61,7 @@ h { display: none; }
 .jcMenu .jcUser { color: #696; }
 .jcMenu:hover .jcUser { color: #090; }
 .jcEditable, .jcEditable * { box-sizing: border-box; }
-.jcEditable .placeHolder { font-weight: bold; font-style: italic; color: #ccc; }
+.jcPlaceHolder { font-weight: bold; font-style: italic; color: #ccc; }
 .jcEditable { border: #ccc dashed 1px; margin: 2px 0; min-height: 30px; min-width: 30px; overflow: auto; overflow: visible; position: relative; }
 .jcEditMenu { background: #fff; border: #ccc solid 1px; line-height: 8px; padding: 0; position: absolute; right: -1px; top: -1px; z-index:90; }
 .appContextHighlight .jcEditMenu { display: none; }
@@ -79,6 +79,8 @@ h { display: none; }
 	0% { transform: rotate(-360deg); }
 }
 
+table.jcUploads { min-width: 60%; margin: 0 auto; }
+table.jcUploads td:last-child { text-align: right; }
 
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }
@@ -86,3 +88,4 @@ h { display: none; }
 .swal2-container .swal2-actions .swal2-cancel {order: 1; margin-right: auto; }
 .swal2-container .swal2-actions .swal2-deny {order: 2; }
 .swal2-container .swal2-actions .swal2-confirm {order: 3; }
+.btn.btn-sm svg { display: inline-block; width: 20px; height: 20px; fill: #fff; }

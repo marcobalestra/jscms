@@ -49,6 +49,8 @@ jc.prop.loadModules = {
 		AS.path('jsroot') + 'css/jc.css',
 		{ type:'js', src:'https://cdn.jsdelivr.net/npm/sweetalert2@10'},
 		{ type:'js', src:'https:////cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js'},
+		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
+		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js',
 		'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
 		'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
 		'wait:()=>( window.Swal && jQuery.fn.select2 )',
@@ -59,8 +61,6 @@ jc.prop.loadModules = {
 		'wait:()=>( jc.edit && AS.form )',
 	],
 	'datatables': [
-		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
-		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js',
 		'https://cdn.datatables.net/v/dt/dt-1.10.24/date-1.0.3/sp-1.2.2/datatables.min.css',
 		'https://cdn.datatables.net/v/dt/dt-1.10.24/date-1.0.3/sp-1.2.2/datatables.min.js',
 		'wait:()=>((!! $.fn.dataTable) && (!! $.fn.fancybox) )',
@@ -1246,6 +1246,7 @@ jc.page = {
 	step : {
 		info : ( page, id, data, infokey ) => {
 			jc.template.info.get( infokey, ( tdata )=>{
+				$(document.body).trigger('jc_page_template_info_loaded',tdata);
 				if ( ! data ) data = {};
 				if ( ! data.template ) data.template = tdata;
 				jc.page.step.html( page, id, data );
@@ -1260,6 +1261,7 @@ jc.page = {
 					jc.template.html.current( data.template.html );
 					$('#'+jc.prop.mainContainerId).html( html );
 				}
+				$(document.body).trigger('jc_page_template_html_loaded',html);
 				jc.page.step.data( page, id );
 			});
 		},
@@ -1276,6 +1278,7 @@ jc.page = {
 					if ( md.keywords ) $('meta[name="keywords"]',h).attr('content',md.keywords);
 					if ( md.description ) $('meta[name="description"]',h).attr('content',md.description);
 				}
+				$(document.body).trigger('jc_page_data_loaded',j);
 				if (jc.page.prop.editMode == 'page') jc.edit.data( j );
 				if ( data.template.content ) jc.page.render.main(data.template.content);
 			});
@@ -1416,7 +1419,7 @@ jc.page = {
 					else if ( AS.test.str(out) ) w = ( out.indexOf('<div class="jcEditable">') < 0 );
 					if ( w ) {
 						let editable = { prop: b.prop, type: 'block', subtype: b.type };
-						if ( AS.test.udef(out) || (AS.test.str(out) && (out.length==0)) ) out = '<span class="placeHolder">'+b.prop+'</span>';
+						if ( AS.test.udef(out) || (AS.test.str(out) && (out.length==0)) ) out = '<span class="jcPlaceHolder">'+b.prop+'</span>';
 						out = $('<div class="jcEditable"></div>').data('editable',editable).append( out );
 					}
 				}
@@ -1894,7 +1897,7 @@ jc.page = {
 				let binary = new DataView(buffer);
 				jc.dav.put( url, binary, (result)=>{
 					if ( result ) {
-						let no = { name: oname, ext: ext, uri: url, size: tf.size, type: tf.type };
+						let no = { name: oname, ext: ext, uri: url, size: tf.size, type: tf.type, added: (new Date()).getTime() };
 						if ( no.type && no.type.length ) {
 							if (no.type.indexOf('image/')==0) no.img = true;
 						} else {
@@ -1908,6 +1911,9 @@ jc.page = {
 						process();
 						return;
 					}
+					const sortf = (a,b)=>(a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1 );
+					uploads.sort(sortf);
+					news.sort(sortf);
 					fld.value = '';
 					pdata.uploads = uploads;
 					let params = {
@@ -1927,6 +1933,33 @@ jc.page = {
 		};
 		process();
 	},
+	rmUpload : ( item, callback ) => {
+		let recurse = (n) => {
+			if ( AS.test.arr(n) ) {
+				if ( n.length ) {
+					if ( n[0].size && n[0].name && n[0].uri ) return n.filter( i => ( i.uri != item.uri ) );
+					else return n.map( i =>(recurse(i)) );
+				}
+			} else if ( AS.test.obj(n) ) {
+				Object.keys(n).forEach( k => { n[k] = recurse( n[k]) } );
+			}
+			return n;
+		}
+		let pdata = recurse(jc.page.data().pageContent);
+		let params = {
+			data : pdata,
+			page: jc.page.current(),
+			noLasts : true,
+			noDialog : true,
+			callback : ()=>{ jc.dav.rm( item.uri,()=>{
+				jc.progress();
+				if ( AS.test.func(callback)) callback.call(window,pdata);
+			})},
+		}
+		if (pdata.id) params.id = id;
+		jc.page.save( params );
+	},
+
 };
 
 jc.actionsMenu = (e) => {
@@ -1943,7 +1976,10 @@ jc.actionsMenu = (e) => {
 	} else {
 		let tp = {label:AS.label('ThisPage')+':',content:[]};
 		let ws = {label:AS.label('WholeSite')+':',content:[]};
-		tp.content.push({icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} });
+		tp.content.push(
+			{icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} },
+			{icon:'jcicon',iconKey:'uploads',label:AS.label('Uploads'),action:()=>{jc.edit.uploads.edit();} }
+		);
 		if ( (jc.page.current()!='index')||AS.test.def(jc.page.data().id)) {
 			tp.content.push('-',{icon:'jcicon danger',iconKey:'pageRm',label:AS.label('DeleteThisPage')+'…',action:()=>{jc.page.rm();} });
 		}
