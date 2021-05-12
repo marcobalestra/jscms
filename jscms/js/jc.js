@@ -1467,6 +1467,33 @@ jc.page = {
 			return;
 		}
 		jc.progress(AS.label('DeletingPage'));
+		if ( ! params.pdata ) {
+			if ( jc.page.data() && jc.page.data().pageContent ) {
+				params.pdata = jc.page.data().pageContent;
+			} else {
+				jc.page.loadData( params.page, params.id, (pdata)=>{
+					params.pdata = pdata;
+					jc.page.rm( params );
+				});
+				return;
+			}
+		}
+		if ( (! params.uploadsDeleted ) && AS.test.arr(params.pdata.uploads) && params.pdata.uploads.length) {
+			let uploads = params.pdata.uploads.clone();
+			let process = ()=>{
+				let url = uploads.shift().uri;
+				jc.dav.rm( url, ()=>{
+					if ( uploads.length ) {
+						process();
+					} else {
+						params.uploadsDeleted = true;
+						jc.page.rm( params );
+					}
+				});
+			};
+			process();
+			return;
+		}
 		if ( AS.test.udef(params.typelist)) {
 			jc.jdav.get('struct/'+params.page+'-list.json',(l)=>{ params.typelist = l||{}; jc.page.rm( params ); })
 			return;
