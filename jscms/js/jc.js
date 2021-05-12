@@ -19,6 +19,7 @@
 /* jc.prop integrate defaults */
 jc.prop.lastHiEntry = '';
 jc.prop.absUriMatcher = ( new RegExp("^([^a-z]+:/)?/","i") );
+if ( AS.test.udef(jc.prop.maxUploadSize)) jc.prop.maxUploadSize = 5242880; // 5MB
 if ( AS.test.udef(jc.prop.uriPrefixPlain)) jc.prop.uriPrefixPlain = '/-jscms/';
 if ( AS.test.udef(jc.prop.uriPrefixOfbs)) jc.prop.uriPrefixOfbs = '/_jscms/';
 if ( AS.test.udef(jc.prop.useObsUri)) jc.prop.useObsUri = false;
@@ -1874,10 +1875,17 @@ jc.page = {
 		const prefix = page + ( id||'');
 		let uploads = AS.def.arr( pdata.uploads );
 		let news = [];
-		const max = fld.files.length;
-		let idx = 0;
+		let indexes = [];
+		for ( let i = 0; i < fld.files.length; i++ ) {
+			if (fld.files[i].size && ( fld.files[i].size < jc.prop.maxUploadSize ) ) indexes.push(i);
+		}
+		if ( indexes.length == 0 ) {
+			fld.value = '';
+			if ( AS.test.func(callback)) callback.call(window,[],uploads);
+			return;
+		}
 		const process = () => {
-			let tf = fld.files[idx];
+			let tf = fld.files[ indexes.shift() ];
 			let oname = tf.name;
 			jc.progress( oname );
 			let ext = oname.replace(/.*\.([^.]+)$/,"$1").toLowerCase();
@@ -1889,16 +1897,16 @@ jc.page = {
 					if ( result ) {
 						let no = { name: oname, ext: ext, uri: url, size: tf.size, type: tf.type, added: (new Date()).getTime() };
 						if ( no.type && no.type.length ) {
-							if (no.type.indexOf('image/')==0) no.img = true;
+							if (no.type.match(/^image\//) ) no.img = true;
+							if (no.img||no.type.match(/\/pdf$/)  ) no.fb = true;
 						} else {
 							no.type = 'application/octet-stream';
 						}
-						no.caption = no.name.replace(/^(.*)\.[^.]+$/,"$1");
+						no.caption = no.name.replace(/^(.*)\.[^.]+$/,"$1").replace(/[._ -]+/g,' ').trim();
 						uploads.push( no );
 						news.push( no );
 					}
-					idx++;
-					if ( idx < max ) {
+					if ( indexes.length ) {
 						process();
 						return;
 					}

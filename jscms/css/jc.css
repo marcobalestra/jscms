@@ -81,8 +81,9 @@ h { display: none; }
 
 #jcPageUploads>div { max-height: 600px; overflow-y: auto; }
 table.jcUploads { min-width: 60%; margin: 0 auto; }
-table.jcUploads td.fs { text-align: right; padding-right: 1%;}
-table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; text-align: right; }
+table.jcUploads td, table.jcUploads th { margin: 0; padding: 2px 4px; }
+table.jcUploads td.fs { text-align: right; }
+table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 @media (max-width: 600px) {
 	table.jcUploads { width: 100%; }
 }

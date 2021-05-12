@@ -462,7 +462,7 @@ jc.edit.uploads = {
 					$tr.append('<td></td>');
 					$('td',$tr).append($i);
 				}
-				if ( u.img ) {
+				if ( u.fb ) {
 					$tr.append(`<td class="fn"><a href="${u.uri}" data-fancybox="uploads" onclick="this.blur()" data-caption="${u.caption.escape()}">${u.name.escape()}</a></td>`);
 				} else {
 					$tr.append('<td class="fn">'+u.name.escape()+'</td>');
