@@ -1,5 +1,5 @@
 body { background-color: #ddd; margin: 0; overflow: auto; padding: 0; }
-#topBarContainer { background-color: #fff; height: 94px; margin: 0; overflow: visible; padding: 0; position: relative; }
+#topBarContainer { background-color: #fff; height: 94px; margin: 0; overflow: visible; padding: 0; position: relative; width: 100%; }
 #topBarContainer #topBar { height: 128px; margin: 0; padding: 0; position: relative; width: 100%; }
 #topBarContainer .topBarImage { background-image: url(../img/banner-large.png); background-repeat: no-repeat; cursor: pointer; height: 121px; left: 8px; position: absolute; top: 2px; width: 461px; }
 #topBarContainer .topBarText { color: #69c; font-size: 140%; font-weight: bold; left: 160px; overflow: hidden; position: absolute; right: 120px; text-overflow: ellipsis; top: 14px; transform: scaleY(1.5); white-space: nowrap; }
@@ -8,3 +8,23 @@ body { background-color: #ddd; margin: 0; overflow: auto; padding: 0; }
 #topNavbar { margin: -10px -10px 10px -10px; }
 #topNavbar a[onclick] { cursor: pointer; }
 #mainContainer div.date { color: #999; font-size: bigger; font-style: italic; text-align: right; }
+
+/* Mobile only */
+@media (max-width: 600px) {
+	body > * { max-width: 100% !important; }
+	#topBarContainer { height: 48px; }
+	#topBarContainer #topBar { height: 128px; left: 0; padding: 0; position: absolute; right: 0; top: 0; }
+	#topBarContainer .topBarImage { transform: scale(0.5,0.5); transform-origin: top left; }
+	#topBarContainer .topBarText { font-size: 100%; left: 80px; right: 80px; top: 8px; }
+	#topBarContainer .jcMenu { right: 4px; top: 4px; }
+	#topBarContainer .jcMenu .jcicon svg { height: 24px; width: 24px; }
+	#topContainer { width: 100%px; }
+	#mainContainer > * { overflow-x: auto; }
+}
+/* Tablets */
+@media (min-width: 600px) {
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+}

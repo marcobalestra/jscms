@@ -79,8 +79,13 @@ h { display: none; }
 	0% { transform: rotate(-360deg); }
 }
 
+#jcPageUploads>div { max-height: 600px; overflow-y: auto; }
 table.jcUploads { min-width: 60%; margin: 0 auto; }
-table.jcUploads td:last-child { text-align: right; }
+table.jcUploads td.fs { text-align: right; padding-right: 1%;}
+table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; text-align: right; }
+@media (max-width: 600px) {
+	table.jcUploads { width: 100%; }
+}
 
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }

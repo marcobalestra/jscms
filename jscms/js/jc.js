@@ -1203,6 +1203,7 @@ jc.page = {
 				return;
 			}
 		}
+		$(document.body).trigger('jc_page_open_requested',{page:page,id:id,uriparams:data});
 		if ( AS.test.str(data) ) data = $.parseParams( data );
 		if ( data && AS.test.str(data.template) ) {
 			if (! infokey) infokey = String(data.template);
@@ -1892,6 +1893,7 @@ jc.page = {
 						} else {
 							no.type = 'application/octet-stream';
 						}
+						no.caption = no.name.replace(/^(.*)\.[^.]+$/,"$1");
 						uploads.push( no );
 						news.push( no );
 					}

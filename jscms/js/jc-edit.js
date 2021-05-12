@@ -121,13 +121,13 @@ jc.edit = {
 		let d = jc.edit.data();
 		let t = b.subtype||b.type;
 		if ( ! jc.edit.form[t] ) return;
-		let $mod = jc.edit.getModal();
+		let $mod = jc.edit.getModal(true);
 		$mod.on('shown.bs.modal',()=>{ AS.form.create( jc.edit.form[t].call(window,b,d) ); });
 		$mod.modal('show');
 	},
 	form : {
 		_base : (b,d)=>{
-			let $mod = jc.edit.getModal(true);
+			let $mod = jc.edit.getModal();
 			let t = b.subtype||b.type;
 			$('.modal-dialog',$mod).append(`<div class="modal-content">
 				<div class="modal-header bg-light">
@@ -318,7 +318,7 @@ jc.edit = {
 			else if ( AS.test.udef(b.qt)) f.setValue('type','html');
 			else f.setValue('type',d[b.prop][b.idx].type);
 		};
-		jc.edit.getModal().on('shown.bs.modal',()=>{ AS.form.create( fopt ); }).modal('show');
+		jc.edit.getModal(true).on('shown.bs.modal',()=>{ AS.form.create( fopt ); }).modal('show');
 	},
 	fixBlocks : (b,d) => {
 		let qt = d[b.prop].length;
@@ -334,15 +334,14 @@ jc.edit = {
 			jc.page.reload();
 		}
 	},
-	getModal : ( empty ) => {
+	getModal : ( buildNew ) => {
+		if (buildNew) $('#jcEditModalLg').remove();
 		let mod = $('#jcEditModalLg');
-		if ( mod.length > 0 ) {
-			if (empty) $('.modal-dialog',mod).html('');
-			return mod;
+		if ( mod.length == 0 ) {
+			mod = $('<div id="jcEditModalLg" class="modal" tabindex="-1"><div class="modal-dialog modal-lg"></div></div>');
+			$(document.body).append( mod );
 		}
-		mod = $('<div id="jcEditModalLg" class="modal" tabindex="-1" data-backdrop="static" data-keyboard="false"><div class="modal-dialog modal-lg"></div></div>');
-		$(document.body).append( mod );
-		return $('#jcEditModalLg',document.body);
+		return mod;
 	},
 	noModal : () => {
 		let mod = jc.edit.getModal();
@@ -405,7 +404,7 @@ jc.edit.uploads = {
 				</button>
 			</div>
 			<div class="modal-body" id="jcPageUploads"></div></div>`);
-		let params = { target: $('#jcPageUploads',$mod), context: 'page' };
+		let params = { target: $('#jcPageUploads',$mod), reloader: ()=>{ jc.edit.uploads.edit() } };
 		$mod.on('shown.bs.modal',()=>{ jc.edit.uploads.render( params); }).modal({show:true,keyboard:false});
 	},
 	render : ( params ) => {
@@ -427,7 +426,7 @@ jc.edit.uploads = {
 			jc.page.upload( $('input[type="file"]',$out).get(0), ( newitems )=>{
 				let refresh = (e)=> {
 					$(document.body).off('jc_page_data_loaded',refresh);
-					if ( params.context=='page') jc.edit.uploads.edit();
+					if ( params.reloader ) params.reloader.call(window);
 				}
 				$(document.body).on('jc_page_data_loaded',refresh);
 				jc.page.reload();
@@ -438,7 +437,7 @@ jc.edit.uploads = {
 		if ( params.uploads.length ) {
 			let $tbl = $('<table class="jcUploads"><thead><tr></tr></thead><tbody></tbody></table>');
 			if ( params.select ) $('thead tr',$tbl).append('<th></th>');
-			$('thead tr',$tbl).append(`<th>${ AS.label('FileName')}</th><th>${ AS.label('FileSize')}</th><th></th>`);
+			$('thead tr',$tbl).append(`<th>${ AS.label('FileName')}</th><th>${ AS.label('Caption')}</th><th>${ AS.label('FileSize')}</th><th></th>`);
 			let onchange = ()=>{
 			};
 			let rm = (item) => {
@@ -447,7 +446,7 @@ jc.edit.uploads = {
 					jc.edit.noModal();
 					let refresh = (e)=> {
 						$(document.body).off('jc_page_data_loaded',refresh);
-						if ( params.context=='page') jc.edit.uploads.edit();
+						if ( params.reloader ) params.reloader.call(window);
 					}
 					$(document.body).on('jc_page_data_loaded',refresh);
 					jc.page.reload();
@@ -464,16 +463,17 @@ jc.edit.uploads = {
 					$('td',$tr).append($i);
 				}
 				if ( u.img ) {
-					$tr.append(`<td><a href="${u.uri}" data-fancybox="uploads" onclick="this.blur()" data-caption="${u.name.escape()}">${u.name.escape()}</a></td>`);
+					$tr.append(`<td class="fn"><a href="${u.uri}" data-fancybox="uploads" onclick="this.blur()" data-caption="${u.caption.escape()}">${u.name.escape()}</a></td>`);
 				} else {
-					$tr.append('<td>'+u.name.escape()+'</td>');
+					$tr.append('<td class="fn">'+u.name.escape()+'</td>');
 				}
-				$tr.append('<td>'+parseInt(u.size).smartSize()+'</td>');
-				let $acts = $('<td class="btn-group"></td>') ;
-				$acts.append(`<a class="btn btn-primary btn-icon btn-sm legitRipple" title="${ AS.label('Download') }" href="${u.uri}" download="${ u.name.escape() }"><i>${ AS.icon('download') }</i></a>`);
+				$tr.append('<td class="fc">'+u.caption.escape()+'</td>');
+				$tr.append('<td class="fs">'+parseInt(u.size).smartSize()+'</td>');
+				let $acts = $('<td><span class="btn-group"></span></td>') ;
+				$('span',$acts).append(`<a class="btn btn-primary btn-icon btn-sm legitRipple" title="${ AS.label('Download') }" href="${u.uri}" download="${ u.name.escape() }"><i>${ AS.icon('download') }</i></a>`);
 				let $del = $(`<a class="btn btn-danger btn-icon btn-sm legitRipple" title="${ AS.label('Delete') }">${ AS.icon('editRemove') }</a>`);
 				$del.on('click',rm);
-				$acts.append($del);
+				$('span',$acts).append($del);
 				$tr.append($acts);
 				$('tbody',$tbl).append($tr);
 			} );

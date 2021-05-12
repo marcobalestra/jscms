@@ -15,6 +15,6 @@
 		jc.prop.authUser = s.checked ? 'Dummy' : undefined;
 		$('.jcMenu').removeClass('jcMenuParsed');
 		jc.page.checkJcMenu();
-		if (s.checked) swal("Demo mode","With a “Dummy” user you’ll be able to edit content, but changes won’t be saved.","info");
+		if (s.checked) Swal.fire("Demo mode","With a “Dummy” user you’ll be able to edit content, but changes won’t be saved.","info");
 	}
 </script>
