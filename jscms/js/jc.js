@@ -358,6 +358,7 @@ jc.login = ( success, fail ) => {
 		(d,err) => {
 			jc.prop.authUser = d ? d.username : undefined;
 			if ( d.username ) AS.setCookie('jcAuthUser',d.username,{path:'/'});
+			else AS.rmCookie('jcAuthUser');
 			if ( d ) success.call(window,d);
 			else fail.call(window,d,err);
 		}
