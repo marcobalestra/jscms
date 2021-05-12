@@ -357,6 +357,7 @@ jc.login = ( success, fail ) => {
 		AS.path('jsauth') + 'auth/username',
 		(d,err) => {
 			jc.prop.authUser = d ? d.username : undefined;
+			if ( d.username ) AS.setCookie('jcAuthUser',d.username,{path:'/'});
 			if ( d ) success.call(window,d);
 			else fail.call(window,d,err);
 		}
@@ -1258,7 +1259,7 @@ jc.page = {
 					if ( md.title ) $('title',h).html(md.title);
 					if ( md.keywords ) $('meta[name="keywords"]',h).attr('content',md.keywords);
 					if ( md.description ) $('meta[name="description"]',h).attr('content',md.description);
-					
+					if ( md.hidden ) $(document.body).append(`<div id="jcHiddenPageIndicator"><span>${ AS.label('PageHidden')}</span></div>`);
 				}
 				$(document.body).trigger('jc_page_data_loaded',j);
 				if (jc.page.prop.editMode == 'page') jc.edit.data( j );
@@ -1272,9 +1273,11 @@ jc.page = {
 		if ( ! $menu.length ) return;
 		$menu.html('');
 		$menu.addClass('jcMenuParsed');
-		if ( jc.prop.authUser ) {
+		let user = jc.prop.authUser||AS.getCookie('jcAuthUser');
+		if ( user ) {
+			jc.springLoad('module:edit');
 			$(document.body).addClass('jcUserAuth');
-			$menu.append(`<div class="jcicon jcAuth">${ AS.icon('user') }</div><div class="jcUser">${ jc.prop.authUser }</div>`);
+			$menu.append(`<div class="jcicon jcAuth">${ AS.icon('user') }</div><div class="jcUser">${ user }</div>`);
 			$menu.on('click contextmenu',jc.actionsMenu);
 			$(document.body).on('contextmenu',jc.actionsMenu);
 		} else {
