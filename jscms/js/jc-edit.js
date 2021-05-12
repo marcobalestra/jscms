@@ -300,6 +300,7 @@ jc.edit = {
 		} else {
 			nb.qt = b.qt;
 		}
+		let $mod = jc.edit.getModal(true);
 		let fopt = jc.edit.form[t].call(window,nb,d);
 		fopt.options.jsaction = (fd,fo) => {
 			fo.destroy();
@@ -318,7 +319,7 @@ jc.edit = {
 			else if ( AS.test.udef(b.qt)) f.setValue('type','html');
 			else f.setValue('type',d[b.prop][b.idx].type);
 		};
-		jc.edit.getModal(true).on('shown.bs.modal',()=>{ AS.form.create( fopt ); }).modal('show');
+		$mod.on('shown.bs.modal',()=>{ AS.form.create( fopt ); }).modal('show');
 	},
 	fixBlocks : (b,d) => {
 		let qt = d[b.prop].length;
@@ -343,14 +344,7 @@ jc.edit = {
 		}
 		return mod;
 	},
-	noModal : () => {
-		let mod = jc.edit.getModal();
-		mod.removeClass("in");
-		$(".modal-backdrop").remove();
-		mod.hide();
-		mod.remove();
-		$(document.body).removeClass( 'modal-open' );
-	},
+	noModal : () => { jc.edit.getModal().modal('hide').remove(); },
 };
 
 jc.edit.meta = {

@@ -19,7 +19,7 @@
 /* jc.prop integrate defaults */
 jc.prop.lastHiEntry = '';
 jc.prop.absUriMatcher = ( new RegExp("^([^a-z]+:/)?/","i") );
-if ( AS.test.udef(jc.prop.maxUploadSize)) jc.prop.maxUploadSize = 5242880; // 5MB
+if ( AS.test.udef(jc.prop.maxUploadSize)) jc.prop.maxUploadSize = 8388608; // 8MiB
 if ( AS.test.udef(jc.prop.uriPrefixPlain)) jc.prop.uriPrefixPlain = '/-jscms/';
 if ( AS.test.udef(jc.prop.uriPrefixOfbs)) jc.prop.uriPrefixOfbs = '/_jscms/';
 if ( AS.test.udef(jc.prop.useObsUri)) jc.prop.useObsUri = false;
@@ -370,17 +370,14 @@ jc.progress = ( msg ) => {
 		first = true;
 		mod = $(AS.label('modalProgress'));
 		$(document.body).append( mod );
-		mod = $('#jcProgressIndicator',document.body);
+		mod = $('#jcProgressIndicator');
 	}
 	if ( AS.test.str(msg) ) {
 		$('.progressMessage',mod).html(msg);
 		mod.modal('handleUpdate');
 		if ( first || (! mod.hasClass('in')) ) mod.modal({backdrop:'static',keyboard:false,show:true});
 	} else {
-		mod.removeClass("in");
-		$(".modal-backdrop").remove();
-		mod.hide();
-		mod.remove();
+		mod.modal('hide').remove();
 	}
 };
 
@@ -1223,15 +1220,7 @@ jc.page = {
 			return;
 		}
 		let url = AS.path('jsdataroot') + page + ( id ? id : '') + '.json';
-		jc.console('loadData',url);
-		$.ajax( url, {
-			method: 'POST',
-			dataType: 'json',
-			cache: false,
-			data : { _ : (new Date()).getTime() },
-			error: jc.getError,
-			success: j => { if ( AS.test.func(callback) ) callback.call( window, j ); },
-		});
+		jc.jdav.get( url, (data) =>{ if ( data && AS.test.func(callback) ) callback.call( window, data ); });
 	},
 	reload : () => { jc.page.step.data( jc.page.current(), jc.page.data().id ); },
 	step : {
@@ -1262,161 +1251,19 @@ jc.page = {
 				let data = jc.page.data();
 				jc.page.addData( { pageContent: j } );
 				jc.URI.push();
+				$('#jcHiddenPageIndicator').remove();
 				if ( j.metadata ) {
 					const h = document.documentElement.querySelector('head');
 					const md = j.metadata;
 					if ( md.title ) $('title',h).html(md.title);
 					if ( md.keywords ) $('meta[name="keywords"]',h).attr('content',md.keywords);
 					if ( md.description ) $('meta[name="description"]',h).attr('content',md.description);
+					
 				}
 				$(document.body).trigger('jc_page_data_loaded',j);
 				if (jc.page.prop.editMode == 'page') jc.edit.data( j );
-				if ( data.template.content ) jc.page.render.main(data.template.content);
+				if ( data.template.content ) jc.render.init(data.template.content);
 			});
-		},
-	},
-	render : {
-		main : (data,pdata) => {
-			if ( ! Array.isArray(data) ) data = [data];
-			let pfull = jc.page.data();
-			if ( AS.test.udef(pdata)) pdata = AS.test.obj(pfull) ? pfull.pageContent : {};
-			data.forEach( e => {
-				if ( e.internalRecursion ) {
-					e = {
-						dontEmpty: true,
-						selector: e.selector,
-						content: Array.isArray(e) ? e : [ e ]
-					};
-				}
-				let sel = e.selector || '#'+jc.prop.mainContainerId;
-				let $tgt = $(sel);
-				if ( ! e.dontEmpty ) {
-					$tgt.html('');
-					$tgt.removeData('jc_part_label');
-				}
-				if ( e.part ) {
-					e.content = { type: 'part', content: e.part };
-					delete e.part;
-				}
-				if ( AS.test.def(e.content) && ( ! e.content) ) {
-					$tgt.html('');
-					e.hidden = true;
-				} else if ( e.content ) {
-					if ( ! Array.isArray(e.content) ) e.content = [e.content];
-					e.content.forEach( c => {
-						jc.page.render.prepare( c, pdata );
-						if ( AS.test.obj(c) ) {
-							if ( ! c.id ) {
-								c.id = AS.generateId('jc-block-');
-								$tgt.append('<hr style="display:none;" id="'+c.id+'" />');
-								$('#'+c.id,$tgt).data(c);
-							}
-							if ( c.rendered ) {
-								if ( jc.page.prop.editMode ) jc.page.render.editable(c);
-								$('#'+c.id,$tgt).after( c.rendered ).remove();
-								delete c.rendered;
-								delete c.internalRecursion;
-								delete c.id;
-								if ( AS.test.func(c.callback)) c.callback.call(window,c);
-								delete c.callback;
-							} else if ( c.type ){
-								c.internalRecursion = true;
-								c.selector = sel;
-								if ( jc.page.render[c.type] ) jc.page.render[c.type].call( window, c, pdata, pfull );
-							}
-						}
-					} );
-				}
-				$( ()=>{
-					jc.page.checkJcMenu($tgt);
-					$tgt.toggle(!e.hidden);
-					if ( jc.page.prop.editMode && jc.edit ) jc.edit.start();
-					document.body.style.overflow= 'auto';
-				});
-			} );
-		},
-		prepare : ( c, pdata, $scope ) => {
-			if ( AS.test.str(c) || AS.test.func(c) ) {
-				let ev = jc.evalFunc(c);
-				c = ev ? { type:'func', func: ev } : { rendered: c };
-			}
-			if ( AS.test.obj(c) ) {
-				if ( ! c.type ) {
-					if ( c.blocks ) c.type = 'blocks';
-					else if ( c.render ) c.type = 'customJs';
-				}
-				if ( c.func && (! c.rendered) ) c.rendered =  c.func.call(window,pdata);
-			}
-		},
-		editable : ( c ) => {
-			if ( jc.page.prop.editMode && c.rendered && c.editable && AS.test.obj(c.editable) ) {
-				let w = true;
-				if ( (c.rendered instanceof jQuery)||(c.rendered instanceof NodeList)||(c.rendered instanceof Node) ) w = ! $('.jcEditable',c.rendered).length;
-				else if ( AS.test.str(c.rendered) ) w = ( c.rendered.indexOf('<div class="jcEditable">') < 0 );
-				if ( w ) {
-					c.rendered = $('<div class="jcEditable"></div>').data('editable',c.editable).append( c.rendered );
-				}
-			}
-			return c;
-		},
-		customJs : ( o ) => {
-			if ( ! jc.page.prop.renderers[o.render] ) {
-				let url = AS.path('jsrenderers') + o.render + '.js';
-				jc.console('Loading external renderer:',url);
-				$.ajax( url, {
-					method: 'GET',
-					dataType: 'text',
-					error: jc.getError,
-					success: t => {
-						let e;
-						try {
-							let f = eval(t);
-							t = f;
-						} catch(e) {
-							jc.console('Error evaluating external JS render',url,o,e);
-						}
-						if ( AS.test.func(t) ) {
-							jc.page.prop.renderers[o.render] = t;
-							jc.page.render.customJs( o );
-						} else {
-							jc.console('External JS render not a function',url,o,t);
-						}
-					},
-				});
-				return;
-			}
-			o.func = jc.page.prop.renderers[o.render];
-			jc.page.render.main(o);
-		},
-		part : ( o ) => {
-			if ( $(o.selector).data('jc_part_label') != o.content ) {
-				jc.template.part.get( o.content, (partcontent) => {
-					$(o.selector).data('jc_part_label',o.content);
-					o.rendered = partcontent;
-					if ( AS && AS.labels ) o.rendered = AS.labels.labelize( o.rendered );
-					jc.page.render.main(o);
-				});
-			}
-		},
-		blocks : (o,pdata,pfull) => {
-			if ( ! Array.isArray(o.blocks)) o.blocks = [o.blocks];
-			let canedit = o.editable;
-			o.rendered = o.blocks.map( (b,idx) => {
-				let blockEditable = !( AS.test.def(b.editable) && (!b.editable));
-				let out = jc.page.blocks[b.type] ? jc.page.blocks[b.type].call(window,b,pdata,o) : '';
-				if ( canedit && blockEditable && jc.page.prop.editMode ) {
-					let w = true;
-					if ( (out instanceof jQuery)||(out instanceof NodeList)||(out instanceof Node) ) w = ! $('.jcEditable',out).length;
-					else if ( AS.test.str(out) ) w = ( out.indexOf('<div class="jcEditable">') < 0 );
-					if ( w ) {
-						let editable = { prop: b.prop, type: 'block', subtype: b.type };
-						if ( AS.test.udef(out) || (AS.test.str(out) && (out.length==0)) ) out = '<span class="jcPlaceHolder">'+b.prop+'</span>';
-						out = $('<div class="jcEditable"></div>').data('editable',editable).append( out );
-					}
-				}
-				return out;
-			});
-			jc.page.render.main(o,pdata);
 		},
 	},
 	checkJcMenu : ( ctx )=>{
@@ -1450,56 +1297,6 @@ jc.page = {
 				Swal.fire({ title: AS.label('LoginDoneTitle'), text: AS.label('LoginDoneBody',{user:jc.prop.authUser}), icon: "success" });
 			}
 		});
-	},
-	blocks : {
-		text : (b,d)=>{
-			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
-			let out = $(b.wrap||d.wrap||'<div></div>');
-			out.append( d[b.prop] );
-			return out;
-		},
-		html : (b,d)=> {
-			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
-			return d[b.prop];
-		},
-		date : (b,d) => {
-			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
-			return '<div class="date">'+(new Date()).fromsql(d[b.prop]).toString().replace(/ *[0-9]{2}:[0-9]{2}:[0-9]{2}.*/,"")+'</div>';
-		},
-		mixed : (b,d) => {
-			if ( ! d[b.prop] ) return '';
-			let out = $(b.wrap || '<div class="jcMixedBlocks"></div>');
-			if ( ! Array.isArray(d[b.prop]) ) d[b.prop] = [d[b.prop]];
-			let qt = d[b.prop].length;
-			d[b.prop].forEach( (sb,idx) => {
-				if ( AS.test.str( sb ) ) sb = { content:sb };
-				if ( ! AS.test.obj( sb )) return;
-				if ( ! sb.type ) sb.type='text';
-				if (jc.page.blocks[sb.type]) {
-					let r = jc.page.blocks[sb.type].call(window,{prop:sb.type},sb) || '';
-					if ( jc.page.prop.editMode ) {
-						let editable = { prop: b.prop, type: 'block', subtype: sb.type, idx: idx, qt: qt };
-						r = $('<div class="jcEditable"></div>').data('editable',editable).append( r );
-					}
-					out.append( r );
-				}
-			} );
-			return out;
-		},
-		part : (b,d,p) => {
-			let id = AS.generateId('blockPart');
-			let div = $('<div></div>');
-			div.attr('id',id);
-			let nb = {
-				selector: '#'+id,
-				type: 'part',
-				content: b.content||d[b.prop],
-				internalRecursion : true,
-				callback : ()=>{ div.removeAttr('id'); }
-			}
-			window.setTimeout(()=>{jc.page.render.main(nb,d)},10);
-			return div;
-		},
 	},
 	edit : ( status, savePolicy ) => {
 		if ( status ) {
@@ -1958,7 +1755,226 @@ jc.page = {
 		if (pdata.id) params.id = id;
 		jc.page.save( params );
 	},
+};
 
+jc.render = {
+	prop : {},
+	init : ( ...args ) => {
+		delete jc.render.prop.pending;
+		$(document.body).trigger('jc_render_start');
+		jc.console('Rendering is starting');
+		jc.render.main.apply( window, args );
+	},
+	queue : ( delta ) => {
+		if ( AS.test.num(delta) ) {
+			if (AS.test.udef(jc.render.prop.pending)) jc.render.prop.pending = 0;
+			jc.render.prop.pending += delta;
+			if ( jc.render.prop.pending == 0 ) {
+				$(document.body).trigger('jc_render_end');
+				jc.console('Rendering is over');
+				delete jc.render.prop.pending;
+			}
+		}
+		return jc.render.prop.pending;
+	},
+	main : (data,pdata) => {
+		if ( ! Array.isArray(data) ) data = [data];
+		let pfull = jc.page.data();
+		if ( AS.test.udef(pdata)) pdata = AS.test.obj(pfull) ? pfull.pageContent : {};
+		data.forEach( e => {
+			if ( e.internalRecursion ) {
+				e = {
+					dontEmpty: true,
+					selector: e.selector,
+					content: Array.isArray(e) ? e : [ e ]
+				};
+			}
+			let sel = e.selector || '#'+jc.prop.mainContainerId;
+			let $tgt = $(sel);
+			if ( ! e.dontEmpty ) {
+				$tgt.html('');
+				$tgt.removeData('jc_part_label');
+			}
+			if ( e.part ) {
+				e.content = { type: 'part', content: e.part };
+				delete e.part;
+			}
+			if ( AS.test.def(e.content) && ( ! e.content) ) {
+				$tgt.html('');
+				e.hidden = true;
+				return;
+			}
+			if ( e.content ) {
+				if ( ! Array.isArray(e.content) ) e.content = [e.content];
+				e.content.forEach( c => {
+					jc.render.prepare( c, pdata );
+					if ( AS.test.obj(c) ) {
+						if ( ! c.id ) {
+							c.id = AS.generateId('jc-block-');
+							$tgt.append('<hr style="display:none;" id="'+c.id+'" />');
+							$('#'+c.id,$tgt).data(c);
+							jc.render.queue(1);
+						}
+						if ( c.rendered ) {
+							if ( jc.page.prop.editMode ) jc.render.editable(c);
+							$('#'+c.id,$tgt).after( c.rendered ).remove();
+							delete c.rendered;
+							delete c.internalRecursion;
+							delete c.id;
+							if ( AS.test.func(c.callback)) c.callback.call(window,c);
+							delete c.callback;
+							jc.render.queue(-1);
+						} else if ( c.type ){
+							c.internalRecursion = true;
+							c.selector = sel;
+							if ( jc.render[c.type] ) jc.render[c.type].call( window, c, pdata, pfull );
+						}
+					}
+				} );
+			}
+			$( ()=>{
+				jc.page.checkJcMenu($tgt);
+				$tgt.toggle(!e.hidden);
+				if ( jc.page.prop.editMode && jc.edit ) jc.edit.start();
+				document.body.style.overflow= 'auto';
+			});
+		} );
+	},
+	prepare : ( c, pdata, $scope ) => {
+		if ( AS.test.str(c) || AS.test.func(c) ) {
+			let ev = jc.evalFunc(c);
+			c = ev ? { type:'func', func: ev } : { rendered: c };
+		}
+		if ( AS.test.obj(c) ) {
+			if ( ! c.type ) {
+				if ( c.blocks ) c.type = 'blocks';
+				else if ( c.render ) c.type = 'customJs';
+			}
+			if ( c.func && (! c.rendered) ) c.rendered =  c.func.call(window,pdata);
+		}
+	},
+	editable : ( c ) => {
+		if ( jc.page.prop.editMode && c.rendered && c.editable && AS.test.obj(c.editable) ) {
+			let w = true;
+			if ( (c.rendered instanceof jQuery)||(c.rendered instanceof NodeList)||(c.rendered instanceof Node) ) w = ! $('.jcEditable',c.rendered).length;
+			else if ( AS.test.str(c.rendered) ) w = ( c.rendered.indexOf('<div class="jcEditable">') < 0 );
+			if ( w ) {
+				c.rendered = $('<div class="jcEditable"></div>').data('editable',c.editable).append( c.rendered );
+			}
+		}
+		return c;
+	},
+	customJs : ( o ) => {
+		if ( ! jc.page.prop.renderers[o.render] ) {
+			let url = AS.path('jsrenderers') + o.render + '.js';
+			jc.console('Loading external renderer:',url);
+			$.ajax( url, {
+				method: 'GET',
+				dataType: 'text',
+				error: jc.getError,
+				success: t => {
+					let e;
+					try {
+						let f = eval(t);
+						t = f;
+					} catch(e) {
+						jc.console('Error evaluating external JS render',url,o,e);
+					}
+					if ( AS.test.func(t) ) {
+						jc.page.prop.renderers[o.render] = t;
+						jc.render.customJs( o );
+					} else {
+						jc.console('External JS render not a function',url,o,t);
+					}
+				},
+			});
+			return;
+		}
+		o.func = jc.page.prop.renderers[o.render];
+		jc.render.main(o);
+	},
+	part : ( o ) => {
+		if ( $(o.selector).data('jc_part_label') != o.content ) {
+			jc.render.queue(1);
+			jc.template.part.get( o.content, (partcontent) => {
+				$(o.selector).data('jc_part_label',o.content);
+				o.rendered = partcontent;
+				if ( AS && AS.labels ) o.rendered = AS.labels.labelize( o.rendered );
+				jc.render.main(o);
+				jc.render.queue(-1);
+			});
+		}
+	},
+	blocks : (o,pdata,pfull) => {
+		if ( ! Array.isArray(o.blocks)) o.blocks = [o.blocks];
+		let canedit = o.editable;
+		o.rendered = o.blocks.map( (b,idx) => {
+			let blockEditable = !( AS.test.def(b.editable) && (!b.editable));
+			let out = jc.render.block[b.type] ? jc.render.block[b.type].call(window,b,pdata,o) : '';
+			if ( canedit && blockEditable && jc.page.prop.editMode ) {
+				let w = true;
+				if ( (out instanceof jQuery)||(out instanceof NodeList)||(out instanceof Node) ) w = ! $('.jcEditable',out).length;
+				else if ( AS.test.str(out) ) w = ( out.indexOf('<div class="jcEditable">') < 0 );
+				if ( w ) {
+					let editable = { prop: b.prop, type: 'block', subtype: b.type };
+					if ( AS.test.udef(out) || (AS.test.str(out) && (out.length==0)) ) out = '<span class="jcPlaceHolder">'+b.prop+'</span>';
+					out = $('<div class="jcEditable"></div>').data('editable',editable).append( out );
+				}
+			}
+			return out;
+		});
+		jc.render.main(o,pdata);
+	},
+	block : {
+		text : (b,d)=>{
+			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
+			let out = $(b.wrap||d.wrap||'<div></div>');
+			out.append( d[b.prop] );
+			return out;
+		},
+		html : (b,d)=> {
+			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
+			return d[b.prop];
+		},
+		date : (b,d) => {
+			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
+			return '<div class="date">'+(new Date()).fromsql(d[b.prop]).toString().replace(/ *[0-9]{2}:[0-9]{2}:[0-9]{2}.*/,"")+'</div>';
+		},
+		mixed : (b,d) => {
+			if ( ! d[b.prop] ) return '';
+			let out = $(b.wrap || '<div class="jcMixedBlocks"></div>');
+			if ( ! Array.isArray(d[b.prop]) ) d[b.prop] = [d[b.prop]];
+			let qt = d[b.prop].length;
+			d[b.prop].forEach( (sb,idx) => {
+				if ( AS.test.str( sb ) ) sb = { content:sb };
+				if ( ! AS.test.obj( sb )) return;
+				if ( ! sb.type ) sb.type='text';
+				if (jc.render.block[sb.type]) {
+					let r = jc.render.block[sb.type].call(window,{prop:sb.type},sb) || '';
+					if ( jc.page.prop.editMode ) {
+						let editable = { prop: b.prop, type: 'block', subtype: sb.type, idx: idx, qt: qt };
+						r = $('<div class="jcEditable"></div>').data('editable',editable).append( r );
+					}
+					out.append( r );
+				}
+			} );
+			return out;
+		},
+		part : (b,d,p) => {
+			let id = AS.generateId('blockPart');
+			let div = $('<div></div>');
+			div.attr('id',id);
+			let nb = {
+				selector: '#'+id,
+				type: 'part',
+				content: b.content||d[b.prop],
+				internalRecursion : true,
+				callback : ()=>{ div.removeAttr('id'); }
+			}
+			window.setTimeout(()=>{jc.render.main(nb,d)},10);
+			return div;
+		},
+	},
 };
 
 jc.actionsMenu = (e) => {
