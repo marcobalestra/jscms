@@ -1433,7 +1433,6 @@ jc.page = {
 				if ( options.data.metadata.description && blocks.find( b =>( AS.test.obj(b) && ( b.prop=='abstract') )) ) options.data.abstract = options.data.metadata.description;
 			}
 		}
-		console.log( JSON.stringify(options.data) );
 		options.callback = (page,id,data) => {
 			jc.page.prop.editMode = 'page';
 			jc.page.open( page, id );
