@@ -28,6 +28,7 @@ AS.form.fields.jcpage = class extends AS.form.field {
 				} );
 			} );
 			if ( cv ) $f.val( cv );
+			if ( to.prop._s2v ) $f.val( to.prop._s2v );
 			$f.select2({
 				dropdownParent : $(to.getForm().fakeForm()).closest('.modal'),
 				placeholder: AS.label('Select'),
@@ -51,7 +52,8 @@ AS.form.fields.jcpage = class extends AS.form.field {
 		let av = v[this.prop.name];
 		let avs = av.page + ( av.id ? av.id : '');
 		this.setValue(av);
-		window.setTimeout( ()=>{$( this.fakeField() ).val(avs).trigger('change');},100);
+		this.prop._s2v = avs;
+		$( this.fakeField() ).val(avs).trigger('change');
 		this.hideWarning();
 	};
 	renderField() { return AS.form.fields.jcpage.renderField.call(window,this); };
