@@ -10,7 +10,7 @@ AS.form.fields.jcpage = class extends AS.form.field {
 		to.field.setAttribute('id', to.prop.id );
 		to.field.setAttribute('name', to.prop.name );
 		to.field.setAttribute('placeholder', to.prop.placeholder );
-		to.field.setAttribute('style', 'max-width:100%;' );
+		to.field.setAttribute('style', 'width:100%;' );
 		to.field.asField = ()=>{ return to; };
 		jc.jdav.get('struct/_all-list.json',(data)=>{
 			let $f = $(to.field);
@@ -55,4 +55,9 @@ AS.form.fields.jcpage = class extends AS.form.field {
 		this.hideWarning();
 	};
 	renderField() { return AS.form.fields.jcpage.renderField.call(window,this); };
+	postRender() {
+		let $d = $( this.field ).closest('div');
+		$d.css({'padding':'.5em 1em 1em 1em'});
+		return AS.form.field.postRender.call(window,this);
+	};
 };

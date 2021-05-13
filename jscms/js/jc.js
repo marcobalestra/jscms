@@ -1215,6 +1215,12 @@ jc.page = {
 		jc.page.changed( false );
 		jc.console('Opening page:'+page, id, data, infokey );
 		jc.page.data( data );
+		let finalize = ()=>{
+			$(document.body).off('jc_render_end',finalize);
+			window.scrollTo(0,0);
+			$(document.body).trigger('jc_page_open_completed',{page:page,id:id,uriparams:data});
+		}
+		$(document.body).on('jc_render_end',finalize);
 		jc.page.step.info( page, id, data, infokey );
 	},
 	loadData : ( page, id, callback ) => {
@@ -1807,6 +1813,7 @@ jc.render = {
 			if ( jc.render.prop.pending == 0 ) {
 				$(document.body).trigger('jc_render_end');
 				jc.console('Rendering is over');
+				window.scrollTo(0,0);
 				delete jc.render.prop.pending;
 			}
 		}

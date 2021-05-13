@@ -35,6 +35,7 @@ AS.labels.load('icons', [{
 	'edit' : '{{icon:square-edit}}',
 	'editAdd' : '{{icon:square-empty-plus}}',
 	'editRemove' : '{{icon:square-empty-remove}}',
+	'editGo' : '{{icon:arrow-right}}',
 	'metadata' : '{{icon:code}}',
 	'moveDown' : '{{icon:chevron-down}}',
 	'moveUp' : '{{icon:chevron-up}}',

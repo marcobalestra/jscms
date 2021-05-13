@@ -91,6 +91,9 @@ jc.edit = {
 				canAdd = true;
 				acts.shift();
 			} else if (canAdd) {
+				if ( data.subtype == 'subpage' ) {
+					acts.push('-',{icon:'jcicon',iconKey:'editGo',label:AS.label('GotoPage'),action:jc.edit.gotoSubpage});
+				}
 				acts.push('-',{icon:'jcicon danger',iconKey:'editRemove',label:AS.label('blockDeleteContent'),action:jc.edit.rm},'-');
 			}
 			if (canAdd) {
@@ -114,6 +117,13 @@ jc.edit = {
 		e.preventDefault();
 		e.stopPropagation();
 		return $(e.target).closest('.jcEditable').data('editable');
+	},
+	gotoSubpage : (e) => {
+		let b = jc.edit.itemdata(e);
+		let d = jc.edit.data();
+		let p = d[b.prop];
+		if ( AS.test.arr(p) && AS.test.def(b.idx)) p = p[b.idx][b.subtype];
+		if ( AS.test.obj(p)) jc.page.open( p.page, p.id );
 	},
 	moveup : (e) => {
 		let b = jc.edit.itemdata(e);
@@ -209,7 +219,10 @@ jc.edit = {
 		},
 		date : (b,d) => {
 			let o = jc.edit.form._base(b,d);
-			o.fields.push( ["date","date",{asLabel:'Date',skypempty:true,asTitle:'onlyNonEmptyFields',format:'YYYY-MM-DD',default:(new Date()).tosqldate()}] );
+			o.fields.push(
+				["date","date",{asLabel:'Date',skypempty:true,asTitle:'onlyNonEmptyFields',format:'YYYY-MM-DD',default:(new Date()).tosqldate()}],
+				['footer','freehtml',{value:'<br />'}],
+				);
 			return o;
 		},
 		part : (b,d) => {
@@ -220,6 +233,7 @@ jc.edit = {
 			o.fields.push(
 				['part','select',{asLabel:'PageType',options:opts,mandatory:true}],
 				['type','hidden',{value:'part'}],
+				['footer','freehtml',{value:'<br />'}],
 			);
 			return o;
 		},
@@ -279,6 +293,7 @@ jc.edit = {
 				['type','hidden',{value:'subpage'}],
 				["subpage","jcpage",{nolabel:true,skypempty:true,mandatory:true}],
 				["force",'bool',{asLabel:'ForceAlsoHidden',depends:'subpage'}],
+				['footer','freehtml',{value:'<br />'}],
 			);
 			return o;
 		},
