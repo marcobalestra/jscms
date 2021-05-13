@@ -1196,10 +1196,11 @@ jc.page = {
 		if ( ! AS && AS.labels && AS.labels.loaded ) return setTimeout( ()=>{ jc.page.open(page, id, data, infokey) }, 100);
 		let initialargs = JSON.parse(JSON.stringify([page,data]));
 		if ( ! page ) page = 'index';
+		
 		if ( page == jc.page.current() ) {
 			if ( id ) {
-				if ( jc.page.data() && ( id == jc.page.data().id )) return;
-			} else {
+				if ( jc.page.data() && jc.page.data().id && ( id == jc.page.data().id )) return;
+			} else if (! ( jc.page.data() && jc.page.data().id ) ) {
 				return;
 			}
 		}
@@ -1222,7 +1223,7 @@ jc.page = {
 			return;
 		}
 		let url = AS.path('jsdataroot') + page + ( id ? id : '') + '.json';
-		jc.jdav.get( url, (data) =>{ if ( data && AS.test.func(callback) ) callback.call( window, data ); });
+		jc.jdav.get( url, (data) =>{ if ( AS.test.func(callback) ) callback.call( window, data ); });
 	},
 	reload : () => { jc.page.step.data( jc.page.current(), jc.page.data().id ); },
 	step : {
@@ -1232,7 +1233,7 @@ jc.page = {
 				if ( ! data ) data = {};
 				if ( ! data.template ) data.template = tdata;
 				jc.page.step.html( page, id, data );
-			});
+			},()=>{ jc.page.open('index'); });
 		},
 		html : ( page, id, data ) => {
 			jc.page.current( page );
@@ -1245,10 +1246,14 @@ jc.page = {
 				}
 				$(document.body).trigger('jc_page_template_html_loaded',html);
 				jc.page.step.data( page, id );
-			});
+			},()=>{ jc.page.open('index'); });
 		},
 		data : ( page, id ) => {
 			jc.page.loadData( page, id, j => {
+				if ( ! j ) {
+					jc.page.open('index');
+					return;
+				}
 				window.tp = {};
 				let data = jc.page.data();
 				jc.page.addData( { pageContent: j } );
@@ -1834,6 +1839,7 @@ jc.render = {
 				e.hidden = true;
 				return;
 			}
+			if ( AS.test.udef(e.editable)) e.editable = true;
 			if ( e.content ) {
 				if ( ! Array.isArray(e.content) ) e.content = [e.content];
 				e.content.forEach( c => {
@@ -1845,6 +1851,7 @@ jc.render = {
 							$('#'+c.id,$tgt).data(c);
 							jc.render.queue(1);
 						}
+						if ( AS.test.udef(c.editable) ) c.editable = e.editable;
 						if ( c.rendered ) {
 							if ( jc.page.prop.editMode ) jc.render.editable(c);
 							$('#'+c.id,$tgt).after( c.rendered ).remove();
@@ -1939,7 +1946,8 @@ jc.render = {
 		if ( ! Array.isArray(o.blocks)) o.blocks = [o.blocks];
 		let canedit = o.editable;
 		o.rendered = o.blocks.map( (b,idx) => {
-			let blockEditable = !( AS.test.def(b.editable) && (!b.editable));
+			if (AS.test.udef(b.editable)) b.editable = canedit;
+			let blockEditable = canedit && !( AS.test.def(b.editable) && (!b.editable));
 			let out = jc.render.block[b.type] ? jc.render.block[b.type].call(window,b,pdata,o) : '';
 			if ( canedit && blockEditable && jc.page.prop.editMode ) {
 				let w = true;
@@ -1949,6 +1957,8 @@ jc.render = {
 					let editable = { prop: b.prop, type: 'block', subtype: b.type };
 					if ( AS.test.udef(out) || (AS.test.str(out) && (out.length==0)) ) out = '<span class="jcPlaceHolder">'+b.prop+'</span>';
 					out = $('<div class="jcEditable"></div>').data('editable',editable).append( out );
+				} else {
+					out = $('<div class="jcEditableBlock"></div>').append( out );
 				}
 			}
 			return out;
@@ -1980,8 +1990,8 @@ jc.render = {
 				if ( ! AS.test.obj( sb )) return;
 				if ( ! sb.type ) sb.type='text';
 				if (jc.render.block[sb.type]) {
-					let r = jc.render.block[sb.type].call(window,{prop:sb.type},sb) || '';
-					if ( jc.page.prop.editMode ) {
+					let r = jc.render.block[sb.type].call(window,{prop:sb.type, editable:b.editable},sb) || '';
+					if ( b.editable && jc.page.prop.editMode ) {
 						let editable = { prop: b.prop, type: 'block', subtype: sb.type, idx: idx, qt: qt };
 						r = $('<div class="jcEditable"></div>').data('editable',editable).append( r );
 					}
@@ -1990,7 +2000,7 @@ jc.render = {
 			} );
 			return out;
 		},
-		part : (b,d,p) => {
+		part : (b,d) => {
 			let id = AS.generateId('blockPart');
 			let div = $('<div></div>');
 			div.attr('id',id);
@@ -2000,8 +2010,69 @@ jc.render = {
 				content: b.content||d[b.prop],
 				internalRecursion : true,
 				callback : ()=>{ div.removeAttr('id'); }
-			}
+			};
 			window.setTimeout(()=>{jc.render.main(nb,d)},10);
+			return div;
+		},
+		gallery : (b,d) => {
+			if ( ! (AS.test.arr(d[b.prop]) && d[b.prop].length ) ) return '';
+			let gid = AS.generateId('jcGallery');
+			let $div = $('<div class="jcGallery"></div>');
+			d[b.prop].forEach( u => {
+				let $a = $(`<a href="${u.uri}"></a>`);
+				if ( u.fb ) {
+					$a.attr('data-fancybox',gid);
+					$a.attr('data-caption',u.caption);
+				}
+				if ( u.img ) {
+					$a.append(`<img src="${ u.uri }" alt="${ u.caption }" />`);
+				} else {
+					$a.append( AS.icon('downloadPublic') );
+				}
+				$div.append($a);
+			} );
+			return $div;
+		},
+		subpage : (b,d) => {
+			let id = AS.generateId('blockSubpage');
+			let div = $('<div></div>');
+			div.attr('id',id);
+			let s = b.content||d[b.prop];
+			jc.render.queue(1);
+			jc.template.info.get( s.page, (tmpl)=>{
+				if ( ! AS.test.arr(tmpl.content) ) tmpl.content = [tmpl.content];
+				let blocks =[];
+				tmpl.content.forEach( c =>{
+					if ( ! c.content ) return false;
+					if ( ! AS.test.arr(c.content) ) c.content = [c.content];
+					c.content.forEach( cc => {
+						if (! AS.test.arr(cc.blocks)) return;
+						cc.blocks.filter((x)=>(!(x.type=='subpage'))).forEach( b => {
+							let nb = JSON.parse(JSON.stringify(b));
+							nb.editable = false;
+							blocks.push(nb)
+						});
+					});
+				});
+				if ( ! (AS.test.arr(blocks) && blocks.length) ) return jc.render.queue(-1);
+				jc.jdav.get(  AS.path('jsdataroot') + s.page + ( s.id ? s.id : '') + '.json', (pdata)=>{
+					if ( (! d.force) && pdata.metadata && pdata.metadata.hidden ) return jc.render.queue(-1);
+					if ( AS.test.udef(pdata.blocks)) pdata.blocks = [];
+					if ( ! AS.test.arr(pdata.blocks)) pdata.blocks = [pdata.blocks];
+					if ( ! pdata.blocks.length ) return jc.render.queue(-1);
+					let nb = {
+						selector: '#'+id,
+						content : {
+							type : "blocks",
+							blocks: blocks,
+						},
+						editable : false,
+						callback : ()=>{ }
+					};
+					jc.render.main( nb, pdata );
+					jc.render.queue(-1);
+				});
+			});
 			return div;
 		},
 	},

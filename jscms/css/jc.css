@@ -63,6 +63,7 @@ h { display: none; }
 .jcEditable, .jcEditable * { box-sizing: border-box; }
 .jcPlaceHolder { font-weight: bold; font-style: italic; color: #ccc; }
 .jcEditable { border: #ccc dashed 1px; margin: 2px 0; min-height: 30px; min-width: 30px; overflow: auto; overflow: visible; position: relative; }
+.jcEditableBlock { border-left: #99c dotted 3px; margin: 2px 0; min-height: 30px; min-width: 30px; overflow: auto; overflow: visible; position: relative; padding: 0 0 0 2px; }
 .jcEditMenu { background: #fff; border: #ccc solid 1px; line-height: 8px; padding: 0; position: absolute; right: -1px; top: -1px; z-index:90; }
 .appContextHighlight .jcEditMenu { display: none; }
 .jcEditMenu span { display: inline-block; fill: #999; margin: 0; padding: 0; }
@@ -88,6 +89,10 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 @media (max-width: 600px) {
 	table.jcUploads { width: 100%; }
 }
+
+.jcGallery a { background-color: #fff; border: 1px solid #ccc; box-shadow: 2px 2px 2px #ddd; display: inline-block; height: 80px; margin: 8px; text-align: center; vertical-align: middle; width: 80px; }
+.jcGallery a img { max-width: 64px; max-height: 64px; border: solid 1px #ddd; margin: 8px; }
+.jcGallery a svg {  width: 48px; height: 48px; }
 
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }

@@ -31,6 +31,7 @@ AS.labels.load('icons', [{
 	'circleClose' : '{{icon:circle-remove}}',
 	'done' : '{{icon:square-checkbox}}',
 	'download' : '{{icon:square-download}}',
+	'downloadPublic' : '{{icon:cloud-download}}',
 	'edit' : '{{icon:square-edit}}',
 	'editAdd' : '{{icon:square-empty-plus}}',
 	'editRemove' : '{{icon:square-empty-remove}}',

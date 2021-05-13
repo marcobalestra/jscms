@@ -1,14 +1,31 @@
 
 jc.edit = {
 	prop : {
-		blockTypes : [{type:'text',label:'TextOrHtml',menu:true},{type:'lasts',label:'LastChangedPages'},{type:'part',label:'IncludePagePart'}],
+		blockTypes : [
+			{type:'text',label:'TextOrHtml',menu:true},
+			{type:'gallery',label:'Gallery',menu:true},
+			{type:'lasts',label:'LastChangedPages'},
+			{type:'subpage',label:'IncludePage'},
+			{type:'part',label:'IncludePagePart'},
+		],
+		formPlugins :  ['basic','pikaday','tinymce','iro','slider'],
 	},
 	onload : () => {
 		AS.addEvent(document,'as:tinyMceInited',e=>{
 			e.detail.getWrap().querySelector('.tox-tinymce').style.height = String(Math.min(Math.max((parseInt(window.innerHeight)-240),300),640))+'px';
 		});
+		jc.edit.loadFormPlugins();
 		jc.edit.loadPageTypes();
 		jc.edit.loadPageParts();
+	},
+	loadFormPlugins : () => {
+		if ( ! (AS.form && AS.form.plugin) ) {
+			window.setTimeout( jc.edit.loadFormPlugins, 100 );
+			return;
+		}
+		jc.edit.prop.formPlugins.forEach( p => { AS.form.plugin(p); });
+		// Plugins without locales and CSS
+		jc.springLoad( AS.path('jsroot')+'libs/as-form-jcplugins.js' );
 	},
 	loadPageTypes : ( force )=>{
 		if ( force || (! jc.edit.prop.pageTypes) ) {
@@ -120,10 +137,14 @@ jc.edit = {
 		let b = jc.edit.itemdata(e);
 		let d = jc.edit.data();
 		let t = b.subtype||b.type;
-		if ( ! jc.edit.form[t] ) return;
-		let $mod = jc.edit.getModal(true);
-		$mod.on('shown.bs.modal',()=>{ AS.form.create( jc.edit.form[t].call(window,b,d) ); });
-		$mod.modal('show');
+		if ( jc.edit.custom[t] ) {
+			jc.edit.custom[t].edit(b,d);
+		} else {
+			if ( ! jc.edit.form[t] ) return;
+			let $mod = jc.edit.getModal(true);
+			$mod.on('shown.bs.modal',()=>{ AS.form.create( jc.edit.form[t].call(window,b,d) ); });
+			$mod.modal('show');
+		}
 	},
 	form : {
 		_base : (b,d)=>{
@@ -145,7 +166,6 @@ jc.edit = {
 				<div class="modal-body" id="jcPageEditor"></div>
 			</div>`);
 			return {
-				requires : ['basic','pikaday','tinymce','iro','slider'],
 				options : {
 					effectduration : 0,
 					theme: 'transparent',
@@ -252,6 +272,16 @@ jc.edit = {
 			);
 			return o;
 		},
+		subpage : (b,d) => {
+			let o = jc.edit.form._base(b,d);
+			o.fields.push(
+				['title','freehtml',{value:'<h5>'+AS.label('BlocksFromPage')+'</h5>'}],
+				['type','hidden',{value:'subpage'}],
+				["subpage","jcpage",{nolabel:true,skypempty:true,mandatory:true}],
+				["force",'bool',{asLabel:'ForceAlsoHidden',depends:'subpage'}],
+			);
+			return o;
+		},
 	},
 	add : (e,t) => {
 		let ob = jc.edit.itemdata(e);
@@ -294,6 +324,13 @@ jc.edit = {
 		}
 	},
 	addType : (b,d,t) => {
+		if ( jc.edit.custom[t] ) {
+			jc.edit.custom[t].add(b,d);
+		} else {
+			jc.edit.addByForm( b, d, t );
+		}
+	},
+	addByForm : (b,d,t) => {
 		let nb = {prop:b.prop,idx:AS.label('New')};
 		if ( AS.test.udef(b.qt) ) {
 			nb.qt = 0;
@@ -336,7 +373,11 @@ jc.edit = {
 		}
 	},
 	getModal : ( buildNew ) => {
-		if (buildNew) $('#jcEditModalLg').remove();
+		if (buildNew) {
+			let f;
+			while ( f = AS.form.getForm() ) { f.destroy(); }
+			$('#jcEditModalLg').remove();
+		}
 		let mod = $('#jcEditModalLg');
 		if ( mod.length == 0 ) {
 			mod = $('<div id="jcEditModalLg" class="modal" tabindex="-1"><div class="modal-dialog modal-lg"></div></div>');
@@ -344,7 +385,9 @@ jc.edit = {
 		}
 		return mod;
 	},
-	noModal : () => { jc.edit.getModal().modal('hide').remove(); },
+	noModal : () => {
+		jc.edit.getModal().modal('hide').remove();
+	},
 };
 
 jc.edit.meta = {
@@ -383,6 +426,28 @@ jc.edit.meta = {
 	}
 };
 
+jc.edit.custom = {
+	gallery : {
+		add : (b,d) => {
+			let $mod = jc.edit.getModal(true);
+			$('.modal-dialog',$mod).append(`<div class="modal-content">
+				<div class="modal-header bg-info text-white">
+					<p class="modal-title">
+						<span class="jcicon">${ AS.icon('uploads') }</span> 
+						<b>${ AS.label('Uploads') }</b>
+					</p>
+					<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
+						<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>
+					</button>
+				</div>
+				<div class="modal-body" id="jcPageUploads"></div></div>`);
+			let params = { target: $('#jcPageUploads',$mod), reloader: ()=>{ jc.edit.uploads.edit() } };
+			$mod.on('shown.bs.modal',()=>{ jc.edit.uploads.render( params); }).modal({show:true,keyboard:false});
+		},
+		edit : (b,d) => { },
+	}
+};
+
 jc.edit.uploads = {
 	edit : () => {
 		let pdata = jc.page.data().pageContent;
@@ -408,6 +473,7 @@ jc.edit.uploads = {
 		if ( ! params.uploads ) params.uploads = params.pageData.uploads;
 		params.uploads = AS.def.arr(params.uploads);
 		if ( AS.test.udef(params.select) ) params.select = AS.test.arr(params.selected);
+		if ( params.select && AS.test.udef( params.selected) ) params.selected = [];
 		let $out = $('<div></div>');
 		$out.append($(`<div class="jcUploadsAdders text-center mb-4">
 			<input type="file" multiple="multiple" style="display:none" />
@@ -432,7 +498,18 @@ jc.edit.uploads = {
 			let $tbl = $('<table class="jcUploads"><thead><tr></tr></thead><tbody></tbody></table>');
 			if ( params.select ) $('thead tr',$tbl).append('<th></th>');
 			$('thead tr',$tbl).append(`<th>${ AS.label('FileName')}</th><th>${ AS.label('Caption')}</th><th>${ AS.label('FileSize')}</th><th></th>`);
-			let onchange = ()=>{
+			let onchange = ( e )=>{
+				if ( ! AS.test.func(params.onchange)) return;
+				let $tr = $(e.target).closest('tr');
+				let $c = $('input[type="checkbox"]',$tr);
+				let isChecked = $c.is(':checked');
+				let u = $tr.data();
+				if ( isChecked ) {
+					params.selected.push(u);
+				} else {
+					params.selected = params.selected.filter( i => ( i.uri != u.uri ) );
+				}
+				params.onchange.call(params.selected.clone());
 			};
 			let rm = (item) => {
 				if ( (item instanceof Event)||(item.originalEvent) ) item = $(item.target).closest('tr').data();
@@ -451,13 +528,13 @@ jc.edit.uploads = {
 				$tr.data(u);
 				if ( params.select ) {
 					let $i = $('<input type="ceckbox" />');
-					if ( params.selected && params.selected.find( k=>( k.name == u.name) ) ) $i.attr('checked',true);
+					if ( params.selected && params.selected.find( k=>( k.uri == u.uri) ) ) $i.attr('checked',true);
 					$i.on('click change',onchange);
 					$tr.append('<td></td>');
 					$('td',$tr).append($i);
 				}
 				if ( u.fb ) {
-					$tr.append(`<td class="fn"><a href="${u.uri}" data-fancybox="uploads" onclick="this.blur()" data-caption="${u.caption.escape()}">${u.name.escape()}</a></td>`);
+					$tr.append(`<td class="fn"><a href="${u.uri}" data-fancybox="uploads" data-caption="${u.caption.escape()}">${u.name.escape()}</a></td>`);
 				} else {
 					$tr.append('<td class="fn">'+u.name.escape()+'</td>');
 				}
