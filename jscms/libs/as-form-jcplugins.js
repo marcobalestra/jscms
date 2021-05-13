@@ -51,7 +51,7 @@ AS.form.fields.jcpage = class extends AS.form.field {
 		let av = v[this.prop.name];
 		let avs = av.page + ( av.id ? av.id : '');
 		this.setValue(av);
-		$( this.fakeField() ).val(avs).trigger('change');
+		window.setTimeout( ()=>{$( this.fakeField() ).val(avs).trigger('change');},100);
 		this.hideWarning();
 	};
 	renderField() { return AS.form.fields.jcpage.renderField.call(window,this); };
