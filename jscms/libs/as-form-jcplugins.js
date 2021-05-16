@@ -34,8 +34,6 @@ AS.form.fields.jcpage = class extends AS.form.field {
 				placeholder: AS.label('Select'),
 			});
 			$f.on('change',()=>{ to.setValue(to.getJsValue()); AS.form.field.onchange(to); });
-			//AS.addEvent(to.field,'change',()=>{ to.setValue( to.field.value ); AS.form.field.onchange(to); },'asForm');
-			AS.addEvent(to.field,'change',()=>{ console.log(to); },'asForm');
 		});
 		return AS.form.field.prototype.renderField.call( to );
 	};

@@ -9,12 +9,14 @@ jc.edit = {
 			{type:'part',label:'IncludePagePart'},
 		],
 		formPlugins :  ['basic','pikaday','tinymce','iro','slider'],
+		repo : {},
 	},
 	onload : () => {
 		AS.addEvent(document,'as:tinyMceInited',e=>{
 			e.detail.getWrap().querySelector('.tox-tinymce').style.height = String(Math.min(Math.max((parseInt(window.innerHeight)-240),300),640))+'px';
 		});
 		jc.edit.loadFormPlugins();
+		jc.edit.getRepository();
 		jc.edit.loadPageTypes();
 		jc.edit.loadPageParts();
 	},
@@ -27,6 +29,20 @@ jc.edit = {
 		// Plugins without locales and CSS
 		jc.springLoad( AS.path('jsroot')+'libs/as-form-jcplugins.js' );
 	},
+	getRepository : ( pagetype, callback ) => {
+		if ( AS.test.udef(pagetype)) pagetype = jc.page.current();
+		if ( ! jc.edit.prop.repo[pagetype]) {
+			jc.springLoad( AS.path('jsreporoot')+'/'+pagetype+'.js' );
+			jc.edit.prop.repo[pagetype] = '_loading_';
+		}
+		if ( jc.edit.prop.repo[pagetype] == '_loading_' ) {
+			setTimeout( ()=>{jc.edit.getRepository(pagetype,callback);},100);
+			return;
+		}
+		if ( AS.test.func(callback) ) callback.call( window,jc.edit.prop.repo[pagetype]);
+		else return jc.edit.prop.repo[pagetype];
+	},
+	setRepository : (pagetype,data) => { return jc.edit.prop.repo[pagetype] = data; },
 	loadPageTypes : ( force )=>{
 		if ( force || (! jc.edit.prop.pageTypes) ) {
 			jc.edit.prop.pageTypes = true;
@@ -408,8 +424,23 @@ jc.edit = {
 jc.edit.meta = {
 	edit: ( options ) => {
 		options = AS.def.obj(options);
+		let pagetype= options.pagetype||jc.page.current();
 		let pd = options.pageData||jc.page.data();
 		let ed = options.editData||jc.edit.data();
+		if ( ! options.form ) {
+			jc.edit.getRepository( pagetype, (repo) => {
+				if ( repo && repo.form && repo.form.metadata) {
+					options.form = JSON.parse(JSON.stringify(repo.form.metadata));
+					jc.edit.meta.edit( options );
+				} else {
+					jc.edit.getRepository( 'index', (repo) => {
+						options.form = JSON.parse(JSON.stringify(repo.form.metadata));
+						jc.edit.meta.edit( options );
+					});
+				}
+			});
+			return;
+		}
 		if ( AS.test.udef(ed.metadata) ) ed.metadata = { type: jc.page.current(), id: pd.id };
 		let $mod = jc.edit.getModal(true);
 		$('.modal-dialog',$mod).append(`<div class="modal-content">
@@ -423,21 +454,20 @@ jc.edit.meta = {
 				</button>
 			</div>
 			<div class="modal-body" id="jcPageEditor"></div></div>`);
-		fp = JSON.parse(JSON.stringify(options.form||pd.template.metadata.form));
-		fp.callback = f=> { if ( ed.metadata) f.parse(ed.metadata) };
-		fp.target = 'jcPageEditor';
-		fp.options.effectduration = 0;
-		fp.options.theme = 'light';
-		fp.options.title = `“${ ed.metadata.type }”${ ed.metadata.id ? ' ID: '+ed.metadata.id : '' }`;
-		fp.fields.push(['btns','buttons',{position:'bottom',list:[{label:AS.label('Cancel'),icon:AS.icon('circleClose'),onclick:'()=>{jc.edit.noModal();}'},{btype:'reset'},{btype:'submit',asLabel:'Done'}]}]);
-		fp.options.jsaction = (fd,f) => {
+		options.form.callback = f=> { if ( ed.metadata) f.parse(ed.metadata) };
+		options.form.target = 'jcPageEditor';
+		options.form.options.effectduration = 0;
+		options.form.options.theme = 'light';
+		options.form.options.title = `“${ ed.metadata.type }”${ ed.metadata.id ? ' ID: '+ed.metadata.id : '' }`;
+		options.form.fields.push(['btns','buttons',{position:'bottom',list:[{label:AS.label('Cancel'),icon:AS.icon('circleClose'),onclick:'()=>{jc.edit.noModal();}'},{btype:'reset'},{btype:'submit',asLabel:'Done'}]}]);
+		options.form.options.jsaction = (fd,f) => {
 			f.destroy();
 			jc.edit.noModal();
 			ed.metadata = fd;
 			if ( options.callback ) options.callback.call(window,ed);
 			else jc.edit.data(ed);
 		};
-		$mod.on('shown.bs.modal',()=>{ AS.form.create(fp); }).modal('show');
+		$mod.on('shown.bs.modal',()=>{ AS.form.create(options.form); }).modal('show');
 	}
 };
 

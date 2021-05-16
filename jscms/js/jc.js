@@ -1548,7 +1548,7 @@ jc.page = {
 		});
 	},
 	save : ( params ) => {
-		jc.progress(AS.label('SavingPage'));
+		if ( ! params.mute ) jc.progress(AS.label('SavingPage'));
 		if ( AS.test.udef(params)) params = {};
 		else if ( AS.test.func(params)) params = { callback: params };
 		if ( AS.test.udef(params.data)) params.data = jc.edit.data();
@@ -1562,8 +1562,8 @@ jc.page = {
 			jc.jdav.get('struct/_all-list.json',(l)=>{ params.fulllist = l||{}; jc.page.save( params ); })
 			return;
 		}
-		let isNew = (params.id=='new');
-		if ( isNew ) {
+		if (params.id=='new') {
+			params.isNew = true;
 			if ( Object.keys(params.typelist).length ) {
 				let max = 0;
 				Object.keys(params.typelist).forEach( k => {
@@ -1575,136 +1575,138 @@ jc.page = {
 				params.id = 1;
 			}
 		}
-		if ( AS.test.udef(params.data.metadata) ) params.data.metadata = {};
-		Object.keys(params.data).forEach( k => {
-			if ( AS.test.arr(params.data[k])) params.data[k].forEach( i => {
-				if ( AS.test.obj(i) && ! AS.test.arr(i) ) {
-					delete i.idx;
-					delete i.qt;
-				}
-			} );
-		} );
-		if ( params.id ) {
-			params.data.id = params.id;
-			params.data.metadata.id = params.id;
-		}
-		if (( ! params.data.metadata.description ) && AS.test.str( params.data.abstract)) params.data.metadata.description = params.data.abstract.dehtml().shorten(256);
-		if (( ! params.data.metadata.title ) && AS.test.str( params.data.title)) params.data.metadata.title = params.data.title.dehtml().shorten(48);
-		let tpd = {
-			title: params.data.metadata.title||'',
-			desc: params.data.metadata.description || '',
-			upd: (new Date()).getTime(),
-			user: jc.prop.authUser
-		};
-		if ( params.data.metadata.hidden ) tpd.hidden = true;
-		if ( params.data.blogdate ) tpd.date = params.data.blogdate;
-		if ( params.id ) tpd.id = parseInt(params.id);
-		if (( ! tpd.title.length) && AS.test.str( params.data.title)) tpd.title = params.data.title.dehtml().shorten(48);
-		if ( ! tpd.title.length ) tpd.title = params.page + ( params.id ? ' '+params.id : '');
-		jc.jdav.put( params.page + ( params.id || '') + '.json', params.data, ()=>{
-			if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
-			params.fulllist[params.page][String(params.id?params.id:0)] = tpd;
-			jc.progress(AS.label('SavingArticleList'));
-			let finalize = () => {
-				jc.progress(false);
-				if ( (! isNew) && (! params.noDialog) ) {
-					window.setTimeout( ()=>{
-						Swal.fire({
-							title: AS.label('PageSavedTitle'),
-							text: AS.label('PageSavedBody',{page:params.page,id:params.id}),
-							icon: "success",
-							showCancelButton:false,
-							showConfirmButton:false,
-							timer: 2000,
-							timerProgressBar: true,
-						});
-					},100);
-				}
-				if ( AS.test.func(params.callback) ) {
-					params.callback.call(window,params.page,params.id,params.data);
-					return;
-				}
-				if ( jc.edit ) jc.edit.data(false);
-				jc.page.current('-');
-				jc.page.open( page, id );
-			};
-			jc.jdav.put('struct/_all-list.json',params.fulllist,()=>{
-				params.typelist[String(params.id?params.id:0)] = tpd;
-				jc.jdav.put('struct/'+params.page+'-list.json',params.typelist,()=>{
-					if ( params.noLasts ) {
-						finalize();
-					} else {
-						jc.progress(AS.label('SavingLasts'));
-						jc.page.makeLasts( params.page, params.typelist, finalize );
+		if ( ! params.tpd ) {
+			if ( AS.test.udef(params.data.metadata) ) params.data.metadata = {};
+			Object.keys(params.data).forEach( k => {
+				if ( AS.test.arr(params.data[k])) params.data[k].forEach( i => {
+					if ( AS.test.obj(i) && ! AS.test.arr(i) ) {
+						delete i.idx;
+						delete i.qt;
 					}
+				} );
+			} );
+			if ( params.id ) {
+				params.data.id = params.id;
+				params.data.metadata.id = params.id;
+			}
+			if (( ! params.data.metadata.description ) && AS.test.str( params.data.abstract)) params.data.metadata.description = params.data.abstract.dehtml().shorten(256);
+			if (( ! params.data.metadata.title ) && AS.test.str( params.data.title)) params.data.metadata.title = params.data.title.dehtml().shorten(48);
+			params.tpd = {
+				title: params.data.metadata.title||'',
+				desc: params.data.metadata.description || '',
+				upd: (new Date()).getTime(),
+				user: jc.prop.authUser
+			};
+			if ( params.data.metadata.hidden ) params.tpd.hidden = true;
+			if ( params.data.blogdate ) params.tpd.date = params.data.blogdate;
+			if ( params.id ) params.tpd.id = parseInt(params.id);
+			if (( ! params.tpd.title.length) && AS.test.str( params.data.title)) params.tpd.title = params.data.title.dehtml().shorten(48);
+			if ( ! params.tpd.title.length ) params.tpd.title = params.page + ( params.id ? ' '+params.id : '');
+		}
+		if ( ! params.saved ) {
+			jc.jdav.put( params.page + ( params.id || '') + '.json', params.data, ()=>{
+				params.saved = true;
+				jc.page.save( params );
+			});
+			return;
+		}
+		if ( (! params.noFullList) && (! params.savedFullList) ) {
+			if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
+			params.fulllist[params.page][String(params.id?params.id:0)] = params.tpd;
+			if ( ! params.mute ) jc.progress(AS.label('SavingArticleList'));
+			jc.jdav.put('struct/_all-list.json',params.fulllist,()=>{
+				params.savedFullList = true;
+				jc.page.save( params );
+			});
+			return;
+		}
+		if ( (! params.noFullList) && (! params.savedTypeList) ) {
+			params.typelist[String(params.id?params.id:0)] = params.tpd;
+			jc.jdav.put('struct/'+params.page+'-list.json',params.typelist,()=>{
+				params.savedTypeList = true;
+				jc.page.save( params );
+			});
+			return;
+		}
+		if ( ! ( params.noLasts) && (! params.savedLasts) ) {
+			if ( ! params.mute ) jc.progress(AS.label('SavingLasts'));
+			let lasts = [];
+			Object.keys(params.fulllist).forEach( k => {
+				const pm = params.fulllist[k];
+				if (!pm.hidden) lasts.push( pm );
+			});
+			lasts.sort( (a,b) =>(b.upd - a.upd));
+			qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) );
+			qts.sort( (a,b)=>( b - a ) );
+			let proc = () => {
+				if ( qts.length ) {
+					const qt = qts.shift();
+					lasts.splice(qt -1);
+					jc.jdav.put('struct/'+params.page+'-last'+qt+'.json',lasts,proc);
+					return;
+				} else {
+					params.savedLasts = true;
+					jc.page.save( params );
+				}
+			}
+			proc();
+			return;
+		}
+		if ( ! ( params.noLasts) && (! params.savedDates) ) {
+			let aggr = {};
+			Object.keys(params.fulllist).forEach( k => {
+				const pm = params.fulllist[k];
+				if (pm.hidden) return;
+				if ( ! AS.test.str(pm.date) ) return;
+				const dp = pm.date.split('-');
+				if ( dp.length != 3 ) return;
+				aggr[dp[0]] = AS.def.arr(aggr[dp[0]]);
+				aggr[dp[0]].push(pm);
+				aggr[dp[0]+'-'+dp[1]] = AS.def.arr(aggr[dp[0]+'-'+dp[1]]);
+				aggr[dp[0]+'-'+dp[1]].push( pm );
+			});
+			let flist = Object.keys(aggr).map( sel => {
+				let mlist = aggr[sel];
+				mlist.sort( (a,b)=>{
+					if ( a.date == b.date ) return ( a.upd < b.ud ? -1 : 1);
+					return (a.date < b.date ? -1 : 1 );
 				});
+				return {prefix: sel, list: mlist };
 			});
-		});
-	},
-	makeLasts : ( page, list, callback ) => {
-		if ( AS.test.udef(list) ) {
-			jc.jdav.get('struct/'+page+'-list.json',(l)=>{
-				jc.page.makeLasts( page, (l||{}), callback );
-			});
+			let proc = () => {
+				if ( flist.length ) {
+					let f = flist.shift();
+					jc.jdav.put('struct/'+page+'-bydate-'+f.prefix+'.json',f.list,proc);
+					return;
+				} else {
+					params.savedDates = true;
+					jc.page.save( params );
+				}
+			}
+			proc();
 			return;
 		}
-		let lasts = [];
-		Object.keys(list).forEach( k => {
-			const pm = list[k];
-			if (!pm.hidden) lasts.push( pm );
-		});
-		lasts.sort( (a,b) =>(b.upd - a.upd));
-		qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) );
-		qts.sort( (a,b)=>( b - a ) );
-		let proc = () => {
-			if ( qts.length ) {
-				const qt = qts.shift();
-				lasts.splice(qt -1);
-				jc.jdav.put('struct/'+page+'-last'+qt+'.json',lasts,proc);
-				return;
-			} else {
-				jc.page.makeDateEntries(page,list,callback);
-			}
+		if ( ! params.mute ) jc.progress(false);
+		if ( (! params.isNew) && (! params.noDialog) && (! params.mute) ) {
+			window.setTimeout( ()=>{
+				Swal.fire({
+					title: AS.label('PageSavedTitle'),
+					text: AS.label('PageSavedBody',{page:params.page,id:params.id}),
+					icon: "success",
+					showCancelButton:false,
+					showConfirmButton:false,
+					timer: 1500,
+					timerProgressBar: true,
+				});
+			},100);
 		}
-		proc();
-	},
-	makeDateEntries : ( page, list, callback ) => {
-		if ( AS.test.udef(list) ) {
-			jc.jdav.get('struct/'+page+'-list.json',(l)=>{
-				jc.page.makeDateEntries( page, (l||{}), callback );
-			});
+		if ( AS.test.func(params.callback) ) {
+			params.callback.call(window,params.page,params.id,params.data);
 			return;
 		}
-		let aggr = {};
-		Object.keys(list).forEach( k => {
-			const pm = list[k];
-			if (pm.hidden) return;
-			if ( ! AS.test.str(pm.date) ) return;
-			const dp = pm.date.split('-');
-			if ( dp.length != 3 ) return;
-			aggr[dp[0]] = AS.def.arr(aggr[dp[0]]);
-			aggr[dp[0]].push(pm);
-			aggr[dp[0]+'-'+dp[1]] = AS.def.arr(aggr[dp[0]+'-'+dp[1]]);
-			aggr[dp[0]+'-'+dp[1]].push( pm );
-		});
-		let flist = Object.keys(aggr).map( sel => {
-			let mlist = aggr[sel];
-			mlist.sort( (a,b)=>{
-				if ( a.date == b.date ) return ( a.upd < b.ud ? -1 : 1);
-				return (a.date < b.date ? -1 : 1 );
-			});
-			return {prefix: sel, list: mlist };
-		});
-		let proc = () => {
-			if ( flist.length ) {
-				let f = flist.shift();
-				jc.jdav.put('struct/'+page+'-bydate-'+f.prefix+'.json',f.list,proc);
-				return;
-			} else if (AS.test.func(callback)) {
-				callback.call(window);
-			}
-		}
-		proc();
+		if ( jc.edit ) jc.edit.data(false);
+		jc.page.current('-');
+		jc.page.open( page, id );
 	},
 	upload : (fld,callback) => {
 		const page = jc.page.current();
