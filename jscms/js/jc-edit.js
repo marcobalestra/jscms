@@ -192,12 +192,13 @@ jc.page.rm = ( params ) => {
 };
 
 jc.page.save = ( params ) => {
+	console.log( params );
 	if ( ! params.mute ) jc.progress(AS.label('SavingPage'));
 	if ( AS.test.udef(params)) params = {};
 	else if ( AS.test.func(params)) params = { callback: params };
 	if ( AS.test.udef(params.data)) params.data = jc.edit.data();
 	if ( AS.test.udef(params.page)) params.page = jc.page.current();
-	if ( AS.test.udef(params.id) ) params.id = (jc.page.data()||{}).id;
+	if ( AS.test.udef(params.id) ) params.id = params.data.id;
 	if ( AS.test.udef(params.typelist)) {
 		jc.jdav.get('struct/'+params.page+'-list.json',(l)=>{ params.typelist = l||{}; jc.page.save( params ); })
 		return;
@@ -488,6 +489,7 @@ jc.page.rmUpload = ( item, callback ) => {
 	let params = {
 		data : pdata,
 		page: jc.page.current(),
+		id: jc.page.data().pageContent.id,
 		noLasts : true,
 		noDialog : true,
 		callback : ()=>{ jc.dav.rm( item.uri,()=>{
@@ -495,7 +497,6 @@ jc.page.rmUpload = ( item, callback ) => {
 			if ( AS.test.func(callback)) callback.call(window,pdata);
 		})},
 	}
-	if (pdata.id) params.id = id;
 	jc.page.save( params );
 };
 
