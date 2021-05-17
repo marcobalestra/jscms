@@ -460,6 +460,41 @@ jc.dav = {
 			success : (xt) => { success.call(window,xt); }
 		});
 	},
+	purge : ( ...args ) => {
+		let success,fail,options={};
+		args.forEach( (a) => {
+			if ( AS.test.obj(a)) {
+				if ( a.dir ) options.dir = a.dir;
+				if ( a.ext ) options.ext = a.ext;
+				if ( a.match ) options.match = a.match;
+				return;
+			}
+			let f = jc.evalFunc(a);
+			if ( AS.test.func(f) ) {
+				if ( success ) fail = f;
+				else success = f;
+			}
+			if ( AS.test.str(a) ) {
+				options.dir = a;
+			}
+		} );
+		fail = fail||success||jc.getError;
+		success = success||(()=>{});
+		if (options.dir) options.dir = options.dir.replace(/\/$/,'');
+		jc.dav.ls( options, (out)=>{
+			let count = 0;
+			let proc = ()=>{
+				if ( out.list.length ) {
+					count++;
+					let url = (out.dir ? out.dir + '/' : '') + out.list.shift();
+					jc.dav.rm( url, proc );
+				} else {
+					if ( AS.test.func(success) ) success.call( window, count );
+				}
+			};
+			proc();
+		}, fail);
+	},
 	ls : ( ...args ) => {
 		let success,fail,options={};
 		args.forEach( (a) => {
@@ -1377,426 +1412,6 @@ jc.page = {
 		jc.edit.data(false);
 		jc.page.prop.editMode = status;
 		jc.page.reload();
-	},
-	create : ( options ) => {
-		options = AS.def.obj(options);
-		if ( AS.test.udef(options.page) ) {
-			jc.jdav.get(
-				AS.path('jsauth') + 'auth/lstemplates',
-				(l) => {
-					let opts = {};
-					l.list.sort();
-					l.list.forEach( (k) => { opts[k] = k; } );
-					Swal.fire({
-						title: AS.label('SelectPageType'),
-						text: AS.label('SelectPageTypeDesc'),
-						input: 'select',
-						icon: 'question',
-						inputOptions : opts,
-						inputPlaceholder: 'Select',
-						showCancelButton: true,
-						cancelButtonText: AS.label('Cancel'),
-						confirmButtonText: AS.label('OK'),
-						inputValidator : (v) => {
-							return new Promise((resolve) => {
-								if (v.length) {
-									resolve()
-								} else {
-									resolve(AS.label('SelectPageType'));
-								}
-							})
-						},
-					}).then( result => {
-						if ( ! result.isConfirmed ) return;
-						options.page = result.value;
-						jc.page.create( options );
-					});
-				}
-			)
-			return;
-		}
-		if ( AS.test.udef(options.template) ) {
-			jc.template.info.get( options.page, ( tdata )=>{
-				options.template = tdata;
-				jc.page.create( options );
-			});
-			return;
-		}
-		if ( AS.test.udef( options.data) ) {
-			options.id = 'new';
-			jc.edit.meta.edit({
-				pageData : {},
-				editData : { metadata: { type: options.page, id:'new' }},
-				form : options.template.metadata.form,
-				callback : pd => {
-					options.data = pd;
-					jc.page.create( options );
-				}
-			});
-			return;
-		}
-		options.noDialog = true;
-		options.noLasts = true;
-		if ( AS.test.obj(options.template.content) ) {
-			let blocks = options.template.content.find( c => (AS.test.obj(c.content) && AS.test.arr(c.content.blocks)));
-			if ( blocks ) {
-				blocks = blocks.content.blocks;
-				if ( options.data.metadata.title && blocks.find( b =>( AS.test.obj(b) && ( b.prop=='title') )) ) options.data.title = options.data.metadata.title;
-				if ( options.data.metadata.description && blocks.find( b =>( AS.test.obj(b) && ( b.prop=='abstract') )) ) options.data.abstract = options.data.metadata.description;
-			}
-		}
-		options.callback = (page,id,data) => {
-			jc.page.prop.editMode = 'page';
-			jc.page.open( page, id );
-		};
-		jc.page.save( options );
-	},
-	rm : ( params ) => {
-		if ( AS.test.udef(params)) params = {};
-		else if ( AS.test.func(params)) params = { callback: params };
-		if ( AS.test.udef(params.page)) params.page = jc.page.current();
-		if ( AS.test.udef(params.id) ) params.id = (jc.page.data()||{}).id;
-		if ( (params.page == 'index') && (! params.id)) {
-			Swal.fire({ title: AS.label('Warning'), text: AS.label('CantDeleteIndex'), icon: "error" });
-			return;
-		}
-		if ( ! params.confirmed ) {
-			Swal.fire({
-				title: AS.label('DeleteThisPage'),
-				html: '<div style="white-space:pre;">'+AS.label('PageEraseBody',{page:params.page,id:params.id})+'</div>',
-				icon: "warning",
-				showDenyButton: false,
-				showCancelButton: true,
-				cancelButtonText: AS.label('Cancel'),
-				confirmButtonText: AS.label('OK'),
-			}).then( result => {
-				if ( result.isConfirmed ) {
-					params.confirmed = true;
-					jc.page.rm( params );
-				}
-			});
-			return;
-		}
-		jc.progress(AS.label('DeletingPage'));
-		if ( ! params.pdata ) {
-			if ( jc.page.data() && jc.page.data().pageContent ) {
-				params.pdata = jc.page.data().pageContent;
-			} else {
-				jc.page.loadData( params.page, params.id, (pdata)=>{
-					params.pdata = pdata;
-					jc.page.rm( params );
-				});
-				return;
-			}
-		}
-		if ( (! params.uploadsDeleted ) && AS.test.arr(params.pdata.uploads) && params.pdata.uploads.length) {
-			let uploads = params.pdata.uploads.clone();
-			let process = ()=>{
-				let url = uploads.shift().uri;
-				jc.dav.rm( url, ()=>{
-					if ( uploads.length ) {
-						process();
-					} else {
-						params.uploadsDeleted = true;
-						jc.page.rm( params );
-					}
-				});
-			};
-			process();
-			return;
-		}
-		if ( AS.test.udef(params.typelist)) {
-			jc.jdav.get('struct/'+params.page+'-list.json',(l)=>{ params.typelist = l||{}; jc.page.rm( params ); })
-			return;
-		}
-		if ( AS.test.udef(params.fulllist)) {
-			jc.jdav.get('struct/_all-list.json',(l)=>{ params.fulllist = l||{}; jc.page.rm( params ); })
-			return;
-		}
-		jc.dav.rm( params.page + ( params.id || '') + '.json', ()=>{
-			delete params.fulllist[params.page][String(params.id?params.id:0)];
-			jc.progress(AS.label('SavingArticleList'));
-			jc.jdav.put('struct/_all-list.json',params.fulllist,()=>{
-				delete params.typelist[String(params.id?params.id:0)];
-				jc.jdav.put('struct/'+params.page+'-list.json',params.typelist,()=>{
-					jc.progress(AS.label('SavingLasts'));
-					jc.page.makeLasts( params.page, params.typelist, ()=>{
-						jc.progress(false);
-						if (! params.noDialog) {
-							window.setTimeout( ()=>{
-								Swal.fire({
-									title: AS.label('PageErasedTitle'),
-									text: AS.label('PageErasedBody',{page:params.page,id:params.id}),
-									icon: "success",
-									showCancelButton:false,
-									showConfirmButton:false,
-									timer: 2000,
-									timerProgressBar: true,
-								});
-							},100);
-						}
-						if ( AS.test.func(params.callback) ) {
-							params.callback.call(window,params.page,params.id,params.data);
-							return;
-						}
-						if ( jc.edit ) jc.edit.data(false);
-						jc.page.current('-');
-						jc.page.open( 'index' );
-					});
-				});
-			});
-		});
-	},
-	save : ( params ) => {
-		if ( ! params.mute ) jc.progress(AS.label('SavingPage'));
-		if ( AS.test.udef(params)) params = {};
-		else if ( AS.test.func(params)) params = { callback: params };
-		if ( AS.test.udef(params.data)) params.data = jc.edit.data();
-		if ( AS.test.udef(params.page)) params.page = jc.page.current();
-		if ( AS.test.udef(params.id) ) params.id = (jc.page.data()||{}).id;
-		if ( AS.test.udef(params.typelist)) {
-			jc.jdav.get('struct/'+params.page+'-list.json',(l)=>{ params.typelist = l||{}; jc.page.save( params ); })
-			return;
-		}
-		if ( AS.test.udef(params.fulllist)) {
-			jc.jdav.get('struct/_all-list.json',(l)=>{ params.fulllist = l||{}; jc.page.save( params ); })
-			return;
-		}
-		if (params.id=='new') {
-			params.isNew = true;
-			if ( Object.keys(params.typelist).length ) {
-				let max = 0;
-				Object.keys(params.typelist).forEach( k => {
-					let n = parseInt(k);
-					if ( (!isNaN(n)) && ( n >= max )) max = n+1;
-				} );
-				if ( max > 0 ) params.id = max;
-			} else {
-				params.id = 1;
-			}
-		}
-		if ( ! params.tpd ) {
-			if ( AS.test.udef(params.data.metadata) ) params.data.metadata = {};
-			Object.keys(params.data).forEach( k => {
-				if ( AS.test.arr(params.data[k])) params.data[k].forEach( i => {
-					if ( AS.test.obj(i) && ! AS.test.arr(i) ) {
-						delete i.idx;
-						delete i.qt;
-					}
-				} );
-			} );
-			if ( params.id ) {
-				params.data.id = params.id;
-				params.data.metadata.id = params.id;
-			}
-			if (( ! params.data.metadata.description ) && AS.test.str( params.data.abstract)) params.data.metadata.description = params.data.abstract.dehtml().shorten(256);
-			if (( ! params.data.metadata.title ) && AS.test.str( params.data.title)) params.data.metadata.title = params.data.title.dehtml().shorten(48);
-			params.tpd = {
-				title: params.data.metadata.title||'',
-				desc: params.data.metadata.description || '',
-				upd: (new Date()).getTime(),
-				user: jc.prop.authUser
-			};
-			if ( params.data.metadata.hidden ) params.tpd.hidden = true;
-			if ( params.data.blogdate ) params.tpd.date = params.data.blogdate;
-			if ( params.id ) params.tpd.id = parseInt(params.id);
-			if (( ! params.tpd.title.length) && AS.test.str( params.data.title)) params.tpd.title = params.data.title.dehtml().shorten(48);
-			if ( ! params.tpd.title.length ) params.tpd.title = params.page + ( params.id ? ' '+params.id : '');
-		}
-		if ( ! params.saved ) {
-			jc.jdav.put( params.page + ( params.id || '') + '.json', params.data, ()=>{
-				params.saved = true;
-				jc.page.save( params );
-			});
-			return;
-		}
-		if ( (! params.noFullList) && (! params.savedFullList) ) {
-			if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
-			params.fulllist[params.page][String(params.id?params.id:0)] = params.tpd;
-			if ( ! params.mute ) jc.progress(AS.label('SavingArticleList'));
-			jc.jdav.put('struct/_all-list.json',params.fulllist,()=>{
-				params.savedFullList = true;
-				jc.page.save( params );
-			});
-			return;
-		}
-		if ( (! params.noFullList) && (! params.savedTypeList) ) {
-			params.typelist[String(params.id?params.id:0)] = params.tpd;
-			jc.jdav.put('struct/'+params.page+'-list.json',params.typelist,()=>{
-				params.savedTypeList = true;
-				jc.page.save( params );
-			});
-			return;
-		}
-		if ( ! ( params.noLasts) && (! params.savedLasts) ) {
-			if ( ! params.mute ) jc.progress(AS.label('SavingLasts'));
-			let lasts = [];
-			Object.keys(params.fulllist).forEach( k => {
-				const pm = params.fulllist[k];
-				if (!pm.hidden) lasts.push( pm );
-			});
-			lasts.sort( (a,b) =>(b.upd - a.upd));
-			qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) );
-			qts.sort( (a,b)=>( b - a ) );
-			let proc = () => {
-				if ( qts.length ) {
-					const qt = qts.shift();
-					lasts.splice(qt -1);
-					jc.jdav.put('struct/'+params.page+'-last'+qt+'.json',lasts,proc);
-					return;
-				} else {
-					params.savedLasts = true;
-					jc.page.save( params );
-				}
-			}
-			proc();
-			return;
-		}
-		if ( ! ( params.noLasts) && (! params.savedDates) ) {
-			let aggr = {};
-			Object.keys(params.fulllist).forEach( k => {
-				const pm = params.fulllist[k];
-				if (pm.hidden) return;
-				if ( ! AS.test.str(pm.date) ) return;
-				const dp = pm.date.split('-');
-				if ( dp.length != 3 ) return;
-				aggr[dp[0]] = AS.def.arr(aggr[dp[0]]);
-				aggr[dp[0]].push(pm);
-				aggr[dp[0]+'-'+dp[1]] = AS.def.arr(aggr[dp[0]+'-'+dp[1]]);
-				aggr[dp[0]+'-'+dp[1]].push( pm );
-			});
-			let flist = Object.keys(aggr).map( sel => {
-				let mlist = aggr[sel];
-				mlist.sort( (a,b)=>{
-					if ( a.date == b.date ) return ( a.upd < b.ud ? -1 : 1);
-					return (a.date < b.date ? -1 : 1 );
-				});
-				return {prefix: sel, list: mlist };
-			});
-			let proc = () => {
-				if ( flist.length ) {
-					let f = flist.shift();
-					jc.jdav.put('struct/'+page+'-bydate-'+f.prefix+'.json',f.list,proc);
-					return;
-				} else {
-					params.savedDates = true;
-					jc.page.save( params );
-				}
-			}
-			proc();
-			return;
-		}
-		if ( ! params.mute ) jc.progress(false);
-		if ( (! params.isNew) && (! params.noDialog) && (! params.mute) ) {
-			window.setTimeout( ()=>{
-				Swal.fire({
-					title: AS.label('PageSavedTitle'),
-					text: AS.label('PageSavedBody',{page:params.page,id:params.id}),
-					icon: "success",
-					showCancelButton:false,
-					showConfirmButton:false,
-					timer: 1500,
-					timerProgressBar: true,
-				});
-			},100);
-		}
-		if ( AS.test.func(params.callback) ) {
-			params.callback.call(window,params.page,params.id,params.data);
-			return;
-		}
-		if ( jc.edit ) jc.edit.data(false);
-		jc.page.current('-');
-		jc.page.open( page, id );
-	},
-	upload : (fld,callback) => {
-		const page = jc.page.current();
-		let pdata = jc.page.data().pageContent;
-		const id = pdata.id;
-		const prefix = page + ( id||'');
-		let uploads = AS.def.arr( pdata.uploads );
-		let news = [];
-		let indexes = [];
-		for ( let i = 0; i < fld.files.length; i++ ) {
-			if (fld.files[i].size && ( fld.files[i].size < jc.prop.maxUploadSize ) ) indexes.push(i);
-		}
-		if ( indexes.length == 0 ) {
-			fld.value = '';
-			if ( AS.test.func(callback)) callback.call(window,[],uploads);
-			return;
-		}
-		const process = () => {
-			let tf = fld.files[ indexes.shift() ];
-			let oname = tf.name;
-			jc.progress( oname );
-			let ext = oname.replace(/.*\.([^.]+)$/,"$1").toLowerCase();
-			let newname = AS.generateId(prefix)+'.'+ext;
-			let url = AS.path('jsdataroot') + 'uploads/' + newname;
-			tf.arrayBuffer().then( buffer => {
-				let binary = new DataView(buffer);
-				jc.dav.put( url, binary, (result)=>{
-					if ( result ) {
-						let no = { name: oname, ext: ext, uri: url, size: tf.size, type: tf.type, added: (new Date()).getTime() };
-						if ( no.type && no.type.length ) {
-							if (no.type.match(/^image\//) ) no.img = true;
-							if (no.img||no.type.match(/\/pdf$/)  ) no.fb = true;
-						} else {
-							no.type = 'application/octet-stream';
-						}
-						no.caption = no.name.replace(/^(.*)\.[^.]+$/,"$1").replace(/[._ -]+/g,' ').trim();
-						uploads.push( no );
-						news.push( no );
-					}
-					if ( indexes.length ) {
-						process();
-						return;
-					}
-					const sortf = (a,b)=>(a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1 );
-					uploads.sort(sortf);
-					news.sort(sortf);
-					fld.value = '';
-					pdata.uploads = uploads;
-					let params = {
-						data : pdata,
-						page: page,
-						noLasts : true,
-						noDialog : true,
-						callback : ()=>{
-							jc.progress();
-							if ( AS.test.func(callback)) callback.call(window,news,uploads);
-						}
-					}
-					if (AS.test.def(id)) params.id = id;
-					jc.page.save( params );
-				});
-			});
-		};
-		process();
-	},
-	rmUpload : ( item, callback ) => {
-		let recurse = (n) => {
-			if ( AS.test.arr(n) ) {
-				if ( n.length ) {
-					if ( n[0].size && n[0].name && n[0].uri ) return n.filter( i => ( i.uri != item.uri ) );
-					else return n.map( i =>(recurse(i)) );
-				}
-			} else if ( AS.test.obj(n) ) {
-				Object.keys(n).forEach( k => { n[k] = recurse( n[k]) } );
-			}
-			return n;
-		}
-		let pdata = recurse(jc.page.data().pageContent);
-		let params = {
-			data : pdata,
-			page: jc.page.current(),
-			noLasts : true,
-			noDialog : true,
-			callback : ()=>{ jc.dav.rm( item.uri,()=>{
-				jc.progress();
-				if ( AS.test.func(callback)) callback.call(window,pdata);
-			})},
-		}
-		if (pdata.id) params.id = id;
-		jc.page.save( params );
 	},
 };
 
