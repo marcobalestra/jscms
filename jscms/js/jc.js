@@ -1117,7 +1117,8 @@ jc.template = {
 	prop : {
 		info : {},
 		html : {},
-		part : {}
+		part : {},
+		partrepo : {},
 	},
 	info : {
 		get: ( template, callback ) => {
@@ -1167,26 +1168,53 @@ jc.template = {
 		get : ( key, callback ) => {
 			let v = jc.template.prop.part[key];
 			if ( ! v ) {
-				let ext='.js',dataType='json';
-				if ( key.match(/\.x?html?$/) ) {
-					ext = '';
-					dataType='html';
-				}
 				jc.template.part.set(key,'_loading_');
-				jc.dav.get( 'parts/'+ key + ext, j =>{
-					jc.template.part.set(key,j);
-					jc.template.part.get(key,callback);
-				},jc.getError);
+				if ( key.match(/\.json$/) ) {
+					jc.jdav.get( 'parts/'+ key, j =>{
+						jc.template.part.set(key,j);
+						jc.template.part.get(key,callback);
+					},jc.getError);
+				} else if ( key.match(/\.x?html?$/) ) {
+					jc.dav.get( 'parts/'+ key, j =>{
+						jc.template.part.set(key,j);
+						jc.template.part.get(key,callback);
+					},jc.getError);
+				}
 				return;
 			} else if ( v == '_loading_' ) {
 				setTimeout( ()=>{ jc.template.part.get(key,callback) }, 100 );
-			} else if ( AS.test.func(callback) ) {
+				return;
+			}
+			if ( AS.test.obj(v) && v.type ) {
+				jc.template.repo.get( v.type, (repo)=>{
+					jc.template.part.set(key,repo.render(v));
+					jc.template.part.get(key,callback);
+				})
+				return;
+			}
+			if ( AS.test.func(callback) ) {
 				callback.call( window, v );
 			} else {
 				return v;
 			}
 		},
 		set : ( key, value ) => { jc.template.prop.part[key] = value },
+	},
+	repo : {
+		get : ( repo, callback ) => {
+			let data = jc.template.prop.partrepo[repo];
+			if ( ! data ) {
+				data = '_loading_';
+				jc.springLoad( AS.path('jsreporoot')+'/part-'+repo+'.js' );
+			}
+			if ( data == '_loading_') {
+				window.setTimeout( ()=>{ jc.template.repo.get(repo,callback); }, 100 );
+				return;
+			}
+			if (AS.test.func(callback)) callback.call( window, data );
+			return data;
+		},
+		set : ( repo, data ) => { jc.template.prop.partrepo[repo] = data },
 	},
 };
 
@@ -1239,6 +1267,7 @@ jc.page = {
 				return;
 			}
 		}
+		if ( jc.edit && jc.edit.data() ) jc.edit.data(false);
 		$(document.body).trigger('jc_page_open_requested',{page:page,id:id,uriparams:data});
 		if ( AS.test.str(data) ) data = $.parseParams( data );
 		if ( data && AS.test.str(data.template) ) {
@@ -1560,7 +1589,7 @@ jc.render = {
 			jc.template.part.get( o.content, (partcontent) => {
 				$(o.selector).data('jc_part_label',o.content);
 				o.rendered = partcontent;
-				if ( AS && AS.labels ) o.rendered = AS.labels.labelize( o.rendered );
+				if ( AS.test.str(o.rendered) && AS && AS.labels ) o.rendered = AS.labels.labelize( o.rendered );
 				jc.render.main(o);
 				jc.render.queue(-1);
 			});

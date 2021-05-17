@@ -8,7 +8,7 @@
 		{ selector: "#aboveTopBar", content: false },
 		{ selector: "#topBar", part: "header.html" },
 		{ selector: "#belowTopBar", content: false },
-		{ selector: "#topNavbar", part: 'navbar.html' },
+		{ selector: "#topNavbar", part: 'navbar.json' },
 		{ selector: "#mainContainer", content : {
 			type:"blocks",
 			editable:true,
