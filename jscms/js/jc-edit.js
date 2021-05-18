@@ -980,7 +980,7 @@ jc.edit = {
 		}
 		fo.target = 'jcPageEditor';
 		fo.options.effectduration = 0;
-		fo.fields.push(['hr','hr',{position:'bottom'}],['btns','buttons',{position:'bottom',list:[{label:AS.label('Cancel'),icon:AS.icon('circleClose'),onclick:jc.edit.noModal},{btype:'reset'},{btype:'submit'}]}]),
+		fo.fields.push(['hr','hr',{position:'bottom'}],['btns','buttons',{position:'bottom',list:[{label:AS.label('Cancel'),icon:AS.icon('circleClose'),onclick:jc.edit.noModal},{btype:'submit'}]}]),
 		$mod.on('shown.bs.modal',()=>{ AS.form.create( fo ); });
 		$mod.modal('show');
 	},
