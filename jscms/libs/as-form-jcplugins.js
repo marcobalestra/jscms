@@ -22,7 +22,7 @@ AS.form.fields.jcpage = class extends AS.form.field {
 				Object.keys( ptype ).forEach( id => {
 					let p = ptype[id];
 					id = parseInt(id) ? id : '';
-					if ( (page == curpage) && ( id == curid)) return;
+					if ((! to.prop.includecurrent) && (page == curpage) && ( id == curid)) return;
 					let v = page + id;
 					$f.append(`<option value="${ v }">[${page}${id}] ${p.title.escape()} — ${(p.desc||'').escape()}</option>`);
 				} );
@@ -48,10 +48,12 @@ AS.form.fields.jcpage = class extends AS.form.field {
 	};
 	parse(v) {
 		let av = v[this.prop.name];
-		let avs = av.page + ( av.id ? av.id : '');
-		this.setValue(av);
-		this.prop._s2v = avs;
-		$( this.fakeField() ).val(avs).trigger('change');
+		if ( av ) {
+			let avs = av.page + ( av.id ? av.id : '');
+			this.setValue(av);
+			this.prop._s2v = avs;
+			$( this.fakeField() ).val(avs).trigger('change');
+		}
 		this.hideWarning();
 	};
 	renderField() { return AS.form.fields.jcpage.renderField.call(window,this); };

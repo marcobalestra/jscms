@@ -1,42 +1,44 @@
 (()=>{
 	let data = {
-		form : {
-			requires : ['basic','pikaday','tinymce','iro','slider'],
-			options : {
-				subparts: {
-					label: ['label','text',{asLabel:'Label',normalize:true,mandatory:true,focus:true}],
-					page : ['item','jcpage',{asLabel:'Page',depends:'type=item'}],
+		form : () => {
+			return {
+				requires : ['basic','pikaday','tinymce','iro','slider'],
+				options : {
+					subparts: {
+						label: ['label','text',{asLabel:'Label',normalize:true,mandatory:true,focus:true,depends:'!type=divider'}],
+						page : ['item','jcpage',{nolabel:true,depends:'type=item',includecurrent:true}],
+					},
+					subforms : [
+							{
+								name: 'itemd',
+								subtype: 'array',
+								preview: ['type','label'],
+								values: [
+									['type','select',{asLabel:'Type',options:[{label:'Page',value:'item'},{label:'Divider',value:'divider'}]}],
+									{subpart:'label'},
+									{subpart:'page'},
+								]
+							},
+							{
+								name: 'item',
+								subtype: 'array',
+								preview: ['type','label'],
+								values: [
+									['type','select',{asLabel:'Type',options:[{label:'Page',value:'item'},{label:'Menu',value:'menu'}]}],
+									{subpart:'label'},
+									{subpart:'page'},
+									['menu','subform',{asLabel:'Content',subform:'itemd',depends:'type=menu'}]
+								]
+							},
+					],
 				},
-				subforms : [
-						{
-							name: 'itemd',
-							subtype: 'array',
-							preview: ['label'],
-							values: [
-								{subpart:'label'},
-								['type','select',{asLabel:'Type',options:[{label:'Page',value:'item'},{label:'Divider',value:'divider'}]}],
-								{subpart:'page'},
-							]
-						},
-						{
-							name: 'item',
-							subtype: 'array',
-							preview: ['label'],
-							values: [
-								{subpart:'label'},
-								['type','select',{asLabel:'Type',options:[{label:'Page',value:'item'},{label:'Menu',value:'menu'}]}],
-								{subpart:'page'},
-								['menu','subform',{asLabel:'Content',subform:'itemd',depends:'type=menu'}]
-							]
-						},
+				fields : [
+					['type','hidden',{value:"navbar"}],
+					['theme','hidden',{value:"light"}],
+					['id','text',{label:'ID',skipempty:true,trim:true}],
+					['menu','subform',{asLabel:'Content',subform:'item',mandatory:true}],
 				],
-			},
-			fields : [
-				['type','hidden',{value:"navbar"}],
-				['theme','hidden',{value:"light"}],
-				['id','text',{label:'ID',skipempty:true,trim:true}],
-				['menu','subform',{asLabel:'Content',subform:'item'}],
-			],
+			};
 		},
 		render : ( data ) => {
 			let $navbar = $(`<nav class="navbar navbar-expand-lg navbar-${data.theme} bg-${data.theme}"></nav>`);
@@ -46,18 +48,23 @@
 			const render = ( item, $parent ) => {
 				let $li = $(`<li class="nav-item"></li>`);
 				if ( item.type == "item" ) {
-					$li.append(`<a onclick="jc.page.open('${item.item.page}'${ item.item.id ? ','+item.item.id : ''})">${ item.label.escape() }</a>`);
+					$li.append(` <a class="nav-link" onclick="jc.page.open('${item.item.page}'${ item.item.id ? ','+item.item.id : ''})">${ item.label.escape() }</a> `)
+					if ( (jc.page.current() == item.item.page) && ( item.item.id == jc.page.data().id) ) $li.addClass('active');
 				} else if ( item.type == "menu" ) {
 					$li.addClass('dropdown');
 					let id = AS.generateId('jcMenu');
-					$li.append(`<a class="nav-link dropdown-toggle" href="#" id="${id}" role="button" data-toggle="${id}" aria-haspopup="true" aria-expanded="false">${item.label.escape()}</a>`);
-					let $div = $(`<div class="dropdown-menu" aria-labelledby="${id}"></div>`);
+					$li.append(`<a class="nav-link dropdown-toggle" href="#" id="${id}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${item.label.escape()}</a>`);
+					let $div = $(`<div class="dropdown-menu" aria-labelledby="${id}"> </div>`);
 					item.menu.forEach( (si) => {
-						$div.append(`<a class="dropdown-item" onclick="jc.page.open('${si.item.page}'${ si.item.id ? ','+si.item.id : ''})">${si.item.label.escape()}</a>`);
+						if ( si.type == 'divider') {
+							$div.append(' <div class="dropdown-divider"></div> ');
+							return;
+						}
+						$div.append(` <a class="dropdown-item" onclick="jc.page.open('${si.item.page}'${ si.item.id ? ','+si.item.id : ''})">${si.label.escape()}</a> `);
 					});
 					$li.append($div);
 				}
-				$parent.append($li);
+				$parent.append(' ',$li,' ');
 			};
 			data.menu.forEach( (item) => { render( item, $('div>ul',$navbar) ); } );
 			return $navbar;

@@ -1,1 +1,1 @@
-{"type":"navbar","id":"siteNavigation","theme":"light","menu":[{"label":"Home","type":"item","item":{"page":"index"}}]}
+{"type":"navbar","theme":"light","id":"siteNavigation","menu":[{"label":"Home","type":"item","item":{"page":"index"}}]}

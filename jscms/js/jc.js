@@ -1165,30 +1165,36 @@ jc.template = {
 		},
 	},
 	part : {
-		get : ( key, callback ) => {
+		get : ( key, ...args ) => {
+			let callback,options={};
+			args.forEach( (a) => {
+				if ( AS.test.func(a)) callback = a;
+				else if ( AS.test.obj(a)) options = a;
+			} );
 			let v = jc.template.prop.part[key];
 			if ( ! v ) {
 				jc.template.part.set(key,'_loading_');
 				if ( key.match(/\.json$/) ) {
 					jc.jdav.get( 'parts/'+ key, j =>{
 						jc.template.part.set(key,j);
-						jc.template.part.get(key,callback);
+						jc.template.part.get(key,callback,options);
 					},jc.getError);
 				} else if ( key.match(/\.x?html?$/) ) {
 					jc.dav.get( 'parts/'+ key, j =>{
 						jc.template.part.set(key,j);
-						jc.template.part.get(key,callback);
+						jc.template.part.get(key,callback,options);
 					},jc.getError);
 				}
 				return;
 			} else if ( v == '_loading_' ) {
-				setTimeout( ()=>{ jc.template.part.get(key,callback) }, 100 );
+				setTimeout( ()=>{ jc.template.part.get(key,callback,options) }, 100 );
 				return;
 			}
-			if ( AS.test.obj(v) && v.type ) {
+			if ( AS.test.obj(v) && v.type && (! options.raw ) ) {
 				jc.template.repo.get( v.type, (repo)=>{
-					jc.template.part.set(key,repo.render(v));
-					jc.template.part.get(key,callback);
+					if ( options.repo ) v = repo;
+					else v = repo.render(v);
+					if ( AS.test.func(callback) ) callback.call( window, v );
 				})
 				return;
 			}
@@ -1196,6 +1202,26 @@ jc.template = {
 				callback.call( window, v );
 			} else {
 				return v;
+			}
+		},
+		reload : ( key, ...args ) => {
+			let callback,options={};
+			args.forEach( (a) => {
+				if ( AS.test.func(a)) callback = a;
+				else if ( AS.test.obj(a)) options = a;
+			} );
+			delete jc.template.prop.part[key];
+			return jc.template.part.get(key,callback,options);
+		},
+		put : ( key, data, callback ) => {
+			if ( AS.test.obj(data)) {
+				jc.jdav.put( 'parts/'+ key, data, () =>{
+					jc.template.part.reload( key, {raw:true}, callback );
+				},jc.getError);
+			} else {
+				jc.dav.put( 'parts/'+ key, data, () =>{
+					jc.template.part.reload( key, callback );
+				},jc.getError);
 			}
 		},
 		set : ( key, value ) => { jc.template.prop.part[key] = value },
@@ -1288,7 +1314,7 @@ jc.page = {
 		jc.page.step.info( page, id, data, infokey );
 	},
 	loadData : ( page, id, callback ) => {
-		if ( jc.page.prop.editMode && jc.edit && jc.edit.data() ) {
+		if ( (jc.page.prop.editMode == 'page') && jc.edit && jc.edit.data() ) {
 			if ( AS.test.func(callback) ) callback.call( window, jc.edit.data() );
 			return;
 		}
@@ -1378,7 +1404,7 @@ jc.page = {
 		});
 	},
 	edit : ( status, savePolicy ) => {
-		if ( status ) {
+		if ( status == 'page' ) {
 			jc.springLoad('module:edit');
 			if ( ! jc.edit ) return window.setTimeout( ()=>{ jc.page.edit(status,savePolicy) }, 100 );
 			jc.page.prop.editMode = status;
@@ -1409,6 +1435,12 @@ jc.page = {
 			jc.edit.data( jc.page.data().pageContent );
 			jc.page.reload();
 			return;
+		} else if ( status == 'parts' ) {
+			jc.springLoad('module:edit');
+			if ( ! jc.edit ) return window.setTimeout( ()=>{ jc.page.edit(status,savePolicy) }, 100 );
+			jc.page.prop.editMode = status;
+			jc.page.reload();
+			return;
 		} else if ( AS.test.udef(savePolicy)) {
 			Swal.fire({
 				title: AS.label('SaveChangesTitle'),
@@ -1429,16 +1461,14 @@ jc.page = {
 			});
 			return;
 		}
-		let oe = (jc.edit && jc.edit.data())||false;
-		if ( ! oe ) {
-			jc.page.reload();
-			return;
+		if (jc.page.prop.editMode == 'page') {
+			let oe = (jc.edit && jc.edit.data())||false;
+			if (oe && savePolicy) {
+				jc.page.save( { data: oe, callback: ()=>{ jc.page.edit(status,false)} });
+				return;
+			}
+			jc.edit.data(false);
 		}
-		if (savePolicy) {
-			jc.page.save( { data: oe, callback: ()=>{ jc.page.edit(status,false)} });
-			return;
-		}
-		jc.edit.data(false);
 		jc.page.prop.editMode = status;
 		jc.page.reload();
 	},
@@ -1481,7 +1511,6 @@ jc.render = {
 			let $tgt = $(sel);
 			if ( ! e.dontEmpty ) {
 				$tgt.html('');
-				$tgt.removeData('jc_part_label');
 			}
 			if ( e.part ) {
 				e.content = { type: 'part', content: e.part };
@@ -1583,17 +1612,33 @@ jc.render = {
 		o.func = jc.page.prop.renderers[o.render];
 		jc.render.main(o);
 	},
-	part : ( o ) => {
-		if ( $(o.selector).data('jc_part_label') != o.content ) {
+	part : ( o,pdata,pfull,other ) => {
+		if ( AS.test.udef(other) ) {
 			jc.render.queue(1);
-			jc.template.part.get( o.content, (partcontent) => {
-				$(o.selector).data('jc_part_label',o.content);
-				o.rendered = partcontent;
-				if ( AS.test.str(o.rendered) && AS && AS.labels ) o.rendered = AS.labels.labelize( o.rendered );
-				jc.render.main(o);
-				jc.render.queue(-1);
-			});
+			other = {};
 		}
+		if ( ! other.content ) {
+			jc.template.part.get( o.content, (partcontent) => {
+				other.content = o.rendered = partcontent;
+				if ( AS.test.str(o.rendered) && AS && AS.labels ) o.rendered = AS.labels.labelize( o.rendered );
+				jc.render.part( o,pdata,pfull,other );
+			});
+			return;
+		}
+		if ( (jc.page.prop.editMode == 'parts') ) {
+			if ( ! other.raw ) {
+				jc.template.part.get( o.content, {raw:true},(raw) => {
+					other.raw = raw;
+					jc.render.part( o,pdata,pfull,other );
+				});
+				return;
+			}
+			o.editable = { type: 'part', src: o.content, raw: other.raw };
+		} else {
+			delete o.editable;
+		}
+		jc.render.main(o);
+		jc.render.queue(-1);
 	},
 	blocks : (o,pdata,pfull) => {
 		if ( ! Array.isArray(o.blocks)) o.blocks = [o.blocks];
@@ -1602,7 +1647,7 @@ jc.render = {
 			if (AS.test.udef(b.editable)) b.editable = canedit;
 			let blockEditable = canedit && !( AS.test.def(b.editable) && (!b.editable));
 			let out = jc.render.block[b.type] ? jc.render.block[b.type].call(window,b,pdata,o) : '';
-			if ( canedit && blockEditable && jc.page.prop.editMode ) {
+			if ( canedit && blockEditable && (jc.page.prop.editMode=='page') ) {
 				let w = true;
 				if ( (out instanceof jQuery)||(out instanceof NodeList)||(out instanceof Node) ) w = ! $('.jcEditable',out).length;
 				else if ( AS.test.str(out) ) w = ( out.indexOf('<div class="jcEditable">') < 0 );
@@ -1644,7 +1689,7 @@ jc.render = {
 				if ( ! sb.type ) sb.type='text';
 				if (jc.render.block[sb.type]) {
 					let r = jc.render.block[sb.type].call(window,{prop:sb.type, editable:b.editable},sb) || '';
-					if ( b.editable && jc.page.prop.editMode ) {
+					if ( b.editable && (jc.page.prop.editMode=='page') ) {
 						let editable = { prop: b.prop, type: 'block', subtype: sb.type, idx: idx, qt: qt };
 						r = $('<div class="jcEditable"></div>').data('editable',editable).append( r );
 					}
@@ -1733,18 +1778,24 @@ jc.render = {
 
 jc.actionsMenu = (e) => {
 	let acts = [];
-	if ( jc.page.prop.editMode ) {
+	if ( jc.page.prop.editMode == 'page' ) {
 		acts.push(
 			AS.label('ThisPage')+':',
 			{icon:'jcicon',iconKey:'metadata',label:AS.label('Properties'),action:()=>{jc.edit.meta.edit();} },
-			{icon:'jcicon',iconKey:'pageEditOff',label:AS.label('menuEditOver'),action:()=>{jc.page.edit(false);},content:[
+			{icon:'jcicon',iconKey:'pageEditOff',label:AS.label('menuEditOver')+':',action:()=>{jc.page.edit(false);},content:[
 				{icon:'jcicon',iconKey:'done',label:AS.label('menuEditOverSave'),action:()=>{jc.page.edit(false,true);} },
 				{icon:'jcicon',iconKey:'editRemove',label:AS.label('menuEditOverDiscard'),action:()=>{jc.page.edit(false,false);} }
 			]}
 		);
+	} else if ( jc.page.prop.editMode == 'parts' ) {
+		acts.push(
+			AS.label('IncludedParts')+':',
+			{icon:'jcicon',iconKey:'done',label:AS.label('menuEditOver'),action:()=>{jc.page.edit(false,false);} }
+		);
 	} else {
 		let tp = {label:AS.label('ThisPage')+':',content:[]};
 		let ws = {label:AS.label('WholeSite')+':',content:[]};
+		let tm = {label:AS.label('IncludedParts')+':',content:[]};
 		tp.content.push(
 			{icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} },
 			{icon:'jcicon',iconKey:'uploads',label:AS.label('Uploads'),action:()=>{jc.edit.uploads.edit();} }
@@ -1752,8 +1803,9 @@ jc.actionsMenu = (e) => {
 		if ( (jc.page.current()!='index')||AS.test.def(jc.page.data().id)) {
 			tp.content.push('-',{icon:'jcicon danger',iconKey:'pageRm',label:AS.label('DeleteThisPage')+'…',action:()=>{jc.page.rm();} });
 		}
+		tm.content.push( {icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('parts');} } );
 		ws.content.push({icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.create();} });
-		acts.push(AS.label('menuActionsTitle'),tp,ws);
+		acts.push(AS.label('menuActionsTitle'),tp,ws,tm);
 	}
 	jc.menu(e, { content: acts, highlight: false });
 };

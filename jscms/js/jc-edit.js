@@ -192,7 +192,6 @@ jc.page.rm = ( params ) => {
 };
 
 jc.page.save = ( params ) => {
-	console.log( params );
 	if ( ! params.mute ) jc.progress(AS.label('SavingPage'));
 	if ( AS.test.udef(params)) params = {};
 	else if ( AS.test.func(params)) params = { callback: params };
@@ -408,7 +407,12 @@ jc.page.makeTypeDates = ( pagetype, typelist, callback ) => {
 	return;
 };
 
-jc.page.upload = (fld,callback) => {
+jc.page.upload = (fld,...args) => {
+	let options={},callback;
+	args.forEach( (a) => {
+		if ( AS.test.func(a) ) callback = a;
+		else if ( AS.test.obj(a) ) options = a;
+	} );
 	const page = jc.page.current();
 	let pdata = jc.page.data().pageContent;
 	const id = pdata.id;
@@ -427,7 +431,7 @@ jc.page.upload = (fld,callback) => {
 	const process = () => {
 		let tf = fld.files[ indexes.shift() ];
 		let oname = tf.name;
-		jc.progress( oname );
+		if ( ! options.mute ) jc.progress( oname );
 		let ext = oname.replace(/.*\.([^.]+)$/,"$1").toLowerCase();
 		let newname = AS.generateId(prefix)+'.'+ext;
 		let url = AS.path('jsdataroot') + 'uploads/' + newname;
@@ -442,7 +446,7 @@ jc.page.upload = (fld,callback) => {
 					} else {
 						no.type = 'application/octet-stream';
 					}
-					no.caption = no.name.replace(/^(.*)\.[^.]+$/,"$1").replace(/[._ -]+/g,' ').trim();
+					no.caption = options.caption ? options.caption : no.name.replace(/^(.*)\.[^.]+$/,"$1").replace(/[._ -]+/g,' ').trim();
 					uploads.push( no );
 					news.push( no );
 				}
@@ -459,9 +463,11 @@ jc.page.upload = (fld,callback) => {
 					data : pdata,
 					page: page,
 					noLasts : true,
+					noFullList : true,
 					noDialog : true,
+					mute : !! options.mute,
 					callback : ()=>{
-						jc.progress();
+						if ( ! options.mute ) jc.progress();
 						if ( AS.test.func(callback)) callback.call(window,news,uploads);
 					}
 				}
@@ -486,18 +492,18 @@ jc.page.rmUpload = ( item, callback ) => {
 		return n;
 	}
 	let pdata = recurse(jc.page.data().pageContent);
-	let params = {
+	jc.page.save( {
 		data : pdata,
 		page: jc.page.current(),
 		id: jc.page.data().pageContent.id,
 		noLasts : true,
+		noFullList : true,
 		noDialog : true,
 		callback : ()=>{ jc.dav.rm( item.uri,()=>{
 			jc.progress();
 			if ( AS.test.func(callback)) callback.call(window,pdata);
 		})},
-	}
-	jc.page.save( params );
+	});
 };
 
 /* jc.edit */
@@ -568,20 +574,28 @@ jc.edit = {
 			}
 			$d.addClass('jcEditableParsed');
 			let $em = $(`<div class="jcEditMenu"></div>`);
-			if ( AS.test.def(data.idx) ) {
-				$d.on('dblclick',jc.edit.edit);
-				if ( data.idx < (data.qt -1) ) $em.append('<span class="jcEditMoveDown" onclick="jc.edit.movedown(event)">'+AS.icon('moveDown')+'</span>');
-				if ( data.idx ) $em.append('<span class="jcEditMoveUp" onclick="jc.edit.moveup(event)">'+AS.icon('moveUp')+'</span>');
-				$em.append('<span class="jcEditDropdown">'+AS.icon('menu')+'</span>');
-			} else if ( data.subtype == 'mixed' )  {
-				$em.append('<span class="jcEditDropdown">'+AS.icon('editAdd')+'</span>');
-			} else {
-				$d.on('dblclick',jc.edit.edit);
+			if ( jc.page.prop.editMode == 'page' ) {
+				if ( AS.test.def(data.idx) ) {
+					$d.on('dblclick',jc.edit.edit);
+					if ( data.idx < (data.qt -1) ) $em.append('<span class="jcEditMoveDown" onclick="jc.edit.movedown(event)">'+AS.icon('moveDown')+'</span>');
+					if ( data.idx ) $em.append('<span class="jcEditMoveUp" onclick="jc.edit.moveup(event)">'+AS.icon('moveUp')+'</span>');
+					$em.append('<span class="jcEditDropdown">'+AS.icon('menu')+'</span>');
+				} else if ( data.subtype == 'mixed' )  {
+					$em.append('<span class="jcEditDropdown">'+AS.icon('editAdd')+'</span>');
+				} else {
+					$d.on('dblclick',jc.edit.edit);
+					$em.append('<span class="jcEditDropdown">'+AS.icon('edit')+'</span>');
+				}
+				$d.prepend($em);
+				$d.on('contextmenu',jc.edit.menu);
+				$('.jcEditMenu .jcEditDropdown',$d).on('click contextmenu',jc.edit.menu);
+			} else if ( jc.page.prop.editMode == 'parts' ) {
+				$d.on('dblclick',jc.edit.part);
 				$em.append('<span class="jcEditDropdown">'+AS.icon('edit')+'</span>');
+				$d.prepend($em);
+				$d.on('contextmenu',jc.edit.part);
+				$('.jcEditMenu .jcEditDropdown',$d).on('click contextmenu',jc.edit.part);
 			}
-			$d.prepend($em);
-			$d.on('contextmenu',jc.edit.menu);
-			$('.jcEditMenu .jcEditDropdown',$d).on('click contextmenu',jc.edit.menu);
 		});
 	},
 	data : (d) => {
@@ -906,6 +920,70 @@ jc.edit = {
 			jc.page.reload();
 		}
 	},
+	part: (e) => {
+		let b = jc.edit.itemdata(e);
+		b.target = e.target;
+		b.type = AS.test.obj(b.raw) ? 'object' : 'html';
+		jc.edit.partEdit(b);
+	},
+	partEdit : ( data ) => {
+		if ( (data.type == 'object') && AS.test.udef(data.repo)) {
+			jc.template.part.get( data.src, { repo:true }, (repo) =>{
+				data.repo = repo;
+				jc.edit.partEdit(data);
+			});
+			return;
+		}
+		let $mod = jc.edit.getModal(true);
+		$('.modal-dialog',$mod).append(`<div class="modal-content">
+				<div class="modal-header bg-light">
+					<p class="modal-title">
+						<span class="jcicon">${ AS.icon('edit') }</span> 
+						<b> ${ AS.label('Edit') } “${ data.src }” </b>
+					</p>
+					<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
+						<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>
+					</button>
+				</div>
+				<div class="modal-body" id="jcPageEditor"></div>
+			</div>`);
+		let fo;
+		if ( data.type == 'object') {
+			fo = data.repo.form();
+			fo.callback = (f) => { f.parse(data.raw); }
+			fo.options.jsaction = (fd,f) => {
+				f.destroy();
+				jc.edit.noModal();
+				jc.template.part.put(data.src,fd,()=>{
+					jc.page.reload();
+				});
+			};
+		} else {
+			fo = {
+				options : {
+					theme: 'transparent',
+					subforms: [],
+					jsaction: (fd,f) => {
+						f.destroy();
+						jc.edit.noModal();
+						jc.template.part.put(data.src,fd.html,()=>{
+							jc.page.reload();
+						});
+					}
+				},
+				fields : [ ["html","html",{nolabel:true,trim:true,asTitle:'onlyNonEmptyFields',value:""}] ],
+				callback : (f) => {
+					f.setValue('html',data.raw);
+				},
+			};
+			
+		}
+		fo.target = 'jcPageEditor';
+		fo.options.effectduration = 0;
+		fo.fields.push(['hr','hr',{position:'bottom'}],['btns','buttons',{position:'bottom',list:[{label:AS.label('Cancel'),icon:AS.icon('circleClose'),onclick:jc.edit.noModal},{btype:'reset'},{btype:'submit'}]}]),
+		$mod.on('shown.bs.modal',()=>{ AS.form.create( fo ); });
+		$mod.modal('show');
+	},
 	getModal : ( buildNew ) => {
 		if (buildNew) {
 			let f;
@@ -1024,6 +1102,7 @@ jc.edit.uploads = {
 		if ( params.select && AS.test.udef( params.selected) ) params.selected = [];
 		let $out = $('<div></div>');
 		$out.append($(`<div class="jcUploadsAdders text-center mb-4">
+			<input type="text" placeholder="${ AS.label('Caption')}" name="caption" value="" />
 			<input type="file" multiple="multiple" style="display:none" />
 			<span class="btn-group">
 				<button type="button" class="btn btn-sm btn-primary jcImageUpload">${ AS.icon('upload')} ${AS.label('Upload')}</button>
@@ -1031,7 +1110,9 @@ jc.edit.uploads = {
 		</div>`));
 		let doupload = () => {
 			jc.edit.noModal();
-			jc.page.upload( $('input[type="file"]',$out).get(0), ( newitems )=>{
+			let options = {};
+			if ( $('input[name="caption"]',$out).val().trim().length ) options.caption = $('input[name="caption"]',$out).val().trim();
+			jc.page.upload( $('input[type="file"]',$out).get(0), options, ( newitems )=>{
 				let refresh = (e)=> {
 					$(document.body).off('jc_page_data_loaded',refresh);
 					if ( params.reloader ) params.reloader.call(window);
@@ -1075,7 +1156,7 @@ jc.edit.uploads = {
 				let $tr = $('<tr></tr>')
 				$tr.data(u);
 				if ( params.select ) {
-					let $i = $('<input type="ceckbox" />');
+					let $i = $('<input type="checkbox" />');
 					if ( params.selected && params.selected.find( k=>( k.uri == u.uri) ) ) $i.attr('checked',true);
 					$i.on('click change',onchange);
 					$tr.append('<td></td>');
