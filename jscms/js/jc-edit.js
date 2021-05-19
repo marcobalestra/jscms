@@ -195,7 +195,7 @@ jc.page.save = ( params ) => {
 	if ( ! params.mute ) jc.progress(AS.label('SavingPage'));
 	if ( AS.test.udef(params)) params = {};
 	else if ( AS.test.func(params)) params = { callback: params };
-	if ( AS.test.udef(params.data)) params.data = jc.edit.data();
+	if ( AS.test.udef(params.data)) params.data = jc.edit.data() || jc.page.data().pageContent;
 	if ( AS.test.udef(params.page)) params.page = jc.page.current();
 	if ( AS.test.udef(params.id) ) params.id = params.data.id;
 	if ( AS.test.udef(params.typelist)) {
@@ -307,7 +307,7 @@ jc.page.save = ( params ) => {
 	}
 	if ( jc.edit ) jc.edit.data(false);
 	jc.page.current('-');
-	jc.page.open( page, id );
+	jc.page.open( params.page, params.id );
 };
 
 jc.page.makeTypeLasts = ( pagetype, typelist, callback ) => {
@@ -604,7 +604,7 @@ jc.edit = {
 		} else if ( AS.test.obj(d) ) {
 			jc.prefs.key('onEditData',{ page:jc.page.current(), id:jc.page.data().id, data: d });
 			return jc.prefs.key('onEditData').data;
-		} else if ( jc.page.prop.editMode ) {
+		} else if ( jc.page.prop.editMode == 'page' ) {
 			d = jc.prefs.key('onEditData');
 			let theSame = d && ( d.page == jc.page.current() );
 			if ( theSame && d.id ) theSame = ( d.id == jc.page.data().id );
@@ -1102,24 +1102,32 @@ jc.edit.uploads = {
 		if ( params.select && AS.test.udef( params.selected) ) params.selected = [];
 		let $out = $('<div></div>');
 		$out.append($(`<div class="jcUploadsAdders text-center mb-4">
-			<input type="text" placeholder="${ AS.label('Caption')}" name="caption" value="" />
 			<input type="file" multiple="multiple" style="display:none" />
 			<span class="btn-group">
 				<button type="button" class="btn btn-sm btn-primary jcImageUpload">${ AS.icon('upload')} ${AS.label('Upload')}</button>
 			</span>
 		</div>`));
+		let refresh = (e)=> {
+			$(document.body).off('jc_page_data_loaded',refresh);
+			if ( params.reloader ) params.reloader.call(window);
+		};
 		let doupload = () => {
 			jc.edit.noModal();
 			let options = {};
-			if ( $('input[name="caption"]',$out).val().trim().length ) options.caption = $('input[name="caption"]',$out).val().trim();
 			jc.page.upload( $('input[type="file"]',$out).get(0), options, ( newitems )=>{
-				let refresh = (e)=> {
-					$(document.body).off('jc_page_data_loaded',refresh);
-					if ( params.reloader ) params.reloader.call(window);
-				}
 				$(document.body).on('jc_page_data_loaded',refresh);
 				jc.page.reload();
 			});
+		};
+		let save = () => {
+			let capts = {};
+			$('tr.jcUpload').each( (idx,tr) => {
+				let data = $(tr).data();
+				capts[ data.uri ] = $('input[name="caption"]',tr).val();
+				
+			} );
+			params.uploads.forEach( u=>{ u.caption = capts[ u.uri ] } );
+			jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{ } });
 		};
 		$('.jcImageUpload',$out).on('click',()=>{ $('input[type="file"]',$out).trigger('click'); });
 		$('input[type="file"]',$out).on('change',(e)=>{ doupload() });
@@ -1153,7 +1161,7 @@ jc.edit.uploads = {
 				});
 			};
 			params.uploads.forEach( u=>{
-				let $tr = $('<tr></tr>')
+				let $tr = $('<tr class="jcUpload"></tr>')
 				$tr.data(u);
 				if ( params.select ) {
 					let $i = $('<input type="checkbox" />');
@@ -1167,7 +1175,10 @@ jc.edit.uploads = {
 				} else {
 					$tr.append('<td class="fn">'+u.name.escape()+'</td>');
 				}
-				$tr.append('<td class="fc">'+u.caption.escape()+'</td>');
+				//$tr.append('<td class="fc">'+u.caption.escape()+'</td>');
+				let $capt = $('<input type="text" name="caption" />');
+				$capt.attr('value',u.caption);
+				$tr.append($('<td class="fc"></td>').append($capt));
 				$tr.append('<td class="fs">'+parseInt(u.size).smartSize()+'</td>');
 				let $acts = $('<td><span class="btn-group"></span></td>') ;
 				$('span',$acts).append(`<a class="btn btn-primary btn-icon btn-sm legitRipple" title="${ AS.label('Download') }" href="${u.uri}" download="${ u.name.escape() }"><i>${ AS.icon('download') }</i></a>`);
@@ -1178,6 +1189,8 @@ jc.edit.uploads = {
 				$('tbody',$tbl).append($tr);
 			} );
 			$out.append( $tbl );
+			$out.append(`<div class="text-right"><a class="btn btn-primary saveUploads">${ AS.label('Save')}</a></div>`);
+			$('input[name="caption"]',$tbl).on("change",save);
 		} else {
 			$out.append( '<div class="jcPlaceHolder text-center">'+AS.label('NoItemsFound')+'</div>' );
 		}
