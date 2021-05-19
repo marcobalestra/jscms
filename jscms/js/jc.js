@@ -1741,7 +1741,9 @@ jc.render = {
 				let $ol = $('<ol></ol>');
 				list.forEach( i => {
 					let $li = $('<li></li>');
-					$li.append( $('<span class="title"></span>').html(i.title));
+					let $a = $(`<a class="title"></span>`).html(i.title);
+					$a.on('click',()=>{ jc.page.open(d.ptype, i.id ) });
+					$li.append( $a );
 					if ( d.showdate ) {
 						let dt = new Date(i.upd);
 						$li.append(' ',$('<span class="date"></span>').html( dt.toLocaleDateString() ),$('<span class="time"></span>').html( dt.toLocaleTimeString() ));
