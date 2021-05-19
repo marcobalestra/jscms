@@ -107,3 +107,5 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .swal2-container .swal2-actions .swal2-confirm {order: 3; }
 .btn.btn-sm svg { display: inline-block; width: 20px; height: 20px; fill: #fff; }
 .tox .tox-dialog-wrap__backdrop { display: none; }
+
+a[href*="//"]::after { content: ' →'; margin-left: -2px; }
