@@ -13,7 +13,7 @@ AS.labels.load('en',[{
 	'editYetItOk' : 'Resume',
 	'editYetItTitle' : 'Previous edit detected.',
 	'FileName' : 'File name',
-	'FileSize' : 'File size',
+	'FileSize' : 'Weight',
 	'ForceAlsoHidden' : 'Even if page is hidden',
 	'GotoPage' : 'Go to page',
 	'headerTag' : 'Recipes from real Chefs',
