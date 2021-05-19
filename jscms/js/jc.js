@@ -1731,6 +1731,25 @@ jc.render = {
 			} );
 			return $div;
 		},
+		lasts : (b,d) => {
+			let id = AS.generateId('lasts');
+			let div = $('<div class="jcLasts"></div>');
+			div.attr('id',id);
+			jc.jdav.get( 'struct/'+d.ptype+'-last'+d.qtitems+'.json',(list)=>{
+				if ( ! (AS.test.arr(list) && list.length ) ) return;
+				if ( d.title ) div.append( $('<h4></h4>').append(d.title) );
+				let $ol = $('<ol></ol>');
+				list.forEach( i => {
+					let $li = $('<li></li>');
+					$li.append( $('<span class="title"></span>').html(i.title));
+					if ( d.showdate ) $li.append(' ',$('<span class="date"></span>').html((new Date(i.upd)).toString()));
+					if ( i.desc && i.desc.length) $li.append('<br />', $('<small class="desc"></small>').html(i.desc));
+					$ol.append($li);
+				});
+				div.append($ol);
+			});
+			return div;
+		},
 		subpage : (b,d) => {
 			let id = AS.generateId('blockSubpage');
 			let div = $('<div></div>');

@@ -94,6 +94,10 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcGallery a img { max-width: 64px; max-height: 64px; border: solid 1px #ddd; margin: 8px; }
 .jcGallery a svg {  width: 48px; height: 48px; }
 
+.jcLasts li .title { font-weight: bold; }
+.jcLasts li .date { font-style: italic; color: #999; font-size: smaller; }
+.jcLasts li .date::before { content: ' — '; }
+
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }
 .swal2-container .swal2-actions button { min-width: 80px; text-align: center; }

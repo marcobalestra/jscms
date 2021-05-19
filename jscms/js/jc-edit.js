@@ -757,8 +757,11 @@ jc.edit = {
 		lasts : (b,d) => {
 			let o = jc.edit.form._base(b,d);
 			o.fields.push(
+				['type','hidden',{value:'lasts'}],
+				['title','text',{asLabel:'Title',normalize:true,skipempty:true}],
 				['ptype','select',{asLabel:'PageType',options:jc.edit.prop.pageTypes.clone()}],
 				['qtitems','select',{asLabel:'Max',options:jc.prop.lastChangedQuantities.clone()}],
+				['showdate','bool',{asLabel:'ShowDate'}],
 			);
 			return o;
 		},

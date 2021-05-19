@@ -62,7 +62,7 @@
 							return;
 						}
 						if ( si.type == 'text') {
-							$div.append('<div class="p-2" style="max-width: 320px;">'+si.text+'</div>');
+							$div.append($('<div class="p-2" style="max-width: 320px;"></div>').html(si.text));
 							return;
 						}
 						let $a = $(`<a class="dropdown-item" onclick="jc.page.open('${si.item.page}'${ si.item.id ? ','+si.item.id : ''})">${si.label.escape()}</a>`);
