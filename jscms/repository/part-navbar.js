@@ -48,7 +48,7 @@
 			const render = ( item, $parent ) => {
 				let $li = $(`<li class="nav-item"></li>`);
 				if ( item.type == "item" ) {
-					$li.append(` <a class="nav-link" onclick="jc.page.open('${item.item.page}'${ item.item.id ? ','+item.item.id : ''})">${ item.label.escape() }</a> `)
+					$li.append(`<a class="nav-link" onclick="jc.page.open('${item.item.page}'${ item.item.id ? ','+item.item.id : ''})">${ item.label.escape() }</a>`)
 					if ( (jc.page.current() == item.item.page) && ( item.item.id == jc.page.data().id) ) $li.addClass('active');
 				} else if ( item.type == "menu" ) {
 					$li.addClass('dropdown');
@@ -60,11 +60,14 @@
 							$div.append(' <div class="dropdown-divider"></div> ');
 							return;
 						}
-						$div.append(` <a class="dropdown-item" onclick="jc.page.open('${si.item.page}'${ si.item.id ? ','+si.item.id : ''})">${si.label.escape()}</a> `);
+						let $a = $(`<a class="dropdown-item" onclick="jc.page.open('${si.item.page}'${ si.item.id ? ','+si.item.id : ''})">${si.label.escape()}</a>`);
+						if ( (jc.page.current() == si.item.page) && ( si.item.id == jc.page.data().id) ) $a.addClass('active');
+						$div.append($a);
+
 					});
 					$li.append($div);
 				}
-				$parent.append(' ',$li,' ');
+				$parent.append($li);
 			};
 			data.menu.forEach( (item) => { render( item, $('div>ul',$navbar) ); } );
 			return $navbar;

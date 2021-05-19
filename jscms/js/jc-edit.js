@@ -49,7 +49,6 @@ jc.page.create = ( options ) => {
 		jc.edit.meta.edit({
 			pageData : {},
 			editData : { metadata: { type: options.page, id:'new' }},
-			form : options.template.metadata.form,
 			callback : pd => {
 				options.data = pd;
 				jc.page.create( options );
