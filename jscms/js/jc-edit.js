@@ -63,15 +63,20 @@ jc.page.create = ( options ) => {
 		options.template.content.forEach( c => {
 			if ( AS.test.arr(c.content) ) {
 				c.content.forEach( (d) => {
-					if (AS.test.arr(d.blocks)) d.blocks.forEach( (b) => { blocks.push(b) } );
+					if (AS.test.arr(d.blocks)) d.blocks.forEach( (b) => { if (AS.test.obj(b)) blocks.push(b) } );
 				} );
 			} else if ( AS.test.obj(c.content) ) {
-				if (AS.test.arr(c.content.blocks)) c.content.blocks.forEach( (b) => { blocks.push(b) } );
+				if (AS.test.arr(c.content.blocks)) c.content.blocks.forEach( (b) => { if (AS.test.obj(b)) blocks.push(b) } );
 			}
 		} );
 		if ( blocks.length ) {
-			if ( options.data.metadata.title && blocks.find( b =>( AS.test.obj(b) && ( b.prop=='title') )) ) options.data.title = options.data.metadata.title;
-			if ( options.data.metadata.description && blocks.find( b =>( AS.test.obj(b) && ( b.prop=='abstract') )) ) options.data.abstract = options.data.metadata.description;
+			if ( options.data.metadata.title ) {
+				if ( blocks.find( b =>( b.prop=='title') ) ) options.data.title = options.data.metadata.title;
+			}
+			if (options.data.metadata.description ) {
+				if ( blocks.find( b =>( b.prop=='abstract') ) ) options.data.abstract = options.data.metadata.description;
+				else if ( blocks.find( b =>( b.prop=='descriptions') ) ) options.data.descriptions = options.data.metadata.description;
+			}
 		}
 	}
 	options.callback = (page,id,data) => {
