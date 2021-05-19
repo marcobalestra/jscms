@@ -1742,7 +1742,10 @@ jc.render = {
 				list.forEach( i => {
 					let $li = $('<li></li>');
 					$li.append( $('<span class="title"></span>').html(i.title));
-					if ( d.showdate ) $li.append(' ',$('<span class="date"></span>').html((new Date(i.upd)).toString()));
+					if ( d.showdate ) {
+						let dt = new Date(i.upd);
+						$li.append(' ',$('<span class="date"></span>').html( dt.toLocaleDateString() ),$('<span class="time"></span>').html( dt.toLocaleTimeString() ));
+					}
 					if ( i.desc && i.desc.length) $li.append('<br />', $('<small class="desc"></small>').html(i.desc));
 					$ol.append($li);
 				});

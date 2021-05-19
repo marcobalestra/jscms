@@ -95,8 +95,9 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcGallery a svg {  width: 48px; height: 48px; }
 
 .jcLasts li .title { font-weight: bold; }
-.jcLasts li .date { font-style: italic; color: #999; font-size: smaller; }
+.jcLasts li .date,.jcLasts li .time { font-style: italic; color: #999; font-size: smaller; }
 .jcLasts li .date::before { content: ' — '; }
+.jcLasts li .time::before { content: ', '; }
 
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }
