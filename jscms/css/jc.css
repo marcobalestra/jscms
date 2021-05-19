@@ -52,6 +52,9 @@ h { display: none; }
 .flip-horizontal { transform: scaleX(-1); }
 .flip-vertical { transform: scaleY(-1); }
 .modal .asFormWrap .asFakeForm { width: 100%; resize:  unset; }
+
+#jcToplevelContainer a[href*="//"]::after { content: ' →'; margin-left: -2px; }
+
 .jcMenu { background-color: #fff; cursor: pointer; text-align: center; }
 .jcMenu .jcicon svg { height: 32px; width: 32px; }
 .jcMenu .jcUnauth { fill: #966; }
@@ -107,5 +110,3 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .swal2-container .swal2-actions .swal2-confirm {order: 3; }
 .btn.btn-sm svg { display: inline-block; width: 20px; height: 20px; fill: #fff; }
 .tox .tox-dialog-wrap__backdrop { display: none; }
-
-a[href*="//"]::after { content: ' →'; margin-left: -2px; }

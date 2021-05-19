@@ -35,14 +35,14 @@
 				},
 				fields : [
 					['type','hidden',{value:"navbar"}],
-					['theme','hidden',{value:"light"}],
+					['theme','select',{asLabel:'Theme',options:[{label:'Light',value:"navbar-light bg-light"},{label:'Dark',value:"navbar-dark bg-dark"},{label:'Blue',value:"navbar-dark bg-primary"}]}],
 					['id','text',{label:'ID',skipempty:true,trim:true}],
 					['menu','subform',{asLabel:'Content',subform:'item',mandatory:true}],
 				],
 			};
 		},
 		render : ( data ) => {
-			let $navbar = $(`<nav class="navbar navbar-expand-lg navbar-${data.theme} bg-${data.theme}"></nav>`);
+			let $navbar = $(`<nav class="navbar navbar-expand-lg ${data.theme}"></nav>`);
 			let cid = data.id || AS.generateId('jcNavbar');
 			$navbar.append(`<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#${cid}" aria-controls="${cid}" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>`);
 			$navbar.append(`<div class="collapse navbar-collapse" id="${cid}"><ul class="navbar-nav mr-auto"></ul></div>`);
