@@ -20,7 +20,7 @@ AS.labels.load('it',[{
 	'editYetItTitle' : 'La pagina era già in modifica.',
 	'Error' : 'Errore',
 	'FileName' : 'Nome',
-	'FileSize' : 'Dim.',
+	'FileSize' : 'Peso',
 	'ForceAlsoHidden' : 'Anche se è nascosta',
 	'GotoPage' : 'Vai alla pagina',
 	'headerTag' : 'I cuochi scrivono, tutti possono leggere',
