@@ -5,18 +5,19 @@
 				requires : ['basic','pikaday','tinymce','iro','slider'],
 				options : {
 					subparts: {
-						label: ['label','text',{asLabel:'Label',normalize:true,mandatory:true,focus:true,depends:'!type=divider'}],
+						label: ['label','text',{asLabel:'Label',normalize:true,mandatory:true,focus:true,depends:'!type=divider,!type=text'}],
 						page : ['item','jcpage',{nolabel:true,depends:'type=item',includecurrent:true}],
 					},
 					subforms : [
 							{
 								name: 'itemd',
 								subtype: 'array',
-								preview: ['type','label'],
+								preview: ['type','label','text'],
 								values: [
-									['type','select',{asLabel:'Type',options:[{label:'Page',value:'item'},{label:'Divider',value:'divider'}]}],
+									['type','select',{asLabel:'Type',options:[{label:'Page',value:'item'},{label:'Divider',value:'divider'},{label:'Text',value:'text'}]}],
 									{subpart:'label'},
 									{subpart:'page'},
+									['text','text',{asLabel:'Text',normalize:true,mandatory:true,depends:'type=text'}],
 								]
 							},
 							{
@@ -54,10 +55,14 @@
 					$li.addClass('dropdown');
 					let id = AS.generateId('jcMenu');
 					$li.append(`<a class="nav-link dropdown-toggle" href="#" id="${id}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${item.label.escape()}</a>`);
-					let $div = $(`<div class="dropdown-menu" aria-labelledby="${id}"> </div>`);
+					let $div = $(`<div class="dropdown-menu text-muted" aria-labelledby="${id}"></div>`);
 					item.menu.forEach( (si) => {
 						if ( si.type == 'divider') {
-							$div.append(' <div class="dropdown-divider"></div> ');
+							$div.append('<div class="dropdown-divider"></div>');
+							return;
+						}
+						if ( si.type == 'text') {
+							$div.append('<div class="p-2" style="max-width: 320px;">'+si.text+'</div>');
 							return;
 						}
 						let $a = $(`<a class="dropdown-item" onclick="jc.page.open('${si.item.page}'${ si.item.id ? ','+si.item.id : ''})">${si.label.escape()}</a>`);

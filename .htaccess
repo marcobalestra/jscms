@@ -12,7 +12,7 @@
 	RewriteRule ^style:(.+) styles/$1 [L]
 
 # Determine Template - if any -> tmpl
-	RewriteRule ^[-_]jscms/([^0-9,/]+) - [E=tmpl:$1]
+	RewriteRule ^[!]([^0-9,/]+) - [E=tmpl:$1]
 
 
 # Specific template, if exists

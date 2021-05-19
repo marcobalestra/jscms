@@ -1,5 +1,5 @@
 var jc = { prop : { prefs: {} }};
-jc.prop.uriPrefixPlain = '/-jscms/';
+jc.prop.uriPrefixPlain = '/!';
 jc.prop.mainContainerId = 'jcToplevelContainer';
 jc.prop.prefs.prefsVersion = 1;
 AS.path({jsroot : '/jscms/'});
