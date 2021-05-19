@@ -1081,7 +1081,7 @@ jc.edit.uploads = {
 			<div class="modal-header bg-info text-white">
 				<p class="modal-title">
 					<span class="jcicon">${ AS.icon('uploads') }</span> 
-					<b>${ AS.label('Uploads') }</b>
+					<b>${ AS.label('Attachments') }</b>
 				</p>
 				<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
 					<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>

@@ -1,4 +1,5 @@
 AS.labels.load('it',[{
+	'Attachments' : 'Allegati',
 	'blockAddContent' : 'Aggiungi un blocco',
 	'blockContent' : 'Contenuto',
 	'blockDeleteContent' : 'Elimina il blocco',

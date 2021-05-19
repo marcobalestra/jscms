@@ -1798,7 +1798,7 @@ jc.actionsMenu = (e) => {
 		let tm = {label:AS.label('IncludedParts')+':',content:[]};
 		tp.content.push(
 			{icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} },
-			{icon:'jcicon',iconKey:'uploads',label:AS.label('Uploads'),action:()=>{jc.edit.uploads.edit();} }
+			{icon:'jcicon',iconKey:'uploads',label:AS.label('Attachments'),action:()=>{jc.edit.uploads.edit();} }
 		);
 		if ( (jc.page.current()!='index')||AS.test.def(jc.page.data().id)) {
 			tp.content.push('-',{icon:'jcicon danger',iconKey:'pageRm',label:AS.label('DeleteThisPage')+'…',action:()=>{jc.page.rm();} });
