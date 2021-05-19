@@ -59,9 +59,17 @@ jc.page.create = ( options ) => {
 	options.noDialog = true;
 	options.noLasts = true;
 	if ( AS.test.obj(options.template.content) ) {
-		let blocks = options.template.content.find( c => (AS.test.obj(c.content) && AS.test.arr(c.content.blocks)));
-		if ( blocks ) {
-			blocks = blocks.content.blocks;
+		let blocks = [];
+		options.template.content.forEach( c => {
+			if ( AS.test.arr(c.content) ) {
+				c.content.forEach( (d) => {
+					if (AS.test.arr(d.blocks)) d.blocks.forEach( (b) => { blocks.push(b) } );
+				} );
+			} else if ( AS.test.obj(c.content) ) {
+				if (AS.test.arr(c.content.blocks)) c.content.blocks.forEach( (b) => { blocks.push(b) } );
+			}
+		} );
+		if ( blocks.length ) {
 			if ( options.data.metadata.title && blocks.find( b =>( AS.test.obj(b) && ( b.prop=='title') )) ) options.data.title = options.data.metadata.title;
 			if ( options.data.metadata.description && blocks.find( b =>( AS.test.obj(b) && ( b.prop=='abstract') )) ) options.data.abstract = options.data.metadata.description;
 		}
