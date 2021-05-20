@@ -1725,16 +1725,19 @@ jc.render = {
 					$a.attr('data-fancybox',gid);
 					$a.attr('data-caption',u.caption);
 				}
+				$a.attr('title',u.caption);
 				if ( u.img ) {
 					$a.append(`<img src="${ u.uri }" alt="${ u.caption }" />`);
-					$a.attr('title',u.caption);
 				} else {
-					$a.attr('title',u.caption+((u.ext && u.ext.length) ? ' ('+u.ext.toUpperCase()+')':''));
 					if (u.fb) {
 						$a.append( AS.icon('file') );
 					} else {
 						$a.attr('download',u.name);
 						$a.append( AS.icon('downloadPublic') );
+					}
+					if (u.ext && u.ext.length) {
+						$a.attr('title',u.caption+' ('+u.ext.toUpperCase()+')');
+						$a.append('<span>.'+u.ext.shorten(5)+'</span>');
 					}
 				}
 				$div.append($a);
