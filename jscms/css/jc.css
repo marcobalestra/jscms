@@ -94,19 +94,9 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 }
 
 .jcGallery a { background-color: #fff; box-shadow: -1px 0 #aaa, 1px 0 #aaa, 0 -1px #aaa, 0 1px #aaa, 4px 4px 2px #ddd; display: inline-block; height: 96px; margin: 8px; text-align: center; vertical-align: middle; width: 96px; }
-.jcGallery a>* { transition: all .2s ease-in-out; }
-.jcGallery a img {
-              box-shadow : -1px 0 #ccc,   1px 0 #ccc, 0 -1px #ccc, 0   1px #ccc;
-                  height :  80%;
-                  margin :   10%;
-              object-fit : cover;
-                   width :  80%;
-}
-.jcGallery a:hover img {
-                  height :  100%;
-                  margin : 0;
-                   width :  100%;
-}
+.jcGallery a>* { transition: all .1s ease-in-out; }
+.jcGallery a img { box-shadow: -1px 0 #ccc, 1px 0 #ccc, 0 -1px #ccc, 0 1px #ccc; height: 80%; margin: 10%; object-fit: cover; width: 80%; }
+.jcGallery a:hover img { height: 100%; margin: 0; width: 100%; }
 .jcGallery a svg {  width: 60%; height: 60%; margin: 20%; fill: #999; }
 .jcGallery a:hover svg {  width: 90%; height: 90%; margin: 5%; fill: #336; }
 
