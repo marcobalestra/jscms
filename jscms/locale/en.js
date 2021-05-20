@@ -46,6 +46,7 @@ AS.labels.load('en',[{
 	'PageSavedBody' : 'The page of type “{{page|unknown}}” ID: {{id|(no id)}} was saved.',
 	'PageSavedTitle' : 'Page was saved',
 	'PageTitleHelp' : 'Page name that will appear in browser’s title bar (or tabs bar).',
+	'PageType' : 'Page type',
 	'PageUriHelp' : 'A customizable address that will be the leading section of page URI.',
 	'SaveChangesBody' : 'Do you want to save changes to this page?',
 	'SaveChangesTitle': 'Closing editor',

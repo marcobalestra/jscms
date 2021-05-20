@@ -54,6 +54,7 @@ AS.labels.load('it',[{
 	'PageSavedBody' : 'La pagina di tipo “{{page|unknown}}” ID: {{id|(nessuno)}} è stata salvata.',
 	'PageSavedTitle' : 'Pagina salvata',
 	'PageTitleHelp' : 'Il nome della pagina come comparirà nella barra del titolo (o dei tab) del browser.',
+	'PageType' : 'Tipo di pagina',
 	'PageUriHelp' : 'Un indirizzo personalizzabile che costituirà l’ultima parte dello URI della pagina.',
 	'Properties': 'Proprietà',
 	'SaveChangesBody' : 'Vuoi registrare i cambiamenti della pagina?',
