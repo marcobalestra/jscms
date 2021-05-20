@@ -1746,9 +1746,10 @@ jc.render = {
 					$li.append( $a );
 					if ( d.showdate ) {
 						let dt = new Date(i.upd);
-						$li.append(' ',$('<span class="date"></span>').html( dt.toLocaleDateString() ),$('<span class="time"></span>').html( dt.toLocaleTimeString() ));
+						$li.append(' ',$('<span class="date"></span>').html( dt.toLocaleDateString() ));
+						if ( d.showtime ) $li.append( $('<span class="time"></span>').html( dt.toLocaleTimeString() ) );
 					}
-					if ( i.desc && i.desc.length) $li.append('<br />', $('<small class="desc"></small>').html(i.desc));
+					if ( d.showdesc && i.desc && i.desc.length) $li.append('<br />', $('<small class="desc"></small>').html(i.desc));
 					$ol.append($li);
 				});
 				div.append($ol);

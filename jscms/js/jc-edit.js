@@ -762,6 +762,8 @@ jc.edit = {
 				['ptype','select',{asLabel:'PageType',options:jc.edit.prop.pageTypes.clone()}],
 				['qtitems','select',{asLabel:'Max',options:jc.prop.lastChangedQuantities.clone()}],
 				['showdate','bool',{asLabel:'ShowDate'}],
+				['showtime','bool',{asLabel:'ShowTime',depends:'showdate'}],
+				['showdesc','bool',{asLabel:'ShowDesc'}],
 			);
 			return o;
 		},
