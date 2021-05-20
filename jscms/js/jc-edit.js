@@ -236,8 +236,7 @@ jc.page.save = ( params ) => {
 		Object.keys(params.data).forEach( k => {
 			if ( AS.test.arr(params.data[k])) params.data[k].forEach( i => {
 				if ( AS.test.obj(i) && ! AS.test.arr(i) ) {
-					delete i.idx;
-					delete i.qt;
+					delete i._;
 				}
 			} );
 		} );
@@ -495,7 +494,7 @@ jc.page.rmUpload = ( item, callback ) => {
 	let recurse = (n) => {
 		if ( AS.test.arr(n) ) {
 			if ( n.length ) {
-				if ( n[0].size && n[0].name && n[0].uri ) return n.filter( i => ( i.uri != item.uri ) );
+				if ( n[0].uri ) return n.filter( i => ( i.uri != item.uri ) );
 				else return n.map( i =>(recurse(i)) );
 			}
 		} else if ( AS.test.obj(n) ) {
@@ -587,10 +586,10 @@ jc.edit = {
 			$d.addClass('jcEditableParsed');
 			let $em = $(`<div class="jcEditMenu"></div>`);
 			if ( jc.page.prop.editMode == 'page' ) {
-				if ( AS.test.def(data.idx) ) {
+				if ( AS.test.def(data._) && AS.test.def(data._.idx) ) {
 					$d.on('dblclick',jc.edit.edit);
-					if ( data.idx < (data.qt -1) ) $em.append('<span class="jcEditMoveDown" onclick="jc.edit.movedown(event)">'+AS.icon('moveDown')+'</span>');
-					if ( data.idx ) $em.append('<span class="jcEditMoveUp" onclick="jc.edit.moveup(event)">'+AS.icon('moveUp')+'</span>');
+					if ( data._.idx < (data._.qt -1) ) $em.append('<span class="jcEditMoveDown" onclick="jc.edit.movedown(event)">'+AS.icon('moveDown')+'</span>');
+					if ( data._.idx ) $em.append('<span class="jcEditMoveUp" onclick="jc.edit.moveup(event)">'+AS.icon('moveUp')+'</span>');
 					$em.append('<span class="jcEditDropdown">'+AS.icon('menu')+'</span>');
 				} else if ( data.subtype == 'mixed' )  {
 					$em.append('<span class="jcEditDropdown">'+AS.icon('editAdd')+'</span>');
@@ -630,7 +629,7 @@ jc.edit = {
 		let hl = '.jcEditable';
 		let acts = [{icon:'jcicon',iconKey:'edit',label:AS.label('blockEditContent'),action:jc.edit.edit}];
 		if ( data.subtype ) {
-			let canAdd = AS.test.def(data.idx);
+			let canAdd = ( AS.test.def(data._) && AS.test.def(data._.idx) );
 			if ( data.subtype == 'mixed' ) {
 				hl = false;
 				canAdd = true;
@@ -667,14 +666,14 @@ jc.edit = {
 		let b = jc.edit.itemdata(e);
 		let d = jc.edit.data();
 		let p = d[b.prop];
-		if ( AS.test.arr(p) && AS.test.def(b.idx)) p = p[b.idx][b.subtype];
+		if ( AS.test.arr(p) && AS.test.def(b._.idx)) p = p[b._.idx][b.subtype];
 		if ( AS.test.obj(p)) jc.page.open( p.page, p.id );
 	},
 	moveup : (e) => {
 		let b = jc.edit.itemdata(e);
 		let d = jc.edit.data();
 		if ( Array.isArray( d[b.prop]) ) {
-			d[b.prop].splice( b.idx -1, 2, d[b.prop][b.idx], d[b.prop][b.idx -1]);
+			d[b.prop].splice( b._.idx -1, 2, d[b.prop][b._.idx], d[b.prop][b._.idx -1]);
 			jc.edit.fixBlocks(b,d);
 			jc.page.reload();
 		}
@@ -683,7 +682,7 @@ jc.edit = {
 		let b = jc.edit.itemdata(e);
 		let d = jc.edit.data();
 		if ( Array.isArray( d[b.prop]) ) {
-			d[b.prop].splice( b.idx, 2, d[b.prop][b.idx +1], d[b.prop][b.idx]);
+			d[b.prop].splice( b._.idx, 2, d[b.prop][b._.idx +1], d[b.prop][b._.idx]);
 			jc.edit.fixBlocks(b,d);
 			jc.page.reload();
 		}
@@ -711,7 +710,7 @@ jc.edit = {
 						<span class="jcicon">${ AS.icon('edit') }</span> 
 						<b>
 							${ AS.label('Edit') } “${ jc.page.current() }”${ jc.page.data().id ? ' ID: '+jc.page.data().id : '' },
-							${ b.prop }${ AS.test.def(b.qt) ? ' ['+(AS.test.num(b.idx) ? String(b.idx +1)+'/'+b.qt : b.idx)+']':'' }
+							${ b.prop }${ (AS.test.def(b._) && AS.test.def(b._.qt)) ? ' ['+(AS.test.num(b._.idx) ? String(b._.idx +1)+'/'+b._.qt : b._.idx)+']':'' }
 						</b>
 					</p>
 					<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
@@ -728,9 +727,9 @@ jc.edit = {
 					jsaction: (fd,fo) => {
 						fo.destroy();
 						jc.edit.noModal();
-						if ( AS.test.def(b.qt) ) {
+						if ( AS.test.def(b._) && AS.test.def(b._.qt) ) {
 							// block mixed elem
-							d[b.prop][b.idx] = fd;
+							d[b.prop][b._.idx] = fd;
 							jc.edit.fixBlocks(b,d);
 						} else if ( AS.test.def(fd[t]) ){
 							// single block, single property: one field named like the type
@@ -746,8 +745,8 @@ jc.edit = {
 				fields : [ ['btns','buttons',{position:'bottom',list:[{label:AS.label('Cancel'),icon:AS.icon('circleClose'),onclick:jc.edit.noModal},{btype:'reset'},{btype:'submit'}]}] ],
 				target: 'jcPageEditor',
 				callback : (f) => {
-					if ( b.qt ) {
-						f.parse( d[b.prop][b.idx] );
+					if ( b._ && b._.qt ) {
+						f.parse( d[b.prop][b._.idx] );
 					} else if (AS.test.def(d[b.prop])) {
 						f.setValue(t,d[b.prop]);
 					}
@@ -760,7 +759,7 @@ jc.edit = {
 				['type','hidden',{value:'lasts'}],
 				['title','text',{asLabel:'Title',normalize:true,skipempty:true}],
 				['ptype','select',{asLabel:'PageType',options:jc.edit.prop.pageTypes.clone()}],
-				['qtitems','select',{asLabel:'Max',options:jc.prop.lastChangedQuantities.clone()}],
+				['max','slider',{asLabel:'Max',min:1,max:100,report:{value:true}}],
 				['showdate','bool',{asLabel:'ShowDate'}],
 				['showtime','bool',{asLabel:'ShowTime',depends:'showdate'}],
 				['showdesc','bool',{asLabel:'ShowDesc'}],
@@ -789,7 +788,7 @@ jc.edit = {
 		},
 		text : (b,d) => {
 			let o = jc.edit.form._base(b,d);
-			if ( AS.test.def(b.qt) ) {
+			if ( b._ && AS.test.def(b._.qt) ) {
 				o.fields.push(
 					["type",'select',{asLabel:'blockType',default:'text',options:[{label:AS.label('HTML'),value:'html'},{label:AS.label('Text'),value:'text'}],onchange:(x,fo)=>{
 						let f = fo.getForm();
@@ -896,19 +895,19 @@ jc.edit = {
 		}
 	},
 	addByForm : (b,d,t) => {
-		let nb = {prop:b.prop,idx:AS.label('New')};
-		if ( AS.test.udef(b.qt) ) {
-			nb.qt = 0;
+		let nb = {prop:b.prop,_:{idx:AS.label('New')}};
+		if ( (! b._ ) || AS.test.udef(b._.qt) ) {
+			nb._.qt = 0;
 		} else {
-			nb.qt = b.qt;
+			nb._.qt = b._.qt;
 		}
 		let $mod = jc.edit.getModal(true);
 		let fopt = jc.edit.form[t].call(window,nb,d);
 		fopt.options.jsaction = (fd,fo) => {
 			fo.destroy();
 			jc.edit.noModal();
-			if ( AS.test.def(b.qt)) {
-				d[b.prop].splice( b.idx, 1, d[b.prop][b.idx], fd );
+			if ( b._ && AS.test.def(b._.qt)) {
+				d[b.prop].splice( b._.idx, 1, d[b.prop][b._.idx], fd );
 			} else {
 				if ( ! AS.test.arr(d[b.prop])) d[b.prop] = [];
 				d[b.prop].push(fd);
@@ -918,21 +917,25 @@ jc.edit = {
 		};
 		fopt.callback = (f) => {
 			if ( AS.test.def(t)) f.setValue('type',t);
-			else if ( AS.test.udef(b.qt)) f.setValue('type','html');
-			else f.setValue('type',d[b.prop][b.idx].type);
+			else if ( (b._) || AS.test.udef(b._.qt)) f.setValue('type','html');
+			else f.setValue('type',d[b.prop][b._.idx].type);
 		};
 		$mod.on('shown.bs.modal',()=>{ AS.form.create( fopt ); }).modal('show');
 	},
 	fixBlocks : (b,d) => {
 		let qt = d[b.prop].length;
-		d[b.prop].forEach( (x,i) => { x.idx = i; x.qt = qt } );
+		d[b.prop].forEach( (x,i) => {
+			if ( ! x._ ) x._ = {};
+			x._.idx = i;
+			x._.qt = qt;
+		});
 		jc.edit.data(d);
 	},
 	rm : (e) => {
 		let b = jc.edit.itemdata(e);
 		let d = jc.edit.data();
 		if ( Array.isArray( d[b.prop]) ) {
-			d[b.prop].splice( b.idx, 1 );
+			d[b.prop].splice( b._.idx, 1 );
 			jc.edit.data(d);
 			jc.page.reload();
 		}
@@ -1071,23 +1074,30 @@ jc.edit.meta = {
 
 jc.edit.custom = {
 	gallery : {
-		add : (b,d) => {
-			let $mod = jc.edit.getModal(true);
-			$('.modal-dialog',$mod).append(`<div class="modal-content">
-				<div class="modal-header bg-info text-white">
-					<p class="modal-title">
-						<span class="jcicon">${ AS.icon('uploads') }</span> 
-						<b>${ AS.label('Uploads') }</b>
-					</p>
-					<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
-						<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>
-					</button>
-				</div>
-				<div class="modal-body" id="jcPageUploads"></div></div>`);
-			let params = { target: $('#jcPageUploads',$mod), reloader: ()=>{ jc.edit.uploads.edit() } };
+		getModal : ( empty ) => {
+			let $mod = jc.edit.getModal(empty);
+			if ( empty ) {
+				$('.modal-dialog',$mod).append(`<div class="modal-content">
+					<div class="modal-header bg-info text-white">
+						<p class="modal-title">
+							<span class="jcicon">${ AS.icon('uploads') }</span> 
+							<b>${ AS.label('Attachments') }</b>
+						</p>
+						<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
+							<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>
+						</button>
+					</div>
+					<div class="modal-body" id="jcPageUploads"></div></div>`);
+			}
+			return $mod;
+		},
+		add : (b,d) => { jc.edit.custom.gallery.edit(b,d); },
+		edit : (b,d) => {
+			if ( ! AS.test.arr(d.uploads)) d.uploads = [];
+			let $mod = jc.edit.custom.gallery.getModal(true);
+			let params = { target: $('#jcPageUploads',$mod), reloader: ()=>{ jc.edit.custom.gallery.edit(b,d) }, select: true, selected: d.uploads };
 			$mod.on('shown.bs.modal',()=>{ jc.edit.uploads.render( params); }).modal({show:true,keyboard:false});
 		},
-		edit : (b,d) => { },
 	}
 };
 
@@ -1138,10 +1148,10 @@ jc.edit.uploads = {
 		};
 		let save = () => {
 			let capts = {};
-			$('tr.jcUpload').each( (idx,tr) => {
+			$('tr.jcUpload',$out).each( (_idx,tr) => {
 				let data = $(tr).data();
-				capts[ data.uri ] = $('input[name="caption"]',tr).val();
-				
+				let $i = $('input[name="caption"]',tr);
+				$i.val(capts[ data.uri ] = String($i.val()||'').replace(/[\\"]/g,'').trim() );
 			} );
 			params.uploads.forEach( u=>{ u.caption = capts[ u.uri ] } );
 			jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{ } });
@@ -1156,10 +1166,9 @@ jc.edit.uploads = {
 				if ( ! AS.test.func(params.onchange)) return;
 				let $tr = $(e.target).closest('tr');
 				let $c = $('input[type="checkbox"]',$tr);
-				let isChecked = $c.is(':checked');
 				let u = $tr.data();
-				if ( isChecked ) {
-					params.selected.push(u);
+				if ( $c.is(':checked') ) {
+					params.selected.push({ uri: u.uri });
 				} else {
 					params.selected = params.selected.filter( i => ( i.uri != u.uri ) );
 				}
@@ -1177,7 +1186,7 @@ jc.edit.uploads = {
 					jc.page.reload();
 				});
 			};
-			params.uploads.forEach( u=>{
+			let makeRow = u => {
 				let $tr = $('<tr class="jcUpload"></tr>')
 				$tr.data(u);
 				if ( params.select ) {
@@ -1204,7 +1213,19 @@ jc.edit.uploads = {
 				$('span',$acts).append($del);
 				$tr.append($acts);
 				$('tbody',$tbl).append($tr);
-			} );
+			};
+			if ( params.selected && params.selected.length ) {
+				params.selected.forEach( s => {
+					let u =  params.uploads.find( k => (k.uri == s.uri ));
+					if ( u ) makeRow(u);
+				});
+				params.uploads.forEach( u=>{
+					if ( params.selected.find( k=>( k.uri == u.uri) ) ) return;
+					makeRow(u);
+				});
+			} else {
+				params.uploads.forEach( u=>{ makeRow(u); } );
+			}
 			$out.append( $tbl );
 			$out.append(`<div class="text-right"><a class="btn btn-primary saveUploads">${ AS.label('Save')}</a></div>`);
 			$('input[name="caption"]',$tbl).on("change",save);

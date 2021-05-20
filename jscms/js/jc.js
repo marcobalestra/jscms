@@ -1690,7 +1690,7 @@ jc.render = {
 				if (jc.render.block[sb.type]) {
 					let r = jc.render.block[sb.type].call(window,{prop:sb.type, editable:b.editable},sb) || '';
 					if ( b.editable && (jc.page.prop.editMode=='page') ) {
-						let editable = { prop: b.prop, type: 'block', subtype: sb.type, idx: idx, qt: qt };
+						let editable = { prop: b.prop, type: 'block', subtype: sb.type, _ : { idx: idx, qt: qt } };
 						r = $('<div class="jcEditable"></div>').data('editable',editable).append( r );
 					}
 					out.append( r );
@@ -1735,10 +1735,12 @@ jc.render = {
 			let id = AS.generateId('lasts');
 			let div = $('<div class="jcLasts"></div>');
 			div.attr('id',id);
-			jc.jdav.get( 'struct/'+d.ptype+'-last'+d.qtitems+'.json',(list)=>{
+			let qt = jc.prop.lastChangedQuantities.clone().sort((a,b)=>(a-b)).find( x=>(d.max <= x ));
+			jc.jdav.get( 'struct/'+d.ptype+'-last'+qt+'.json',(list)=>{
 				if ( ! (AS.test.arr(list) && list.length ) ) return;
 				if ( d.title ) div.append( $('<h4></h4>').append(d.title) );
 				let $ol = $('<ol></ol>');
+				list.splice( d.max -1 );
 				list.forEach( i => {
 					let $li = $('<li></li>');
 					let $a = $(`<a class="title"></span>`).html(i.title);
