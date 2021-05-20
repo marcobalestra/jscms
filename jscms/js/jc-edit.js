@@ -1091,11 +1091,25 @@ jc.edit.custom = {
 			}
 			return $mod;
 		},
-		add : (b,d) => { jc.edit.custom.gallery.edit(b,d); },
+		add : (b,d) => {
+			let nb = {prop:b.prop,type:'block',subtype:'gallery',_:{idx:AS.label('New')}};
+			let nd = { type:'gallery', gallery:[] };
+			if ( b._ && AS.test.def(b._.qt)) {
+				d[b.prop].splice( b._.idx, 1, d[b.prop][b._.idx], nd );
+			} else {
+				if ( ! AS.test.arr(d[b.prop])) d[b.prop] = [];
+				d[b.prop].push(nd);
+			}
+			jc.edit.fixBlocks(b,d);
+			nb._.idx = nd._.idx;
+			jc.edit.custom.gallery.edit(nb,d)
+		},
 		edit : (b,d) => {
 			if ( ! AS.test.arr(d.uploads)) d.uploads = [];
+			let bd = d[b.prop][b._.idx];
+			if ( ! AS.test.arr(bd.gallery)) bd.gallery = [];
 			let $mod = jc.edit.custom.gallery.getModal(true);
-			let params = { target: $('#jcPageUploads',$mod), reloader: ()=>{ jc.edit.custom.gallery.edit(b,d) }, select: true, selected: d.uploads };
+			let params = { target: $('#jcPageUploads',$mod), reloader: ()=>{ jc.edit.custom.gallery.edit(b,d) }, select: true, selected: bd.gallery };
 			$mod.on('shown.bs.modal',()=>{ jc.edit.uploads.render( params); }).modal({show:true,keyboard:false});
 		},
 	}
@@ -1136,7 +1150,7 @@ jc.edit.uploads = {
 		</div>`));
 		let refresh = (e)=> {
 			$(document.body).off('jc_page_data_loaded',refresh);
-			if ( params.reloader ) params.reloader.call(window);
+			if ( params.reloader && (! params.thenClose) ) params.reloader.call(window);
 		};
 		let doupload = () => {
 			jc.edit.noModal();
@@ -1162,26 +1176,31 @@ jc.edit.uploads = {
 			let $tbl = $('<table class="jcUploads"><thead><tr></tr></thead><tbody></tbody></table>');
 			if ( params.select ) $('thead tr',$tbl).append('<th></th>');
 			$('thead tr',$tbl).append(`<th>${ AS.label('FileName')}</th><th>${ AS.label('Caption')}</th><th>${ AS.label('FileSize')}</th><th></th>`);
+			let refresh = (e)=> {
+				$(document.body).off('jc_page_data_loaded',refresh);
+				if ( params.reloader ) params.reloader.call(window);
+			};
 			let onchange = ( e )=>{
-				if ( ! AS.test.func(params.onchange)) return;
-				let $tr = $(e.target).closest('tr');
-				let $c = $('input[type="checkbox"]',$tr);
-				let u = $tr.data();
-				if ( $c.is(':checked') ) {
+				e.stopPropagation();
+				params.selected.splice(0);
+				$('tr.jcUpload input[type="checkbox"]:checked',$out).each( (_idx,c) => {
+					let u = $(c).closest('tr').data();
 					params.selected.push({ uri: u.uri });
+				} );
+				if ( AS.test.func(params.onchange) ) {
+					params.onchange.call(params.selected.clone());
 				} else {
-					params.selected = params.selected.filter( i => ( i.uri != u.uri ) );
+					jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{
+						jc.edit.noModal();
+						$(document.body).on('jc_page_data_loaded',refresh);
+						jc.page.reload();
+					}});
 				}
-				params.onchange.call(params.selected.clone());
 			};
 			let rm = (item) => {
 				if ( (item instanceof Event)||(item.originalEvent) ) item = $(item.target).closest('tr').data();
 				jc.page.rmUpload( item, (newpdata)=>{
 					jc.edit.noModal();
-					let refresh = (e)=> {
-						$(document.body).off('jc_page_data_loaded',refresh);
-						if ( params.reloader ) params.reloader.call(window);
-					}
 					$(document.body).on('jc_page_data_loaded',refresh);
 					jc.page.reload();
 				});
@@ -1192,7 +1211,6 @@ jc.edit.uploads = {
 				if ( params.select ) {
 					let $i = $('<input type="checkbox" />');
 					if ( params.selected && params.selected.find( k=>( k.uri == u.uri) ) ) $i.attr('checked',true);
-					$i.on('click change',onchange);
 					$tr.append('<td></td>');
 					$('td',$tr).append($i);
 				}
@@ -1201,7 +1219,6 @@ jc.edit.uploads = {
 				} else {
 					$tr.append('<td class="fn">'+u.name.escape()+'</td>');
 				}
-				//$tr.append('<td class="fc">'+u.caption.escape()+'</td>');
 				let $capt = $('<input type="text" name="caption" />');
 				$capt.attr('value',u.caption);
 				$tr.append($('<td class="fc"></td>').append($capt));
@@ -1228,7 +1245,9 @@ jc.edit.uploads = {
 			}
 			$out.append( $tbl );
 			$out.append(`<div class="text-right"><a class="btn btn-primary saveUploads">${ AS.label('Save')}</a></div>`);
+			$('input[type="checkbox"]',$tbl).on("click change",onchange);
 			$('input[name="caption"]',$tbl).on("change",save);
+			$('.saveUploads',$out).on("click",()=>{ params.thenClose = true; jc.edit.noModal(); });
 		} else {
 			$out.append( '<div class="jcPlaceHolder text-center">'+AS.label('NoItemsFound')+'</div>' );
 		}

@@ -1713,10 +1713,13 @@ jc.render = {
 			return div;
 		},
 		gallery : (b,d) => {
+			let pdata = jc.page.data().pageContent;
 			if ( ! (AS.test.arr(d[b.prop]) && d[b.prop].length ) ) return '';
 			let gid = AS.generateId('jcGallery');
 			let $div = $('<div class="jcGallery"></div>');
-			d[b.prop].forEach( u => {
+			d[b.prop].forEach( uu => {
+				let u = pdata.uploads.find( x => ( x.uri == uu.uri ));
+				if ( ! u ) return;
 				let $a = $(`<a href="${u.uri}"></a>`);
 				if ( u.fb ) {
 					$a.attr('data-fancybox',gid);
@@ -1724,8 +1727,15 @@ jc.render = {
 				}
 				if ( u.img ) {
 					$a.append(`<img src="${ u.uri }" alt="${ u.caption }" />`);
+					$a.attr('title',u.caption);
 				} else {
-					$a.append( AS.icon('downloadPublic') );
+					$a.attr('title',u.caption+((u.ext && u.ext.length) ? ' ('+u.ext.toUpperCase()+')':''));
+					if (u.fb) {
+						$a.append( AS.icon('file') );
+					} else {
+						$a.attr('download',u.name);
+						$a.append( AS.icon('downloadPublic') );
+					}
 				}
 				$div.append($a);
 			} );
