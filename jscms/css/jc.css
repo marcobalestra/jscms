@@ -93,21 +93,8 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 	table.jcUploads { width: 100%; }
 }
 
-.jcGallery a {
-        background-color : #fff;
-              box-shadow : -1px 0 #aaa,   1px 0 #aaa, 0 -1px #aaa, 0   1px #aaa,   4px   4px   2px #ddd;
-                 display : inline-block;
-                  height :  96px;
-                  margin :   8px;
-              text-align : center;
-               transform : skew(-5deg);
-          vertical-align : middle;
-                   width :  96px;
-}
-.jcGallery a:hover {
-              box-shadow : -1px 0 #666,   1px 0 #666, 0 -1px #666, 0   1px #666,   6px   6px   4px #aaa;
-               transform : skew(0deg);
-}
+.jcGallery a { background-color: #fff; box-shadow: -1px 0 #aaa, 1px 0 #aaa, 0 -1px #aaa, 0 1px #aaa, 4px 4px 2px #ddd; display: inline-block; height: 96px; margin: 8px; text-align: center; transform: skew(-10deg); vertical-align: middle; width: 96px; }
+.jcGallery a:hover { box-shadow: -1px 0 #666, 1px 0 #666, 0 -1px #666, 0 1px #666, 6px 6px 4px #aaa; transform: skew(0deg); }
 .jcGallery a, .jcGallery a>* { transition: all .1s ease-in-out; }
 .jcGallery a img { box-shadow: -1px 0 #ccc, 1px 0 #ccc, 0 -1px #ccc, 0 1px #ccc; height: 80%; margin: 10%; object-fit: cover; width: 80%; }
 .jcGallery a:hover img { height: 100%; margin: 0; width: 100%; }
