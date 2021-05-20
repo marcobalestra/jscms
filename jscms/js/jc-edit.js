@@ -759,7 +759,7 @@ jc.edit = {
 				['type','hidden',{value:'lasts'}],
 				['title','text',{asLabel:'Title',normalize:true,skipempty:true}],
 				['ptype','select',{asLabel:'PageType',options:jc.edit.prop.pageTypes.clone()}],
-				['max','slider',{asLabel:'Max',min:1,max:100,report:{value:true}}],
+				['max','slider',{asLabel:'Max',min:1,max:100,report:{value:true},default:10}],
 				['showdate','bool',{asLabel:'ShowDate'}],
 				['showtime','bool',{asLabel:'ShowTime',depends:'showdate'}],
 				['showdesc','bool',{asLabel:'ShowDesc'}],
