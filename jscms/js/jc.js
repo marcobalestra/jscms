@@ -1688,7 +1688,7 @@ jc.render = {
 				if ( ! AS.test.obj( sb )) return;
 				if ( ! sb.type ) sb.type='text';
 				if (jc.render.block[sb.type]) {
-					let r = jc.render.block[sb.type].call(window,{prop:sb.type, editable:b.editable},sb) || '';
+					let r = jc.render.block[sb.type].call(window,{prop:sb.type, editable:b.editable},sb,d) || '';
 					if ( b.editable && (jc.page.prop.editMode=='page') ) {
 						let editable = { prop: b.prop, type: 'block', subtype: sb.type, _ : { idx: idx, qt: qt } };
 						r = $('<div class="jcEditable"></div>').data('editable',editable).append( r );
@@ -1712,8 +1712,8 @@ jc.render = {
 			window.setTimeout(()=>{jc.render.main(nb,d)},10);
 			return div;
 		},
-		gallery : (b,d) => {
-			let pdata = jc.page.data().pageContent;
+		gallery : (b,d,pdata) => {
+// 			let pdata = jc.page.data().pageContent;
 			if ( ! (AS.test.arr(d[b.prop]) && d[b.prop].length ) ) return '';
 			let gid = AS.generateId('jcGallery');
 			let $div = $('<div class="jcGallery"></div>');

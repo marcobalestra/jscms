@@ -1156,8 +1156,16 @@ jc.edit.uploads = {
 			jc.edit.noModal();
 			let options = {};
 			jc.page.upload( $('input[type="file"]',$out).get(0), options, ( newitems )=>{
-				$(document.body).on('jc_page_data_loaded',refresh);
-				jc.page.reload();
+				let finalize = () => {
+					$(document.body).on('jc_page_data_loaded',refresh);
+					jc.page.reload();
+				};
+				if ( AS.test.arr(params.selected) ) {
+					newitems.forEach( (i) => { params.selected.push({ uri: i.uri }); } );
+					jc.page.save({ noDialog: true, noLasts: true, callback: finalize });
+				} else {
+					finalize();
+				}
 			});
 		};
 		let save = () => {
