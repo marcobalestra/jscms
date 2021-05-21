@@ -1717,6 +1717,7 @@ jc.render = {
 			if ( ! (AS.test.arr(d[b.prop]) && d[b.prop].length ) ) return '';
 			let gid = AS.generateId('jcGallery');
 			let $div = $('<div class="jcGallery"></div>');
+			if ( d.size && d.size.length ) $div.addClass( 'size'+d.size);
 			d[b.prop].forEach( uu => {
 				let u = pdata.uploads.find( x => ( x.uri == uu.uri ));
 				if ( ! u ) return;

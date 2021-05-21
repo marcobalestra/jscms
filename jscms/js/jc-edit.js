@@ -1109,7 +1109,7 @@ jc.edit.custom = {
 			let bd = d[b.prop][b._.idx];
 			if ( ! AS.test.arr(bd.gallery)) bd.gallery = [];
 			let $mod = jc.edit.custom.gallery.getModal(true);
-			let params = { target: $('#jcPageUploads',$mod), reloader: ()=>{ jc.edit.custom.gallery.edit(b,d) }, select: true, selected: bd.gallery };
+			let params = { target: $('#jcPageUploads',$mod), reloader: ()=>{ jc.edit.custom.gallery.edit(b,d) }, select: true, gallery: bd };
 			$mod.on('shown.bs.modal',()=>{ jc.edit.uploads.render( params); }).modal({show:true,keyboard:false});
 		},
 	}
@@ -1139,8 +1139,8 @@ jc.edit.uploads = {
 		if ( ! params.pageData ) params.pageData = jc.page.data().pageContent;
 		if ( ! params.uploads ) params.uploads = params.pageData.uploads;
 		params.uploads = AS.def.arr(params.uploads);
-		if ( AS.test.udef(params.select) ) params.select = AS.test.arr(params.selected);
-		if ( params.select && AS.test.udef( params.selected) ) params.selected = [];
+		if ( AS.test.def(params.gallery) && ! AS.test.obj(params.gallery) ) params.gallery = {};
+		if ( params.gallery && ! AS.test.arr( params.gallery.gallery) ) params.gallery.gallery = [];
 		let $out = $('<div></div>');
 		$out.append($(`<div class="jcUploadsAdders text-center mb-4">
 			<input type="file" multiple="multiple" style="display:none" />
@@ -1160,8 +1160,8 @@ jc.edit.uploads = {
 					$(document.body).on('jc_page_data_loaded',refresh);
 					jc.page.reload();
 				};
-				if ( AS.test.arr(params.selected) ) {
-					newitems.forEach( (i) => { params.selected.push({ uri: i.uri }); } );
+				if ( params.gallery ) {
+					newitems.forEach( (i) => { params.gallery.gallery.push({ uri: i.uri }); } );
 					jc.page.save({ noDialog: true, noLasts: true, callback: finalize });
 				} else {
 					finalize();
@@ -1178,11 +1178,26 @@ jc.edit.uploads = {
 			params.uploads.forEach( u=>{ u.caption = capts[ u.uri ] } );
 			jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{ } });
 		};
+		if ( params.gallery ) {
+			let $s = $('<select><option>S</option><option value="">M</option><option>L</option><option>XL</option></select>');
+			$('.jcUploadsAdders .btn-group',$out).append($('<span class="ml-3 mt-1"></span>').append($s));
+			$s.val( params.gallery.size||'' );
+			$s.on('change',()=>{
+				if ( $s.val().length) params.gallery.size = $s.val();
+				else delete params.gallery.size;
+				jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{
+					jc.edit.noModal();
+					$(document.body).on('jc_page_data_loaded',refresh);
+					jc.page.reload();
+				}});
+			});
+			$s.select2({minimumResultsForSearch: Infinity});
+		}
 		$('.jcImageUpload',$out).on('click',()=>{ $('input[type="file"]',$out).trigger('click'); });
 		$('input[type="file"]',$out).on('change',(e)=>{ doupload() });
 		if ( params.uploads.length ) {
 			let $tbl = $('<table class="jcUploads"><thead><tr></tr></thead><tbody></tbody></table>');
-			if ( params.select ) $('thead tr',$tbl).append('<th></th>');
+			if ( params.gallery ) $('thead tr',$tbl).append('<th></th>');
 			$('thead tr',$tbl).append(`<th>${ AS.label('FileName')}</th><th>${ AS.label('Caption')}</th><th>${ AS.label('FileSize')}</th><th></th>`);
 			let refresh = (e)=> {
 				$(document.body).off('jc_page_data_loaded',refresh);
@@ -1190,13 +1205,13 @@ jc.edit.uploads = {
 			};
 			let onchange = ( e )=>{
 				e.stopPropagation();
-				params.selected.splice(0);
+				params.gallery.gallery = [];
 				$('tr.jcUpload input[type="checkbox"]:checked',$out).each( (_idx,c) => {
 					let u = $(c).closest('tr').data();
-					params.selected.push({ uri: u.uri });
+					params.gallery.gallery.push({ uri: u.uri });
 				} );
 				if ( AS.test.func(params.onchange) ) {
-					params.onchange.call(params.selected.clone());
+					params.onchange.call(params.gallery.gallery.clone());
 				} else {
 					jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{
 						jc.edit.noModal();
@@ -1216,9 +1231,9 @@ jc.edit.uploads = {
 			let makeRow = u => {
 				let $tr = $('<tr class="jcUpload"></tr>')
 				$tr.data(u);
-				if ( params.select ) {
+				if ( params.gallery ) {
 					let $i = $('<input type="checkbox" />');
-					if ( params.selected && params.selected.find( k=>( k.uri == u.uri) ) ) $i.attr('checked',true);
+					if ( params.gallery.gallery.find( k=>( k.uri == u.uri) ) ) $i.attr('checked',true);
 					$tr.append('<td></td>');
 					$('td',$tr).append($i);
 				}
@@ -1239,13 +1254,13 @@ jc.edit.uploads = {
 				$tr.append($acts);
 				$('tbody',$tbl).append($tr);
 			};
-			if ( params.selected && params.selected.length ) {
-				params.selected.forEach( s => {
+			if ( params.gallery && params.gallery.gallery.length ) {
+				params.gallery.gallery.forEach( s => {
 					let u =  params.uploads.find( k => (k.uri == s.uri ));
 					if ( u ) makeRow(u);
 				});
 				params.uploads.forEach( u=>{
-					if ( params.selected.find( k=>( k.uri == u.uri) ) ) return;
+					if ( params.gallery.gallery.find( k=>( k.uri == u.uri) ) ) return;
 					makeRow(u);
 				});
 			} else {
