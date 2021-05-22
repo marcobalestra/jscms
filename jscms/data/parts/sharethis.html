@@ -98,7 +98,7 @@ $( ()=>{
 		$('.jcSharing-reddit',t).attr('href','https://reddit.com/submit/?url='+uri+'&resubmit=true&title='+title);
 		$('.jcSharing-vk',t).attr('href','http://vk.com/share.php?title='+title+'&url='+uri);
 	};
-	$(document).on('jc_page_data_loaded',(e,pd) =>{ fix(pd) } );
+	if (! $(document.body).data('jcSharingEvent')) $(document.body).data('jcSharingEvent',true).on('jc_page_data_loaded',(e,pd) =>{ fix(pd) } );
 	fix( jc.page.data().pageContent );
 });
 /* ]]> */
