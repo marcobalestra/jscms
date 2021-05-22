@@ -1244,6 +1244,115 @@ jc.template = {
 	},
 };
 
+/* jc.lists */
+
+jc.lists = {
+	prop : { lists:{}, lasts:{} },
+	list : {
+		uri : ( type ) => ('struct/'+type+'-list.json'),
+		get : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			const callback = args.find(a=>AS.test.func(a));
+			const list = jc.lists.prop.lists[type];
+			if ( list == '_loading_') {
+				window.setTimeout( ()=>{jc.lists.list.get.apply(window,args);}, 100 );
+				return;
+			}
+			if ( ! AS.test.obj(list) ) {
+				jc.lists.prop.lists[type] = '_loading_';
+				jc.jdav.get( jc.lists.list.uri(type), (l)=>{
+					if ( jc.lists.prop.lists[type] == '_loading_') jc.lists.prop.lists[type] = l||{};
+					jc.lists.list.get.apply(window,args);
+				});
+				return;
+			}
+			if ( AS.test.func(callback)) callback.call(window,JSON.parse(JSON.stringify(list)));
+			else return JSON.parse(JSON.stringify(list));
+		},
+		set : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			const list = args.find(a=>AS.test.obj(a))||{};
+			const callback = args.find(a=>AS.test.func(a));
+			let commit = args.find(a=>AS.test.bool(a));
+			if ( AS.test.udef(commit)) commit=true;
+			jc.lists.prop.lists[type] = list;
+			if ( commit ) return jc.lists.list.commit.apply(window,args);
+			if ( AS.test.func(callback)) callback.call(window);
+		},
+		fetch : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			delete jc.lists.prop.lists[type];
+			jc.lists.list.get.apply(window,args);
+		},
+		commit : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			let list = args.find(a=>AS.test.obj(a));
+			const callback = args.find(a=>AS.test.func(a));
+			if ( list ) jc.lists.prop.lists[type] = list;
+			else if ( jc.lists.prop.lists[type] ) list = jc.lists.prop.lists[type];
+			else list = {};
+			jc.jdav.put( jc.lists.list.uri(type), list, (r)=>{
+				if ( AS.test.func(callback)) callback.call(window,r);
+			});
+		},
+	},
+	last : {
+		uri : ( type, qt ) => ('struct/'+type+'-last'+qt+'.json'),
+		get : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			const qt = args.find(a=>AS.test.num(a));
+			const callback = args.find(a=>AS.test.func(a));
+			if ( ! jc.lists.prop.lasts[type] ) jc.lists.prop.lasts[type] = {};
+			let list = jc.lists.prop.lasts[type][String(qt)];
+			if ( list == '_loading_') {
+				window.setTimeout( ()=>{jc.lists.last.get.apply(window,args);}, 100 );
+				return;
+			}
+			if ( ! AS.test.arr(list) ) {
+				jc.lists.prop.lasts[type][String(qt)] = '_loading_';
+				jc.jdav.get( jc.lists.last.uri(type,qt), (l)=>{
+					if ( jc.lists.prop.lasts[type][String(qt)] == '_loading_') jc.lists.prop.lasts[type][String(qt)] = l||[];
+					jc.lists.last.get.apply(window,args);
+				});
+				return;
+			}
+			if ( AS.test.func(callback)) callback.call(window,JSON.parse(JSON.stringify(list)));
+			else return JSON.parse(JSON.stringify(list));
+		},
+		set : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			const qt = args.find(a=>AS.test.num(a));
+			const list = args.find(a=>AS.test.arr(a))||[];
+			const callback = args.find(a=>AS.test.func(a));
+			let commit = args.find(a=>AS.test.bool(a));
+			if ( AS.test.udef(commit)) commit=true;
+			if ( ! jc.lists.prop.lasts[type] ) jc.lists.prop.lasts[type] = {};
+			jc.lists.prop.lasts[type][String(qt)] = list;
+			if ( commit ) return jc.lists.last.commit.apply(window, args);
+			if (AS.test.func(callback)) callback.call(window);
+		},
+		fetch : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			const qt = args.find(a=>AS.test.num(a));
+			if ( ! jc.lists.prop.lasts[type] ) jc.lists.prop.lasts[type] = {};
+			delete jc.lists.prop.lasts[type][String(qt)];
+			jc.lists.last.get.apply(window,args);
+		},
+		commit : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			const qt = args.find(a=>AS.test.num(a));
+			let list = args.find(a=>AS.test.arr(a));
+			const callback = args.find(a=>AS.test.func(a));
+			if ( list ) jc.lists.prop.lasts[type][String(qt)] = list;
+			else if ( jc.lists.prop.lasts[type][String(qt)] ) list = jc.lists.prop.lasts[type][String(qt)];
+			else list = [];
+			jc.jdav.put( jc.lists.last.uri(type,qt), list, (r)=>{
+				if ( AS.test.func(callback)) callback.call(window,r);
+			});
+		},
+	},
+};
+
 /* jc page */
 
 jc.page = {
@@ -1747,16 +1856,17 @@ jc.render = {
 		},
 		lasts : (b,d) => {
 			let id = AS.generateId('lasts');
+			let nodes = (d.view||'ol,li').split(',');
 			let div = $('<div class="jcLasts"></div>');
 			div.attr('id',id);
 			let qt = jc.prop.lastChangedQuantities.clone().sort((a,b)=>(a-b)).find( x=>(d.max <= x ));
-			jc.jdav.get( 'struct/'+d.ptype+'-last'+qt+'.json',(list)=>{
+			jc.lists.last.get(d.ptype,qt,(list)=>{
 				if ( ! (AS.test.arr(list) && list.length ) ) return;
 				if ( d.title ) div.append( $('<h4></h4>').append(d.title) );
-				let $ol = $('<ol></ol>');
+				let $ol = $('<'+nodes[0]+' class="jcLastsEntries"></'+nodes[0]+'>');
 				list.splice( d.max -1 );
 				list.forEach( i => {
-					let $li = $('<li></li>');
+					let $li = $('<'+nodes[1]+' class="jcLastsEntry"></'+nodes[1]+'>');
 					let $a = $(`<a class="title"></span>`).html(i.title);
 					$a.on('click',()=>{ jc.page.open(d.ptype, i.id ) });
 					$li.append( $a );

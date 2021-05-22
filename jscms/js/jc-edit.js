@@ -144,11 +144,11 @@ jc.page.rm = ( params ) => {
 		return;
 	}
 	if ( AS.test.udef(params.typelist)) {
-		jc.jdav.get('struct/'+params.page+'-list.json',(l)=>{ params.typelist = l||{}; jc.page.rm( params ); })
+		jc.lists.list.get(params.page,(l)=>{ params.typelist = l||{}; jc.page.rm( params ); });
 		return;
 	}
 	if ( AS.test.udef(params.fulllist)) {
-		jc.jdav.get('struct/_all-list.json',(l)=>{ params.fulllist = l||{}; jc.page.rm( params ); })
+		jc.lists.list.get((l)=>{ params.fulllist = l||{}; jc.page.rm( params ); });
 		return;
 	}
 	if ( ! params.removed ) {
@@ -161,8 +161,8 @@ jc.page.rm = ( params ) => {
 	if ( ! params.listsPurged ) {
 		delete params.fulllist[params.page][String(params.id?params.id:0)];
 		delete params.typelist[String(params.id?params.id:0)];
-		jc.jdav.put('struct/_all-list.json',params.fulllist,()=>{
-			jc.jdav.put('struct/'+params.page+'-list.json',params.typelist,()=>{
+		jc.lists.list.set(params.fulllist,()=>{
+			jc.lists.list.set(params.page,params.typelist,()=>{
 				params.listsPurged = true;
 				jc.page.rm( params );
 			});
@@ -170,10 +170,12 @@ jc.page.rm = ( params ) => {
 		return;
 	}
 	if ( ! params.lastsPurged ) {
-		jc.page.makeTypeLasts( params.page, params.typelist, ()=>{
-			jc.page.makeTypeDates(params.page, params.typelist, ()=>{
-				params.lastsPurged = true;
-				jc.page.rm( params );
+		jc.page.makeLasts( param.fulllist, ()=>{
+			jc.page.makeTypeLasts( params.page, params.typelist, ()=>{
+				jc.page.makeTypeDates(params.page, params.typelist, ()=>{
+					params.lastsPurged = true;
+					jc.page.rm( params );
+				});
 			});
 		});
 		return;
@@ -211,11 +213,11 @@ jc.page.save = ( params ) => {
 	if ( AS.test.udef(params.page)) params.page = jc.page.current();
 	if ( AS.test.udef(params.id) ) params.id = params.data.id;
 	if ( AS.test.udef(params.typelist)) {
-		jc.jdav.get('struct/'+params.page+'-list.json',(l)=>{ params.typelist = l||{}; jc.page.save( params ); })
+		jc.lists.list.get(params.page,(l)=>{ params.typelist = l||{}; jc.page.save( params ); })
 		return;
 	}
 	if ( AS.test.udef(params.fulllist)) {
-		jc.jdav.get('struct/_all-list.json',(l)=>{ params.fulllist = l||{}; jc.page.save( params ); })
+		jc.lists.list.get((l)=>{ params.fulllist = l||{}; jc.page.save( params ); })
 		return;
 	}
 	if (params.id=='new') {
@@ -269,7 +271,7 @@ jc.page.save = ( params ) => {
 		if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
 		params.fulllist[params.page][String(params.id?params.id:0)] = params.tpd;
 		if ( ! params.mute ) jc.progress(AS.label('SavingArticleList'));
-		jc.jdav.put('struct/_all-list.json',params.fulllist,()=>{
+		jc.lists.list.set(params.fulllist,()=>{
 			params.savedFullList = true;
 			jc.page.save( params );
 		});
@@ -277,7 +279,7 @@ jc.page.save = ( params ) => {
 	}
 	if ( (! params.noFullList) && (! params.savedTypeList) ) {
 		params.typelist[String(params.id?params.id:0)] = params.tpd;
-		jc.jdav.put('struct/'+params.page+'-list.json',params.typelist,()=>{
+		jc.lists.list.set(params.page,params.typelist,()=>{
 			params.savedTypeList = true;
 			jc.page.save( params );
 		});
@@ -285,9 +287,11 @@ jc.page.save = ( params ) => {
 	}
 	if ( ! ( params.noLasts) && (! params.savedLasts) ) {
 		if ( ! params.mute ) jc.progress(AS.label('SavingLasts'));
-		jc.page.makeTypeLasts( params.page, params.typelist, ()=>{
-			params.savedLasts = true;
-			jc.page.save( params );
+		jc.page.makeLasts( params.fulllist, ()=>{
+			jc.page.makeTypeLasts( params.page, params.typelist, ()=>{
+				params.savedLasts = true;
+				jc.page.save( params );
+			});
 		});
 		return;
 	}
@@ -321,9 +325,40 @@ jc.page.save = ( params ) => {
 	jc.page.open( params.page, params.id );
 };
 
+jc.page.makeLasts = ( list, callback ) => {
+	if ( ! AS.test.obj(list) ) {
+		jc.lists.list.get((l)=>{ jc.page.makeLasts( l||{}, callback ); });
+		return;
+	}
+	let lasts = [];
+	Object.keys(list).forEach( (t) => {
+		let typelist = list[t];
+		Object.keys(typelist).forEach( k => {
+			let pm = Object.assign(typelist[k]);
+			pm.page = t;
+			if (!pm.hidden) lasts.push( pm );
+		});
+	} );
+	lasts.sort( (a,b) =>(b.upd - a.upd));
+	qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) );
+	qts.sort( (a,b)=>( b - a ) );
+	let proc = () => {
+		if ( qts.length ) {
+			const qt = qts.shift();
+			lasts.splice(qt -1);
+			jc.lists.last.set(qt,lasts,proc);
+			return;
+		} else {
+			if (AS.test.func(callback)) callback.call(window);
+		}
+	}
+	proc();
+	return;
+};
+
 jc.page.makeTypeLasts = ( pagetype, typelist, callback ) => {
 	if ( ! AS.test.obj(typelist) ) {
-		jc.jdav.get('struct/'+pagetype+'-list.json',(l)=>{
+		jc.lists.list.get(pagetype,(l)=>{
 			typelist = l||{};
 			jc.page.makeTypeLasts( pagetype, typelist, callback );
 		})
@@ -341,7 +376,7 @@ jc.page.makeTypeLasts = ( pagetype, typelist, callback ) => {
 		if ( qts.length ) {
 			const qt = qts.shift();
 			lasts.splice(qt -1);
-			jc.jdav.put('struct/'+pagetype+'-last'+qt+'.json',lasts,proc);
+			jc.lists.last.set(pagetype,qt,lasts,proc);
 			return;
 		} else {
 			if (AS.test.func(callback)) callback.call(window);
@@ -353,7 +388,7 @@ jc.page.makeTypeLasts = ( pagetype, typelist, callback ) => {
 
 jc.page.makeTypeDates = ( pagetype, typelist, callback ) => {
 	if ( ! AS.test.obj(typelist) ) {
-		jc.jdav.get('struct/'+pagetype+'-list.json',(l)=>{
+		jc.lists.list.get(pagetype,(l)=>{
 			typelist = l||{};
 			jc.page.makeTypeDates( pagetype, typelist, callback );
 		})
@@ -755,14 +790,18 @@ jc.edit = {
 		},
 		lasts : (b,d) => {
 			let o = jc.edit.form._base(b,d);
+			let ptypes = jc.edit.prop.pageTypes.clone();
+			ptypes.unshift({label:AS.label('Choose'),value:''},{label:'* '+AS.label('All'),value:'_all'});
+			let vtypes = [{label:AS.label('Numbered list'),value:'ol,li'},{label:AS.label('Bullet list'),value:'ul,li'},{label:AS.label('Plain list'),value:'div,div'}]
 			o.fields.push(
 				['type','hidden',{value:'lasts'}],
-				['title','text',{asLabel:'Title',normalize:true,skipempty:true}],
-				['ptype','select',{asLabel:'PageType',options:jc.edit.prop.pageTypes.clone()}],
-				['max','slider',{asLabel:'Max',min:1,max:100,report:{value:true},default:10}],
-				['showdate','bool',{asLabel:'ShowDate'}],
+				['ptype','select',{asLabel:'PageType',options:ptypes,skipempty:true,mandatory:true}],
+				['title','text',{asLabel:'Title',normalize:true,skipempty:true,depends:'ptype'}],
+				['view','select',{asLabel:'blockTextAspect',options:vtypes,depends:'ptype'}],
+				['max','slider',{asLabel:'Max',min:1,max:100,report:{value:true},default:10,depends:'ptype'}],
+				['showdate','bool',{asLabel:'ShowDate',depends:'ptype'}],
 				['showtime','bool',{asLabel:'ShowTime',depends:'showdate'}],
-				['showdesc','bool',{asLabel:'ShowDesc'}],
+				['showdesc','bool',{asLabel:'ShowDesc',depends:'ptype'}],
 			);
 			return o;
 		},

@@ -97,6 +97,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcGallery.sizeS a { height: 64px; width: 64px; }
 .jcGallery.sizeL a { height: 128px; width: 128px; }
 .jcGallery.sizeXL a { height: 160px; width: 160px; }
+.jcGallery.sizeXXL a { height: 240px; width: 240px; }
 .jcGallery a:hover { box-shadow: -1px 0 #666, 1px 0 #666, 0 -1px #666, 0 1px #666, 6px 6px 4px #aaa; transform: skew(0deg); }
 .jcGallery a, .jcGallery a>* { transition: all .1s ease-in-out; }
 .jcGallery a img { box-shadow: -1px 0 #ccc, 1px 0 #ccc, 0 -1px #ccc, 0 1px #ccc; height: 80%; margin: 10%; object-fit: cover; width: 80%; }
@@ -106,10 +107,11 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcGallery a span { position: absolute; bottom: 25%; right: 10%; color: #999; border: solid 1px #999; font-size: 75%; background-color : #fff; padding: 0 2px; }
 .jcGallery a:hover span { bottom: 10%; right: 2%; font-size: 100%; border-color: #336; color: #336; }
 
-.jcLasts li .title { font-weight: bold; cursor: pointer; }
-.jcLasts li .date,.jcLasts li .time { font-style: italic; color: #999; font-size: smaller; }
-.jcLasts li .date::before { content: ' — '; }
-.jcLasts li .time::before { content: ', '; }
+.jcLasts a { cursor: pointer; }
+.jcLastsEntry .title { font-weight: bold; }
+.jcLastsEntry .date,.jcLastsEntry .time { font-style: italic; color: #999; font-size: smaller; }
+.jcLastsEntry .date::before { content: ' — '; }
+.jcLastsEntry .time::before { content: ', '; }
 
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }
