@@ -114,7 +114,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcLastsEntry .time::before { content: ', '; }
 
 #jcSharingPanel {  display: flex; justify-content: center; align-items: start; padding: 0; margin: 24px 0; border-top: 1px solid #ddd; }
-#jcSharingPanel > a { display: inline-block; text-decoration: none; color: #fff; margin: 8px; width: 40px; height: 40px; overflow:hidden;  border-radius: 5px; transition: 25ms ease-out; }
+#jcSharingPanel > a { display: inline-block; text-decoration: none; color: #fff; margin: 16px 8px; width: 40px; height: 40px; overflow:hidden;  border-radius: 5px; transition: 25ms ease-out; }
 #jcToplevelContainer #jcSharingPanel > a::after { content: ''; }
 #jcSharingPanel > a > div { width: 40px; height: 40px; padding: 8px 10px; }
 #jcSharingPanel > a > div svg { width: 20px; height: 20px; margin: 0; fill: #fff; stroke: none }
