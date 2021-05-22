@@ -1346,8 +1346,26 @@ jc.lists = {
 			if ( list ) jc.lists.prop.lasts[type][String(qt)] = list;
 			else if ( jc.lists.prop.lasts[type][String(qt)] ) list = jc.lists.prop.lasts[type][String(qt)];
 			else list = [];
-			jc.jdav.put( jc.lists.last.uri(type,qt), list, (r)=>{
-				if ( AS.test.func(callback)) callback.call(window,r);
+			let uri = jc.lists.last.uri(type,qt);
+			jc.jdav.put( uri, list, (r)=>{
+				uri = uri.replace(/\.json/,'.rss');
+				let feed = '<?xml version="1.0" encoding="UTF-8" ?>\n<rss version="2.0">\n<channel>\n';
+				feed += '<title>'+$('head title',document.documentElement).html().escape()+'</title>\n';
+				let baseuri = window.location.protocol + '//' + window.location.hostname + '/';
+				feed += '<link>'+baseuri+'</link>\n';
+				list.forEach( i => {
+					let pt = i.page||type;
+					feed += '<item>\n';
+					feed += '\t<link>'+baseuri+pt+(i.id||'')+'/</link>\n';
+					feed += '\t<pubDate>'+ (new Date(i.upd)).toUTCString() +'</pubDate>\n';
+					feed += '\t<title>'+i.title.escape()+'</title>\n';
+					if ( i.desc && i.desc.length ) feed += '\t<description><![CDATA['+i.desc+']]></description>\n';
+					feed += '</item>\n';
+				} );
+				feed += '</channel>\n</rss>\n';
+				jc.dav.put( uri, feed, (r)=>{
+					if ( AS.test.func(callback)) callback.call(window,r);
+				});
 			});
 		},
 	},
