@@ -113,30 +113,32 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcLastsEntry .date::before { content: ' — '; }
 .jcLastsEntry .time::before { content: ', '; }
 
-#jcSharingPanel {  display: flex; justify-content: center; align-items: start; padding: 0; margin: 24px 0; border-top: 1px solid #ddd; }
-#jcSharingPanel > a { display: inline-block; text-decoration: none; color: #fff; margin: 16px 8px; width: 40px; height: 40px; overflow:hidden;  border-radius: 5px; transition: 25ms ease-out; }
+#jcSharingPanel { align-items: start; border-top: 1px solid #ddd; display: flex; flex-wrap: wrap; justify-content: center; margin: 24px 0; padding: 8px; }
 #jcToplevelContainer #jcSharingPanel > a::after { content: ''; }
-#jcSharingPanel > a > div { width: 40px; height: 40px; padding: 8px 10px; }
-#jcSharingPanel > a > div svg { width: 20px; height: 20px; margin: 0; fill: #fff; stroke: none }
-.jcSharing-facebook { background-color: #3b5998; border-color: #3b5998; }
-.jcSharing-facebook:hover, .jcSharing-facebook:active { background-color: #2d4373; border-color: #2d4373; }
-.jcSharing-twitter { background-color: #55acee; border-color: #55acee; }
-.jcSharing-twitter:hover, .jcSharing-twitter:active { background-color: #2795e9; border-color: #2795e9; }
-.jcSharing-tumblr { background-color: #35465C; border-color: #35465C; }
-.jcSharing-tumblr:hover, .jcSharing-tumblr:active { background-color: #222d3c; border-color: #222d3c; }
-.jcSharing-email { background-color: #777777; border-color: #777777; }
-.jcSharing-email:hover, .jcSharing-email:active { background-color: #5e5e5e; border-color: #5e5e5e; }
-.jcSharing-pinterest { background-color: #bd081c; border-color: #bd081c; }
-.jcSharing-pinterest:hover, .jcSharing-pinterest:active { background-color: #8c0615; border-color: #8c0615; }
-.jcSharing-linkedin { background-color: #0077b5; border-color: #0077b5; }
-.jcSharing-linkedin:hover, .jcSharing-linkedin:active { background-color: #046293; border-color: #046293; }
-.jcSharing-reddit { background-color: #5f99cf; border-color: #5f99cf; }
-.jcSharing-reddit:hover, .jcSharing-reddit:active { background-color: #3a80c1; border-color: #3a80c1; }
-.jcSharing-vk { background-color: #507299; border-color: #507299; }
-.jcSharing-vk:hover .jcSharing-vk:active { background-color: #43648c; border-color: #43648c; }
-.jcSharing-telegram { background-color: #54A9EB; }
-.jcSharing-telegram:hover { background-color: #4B97D1; }
-.jcSharing-whatsapp { background-color: #25D366; }
+#jcSharingPanel a { border: none; border-radius: 5px; color: #fff; display: inline-block; fill: #fff; height: 40px; margin: 8px 8px; overflow: hidden; stroke: none; text-decoration: none; transition: all .25s ease-out; width: 40px; }
+#jcSharingPanel a:hover { background: linear-gradient(to right, #ddd,#fff,#ddd); }
+#jcSharingPanel > a > svg { height: 20px; margin: 10px; transition: all .15s ease-out; width: 20px; }
+#jcSharingPanel > a:hover > svg, #jcSharingPanel > a:active > svg { height: 30px; margin: 5px; width: 30px; }
+.jcSharing-facebook { background: #3b5998; }
+#jcSharingPanel > a.jcSharing-facebook:hover, #jcSharingPanel > a.jcSharing-facebook:active { fill: #3b5998; }
+.jcSharing-twitter { background: #55acee; }
+#jcSharingPanel > a.jcSharing-twitter:hover, #jcSharingPanel > a.jcSharing-twitter:active { fill: #55acee; }
+.jcSharing-tumblr { background: #35465c; }
+#jcSharingPanel > a.jcSharing-tumblr:hover, #jcSharingPanel > a.jcSharing-tumblr:active { fill: #35465c; }
+.jcSharing-email { background: #777; }
+#jcSharingPanel > a.jcSharing-email:hover, #jcSharingPanel > a.jcSharing-email:active { fill: #777; }
+.jcSharing-pinterest { background: #bd081c; }
+#jcSharingPanel > a.jcSharing-pinterest:hover, #jcSharingPanel > a.jcSharing-pinterest:active { fill: #bd081c; }
+.jcSharing-linkedin { background: #0077b5; }
+#jcSharingPanel > a.jcSharing-linkedin:hover, #jcSharingPanel > a.jcSharing-linkedin:active { fill: #0077b5; }
+.jcSharing-reddit { background: #5f99cf; }
+#jcSharingPanel > a.jcSharing-reddit:hover, #jcSharingPanel > a.jcSharing-reddit:active { fill: #5f99cf; }
+.jcSharing-vk { background: #507299; }
+#jcSharingPanel > a.jcSharing-vk:hover, #jcSharingPanel > a.jcSharing-vk:active { fill: #507299; }
+.jcSharing-telegram { background: #54a9eb; }
+#jcSharingPanel > a.jcSharing-telegram:hover, #jcSharingPanel > a.jcSharing-telegram:active { fill: #54a9eb; }
+.jcSharing-whatsapp { background: #25d366; }
+#jcSharingPanel > a.jcSharing-whatsapp:hover, #jcSharingPanel > a.jcSharing-whatsapp:active { fill: #25d366; }
 
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }
