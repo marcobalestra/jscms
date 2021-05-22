@@ -113,6 +113,31 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcLastsEntry .date::before { content: ' — '; }
 .jcLastsEntry .time::before { content: ', '; }
 
+#jcSharingPanel {  display: flex; justify-content: center; align-items: start; }
+#jcSharingPanel > a { display: inline-block; text-decoration: none; color: #fff; margin: 0.5em; width: 40px; height: 40px; overflow:hidden;  border-radius: 5px; transition: 25ms ease-out; }
+#jcSharingPanel > a[href]::after { content: ''; }
+#jcSharingPanel > a > div { width: 40px; height: 40px; padding: 8px 10px; }
+#jcSharingPanel > a > div svg { width: 20px; height: 20px; margin: 0; fill: #fff; stroke: none }
+.jcSharing-facebook { background-color: #3b5998; border-color: #3b5998; }
+.jcSharing-facebook:hover, .jcSharing-facebook:active { background-color: #2d4373; border-color: #2d4373; }
+.jcSharing-twitter { background-color: #55acee; border-color: #55acee; }
+.jcSharing-twitter:hover, .jcSharing-twitter:active { background-color: #2795e9; border-color: #2795e9; }
+.jcSharing-tumblr { background-color: #35465C; border-color: #35465C; }
+.jcSharing-tumblr:hover, .jcSharing-tumblr:active { background-color: #222d3c; border-color: #222d3c; }
+.jcSharing-email { background-color: #777777; border-color: #777777; }
+.jcSharing-email:hover, .jcSharing-email:active { background-color: #5e5e5e; border-color: #5e5e5e; }
+.jcSharing-pinterest { background-color: #bd081c; border-color: #bd081c; }
+.jcSharing-pinterest:hover, .jcSharing-pinterest:active { background-color: #8c0615; border-color: #8c0615; }
+.jcSharing-linkedin { background-color: #0077b5; border-color: #0077b5; }
+.jcSharing-linkedin:hover, .jcSharing-linkedin:active { background-color: #046293; border-color: #046293; }
+.jcSharing-reddit { background-color: #5f99cf; border-color: #5f99cf; }
+.jcSharing-reddit:hover, .jcSharing-reddit:active { background-color: #3a80c1; border-color: #3a80c1; }
+.jcSharing-vk { background-color: #507299; border-color: #507299; }
+.jcSharing-vk:hover .jcSharing-vk:active { background-color: #43648c; border-color: #43648c; }
+.jcSharing-telegram { background-color: #54A9EB; }
+.jcSharing-telegram:hover { background-color: #4B97D1; }
+.jcSharing-whatsapp { background-color: #25D366; }
+
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }
 .swal2-container .swal2-actions button { min-width: 80px; text-align: center; }
