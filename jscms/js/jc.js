@@ -117,14 +117,14 @@ var tp = {};
 
 /* Global changes */
 
-window.onpopstate = () => {
+$(window).on('popstate',() => {
 	if ( jc.page.prop.editMode ) return;
 	let sp = jc.URI.decode();
 	if ( AS.test.str(sp.page) ) {
 		jc.prop.lastHiEntry = jc.URI.encode( sp );
 		jc.page.open(sp.page,sp.id,sp.data);
 	}
-};
+});
 
 if (!Date.prototype.clone) Date.prototype.clone = function() { let d = new Date(); d.setTime( this.getTime()); return d; };
 if (!Date.prototype.tosqldate) Date.prototype.tosqldate = function() {
