@@ -9,16 +9,19 @@
 		{ selector: "#topBar", part: "header.html" },
 		{ selector: "#belowTopBar", content: false },
 		{ selector: "#topNavbar", part: 'navbar.json' },
-		{ selector: "#mainContainer", content : {
-			type:"blocks",
-			editable:true,
-			blocks:[
-				{ type:"date",wrap:"<div></div>",prop:"blogdate" },
-				{ type:"text",wrap:"<h3></h3>",prop:"title" },
-				{ type:"text",wrap:"<h5></h5>",prop:"abstract" },
-				{ type:"mixed",prop:"blocks" }
-			]
-		}},
+		{ selector: "#mainContainer", content : [
+			{
+				type:"blocks",
+				editable:true,
+				blocks:[
+					{ type:"date",wrap:"<div></div>",prop:"blogdate" },
+					{ type:"text",wrap:"<h3></h3>",prop:"title" },
+					{ type:"text",wrap:"<h5></h5>",prop:"abstract" },
+					{ type:"mixed",prop:"blocks" }
+				]
+			},
+			{ type:"part", content: "sharethis.html" },
+		]},
 	];
 	ti.metadata = {
 		form : {
