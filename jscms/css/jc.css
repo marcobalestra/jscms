@@ -115,10 +115,11 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 
 #jcSharingPanel { align-items: start; border-top: 1px solid #ddd; display: flex; flex-wrap: wrap; justify-content: center; margin: 24px 0; padding: 8px; }
 #jcToplevelContainer #jcSharingPanel > a::after { content: ''; }
-#jcSharingPanel a { border: none; border-radius: 5px; color: #fff; display: inline-block; fill: #fff; height: 40px; margin: 8px 8px; overflow: hidden; stroke: none; text-decoration: none; transition: all .25s ease-out; width: 40px; }
-#jcSharingPanel a:hover { background: linear-gradient(to right, #ddd,#fff,#ddd); }
+#jcSharingPanel a { border: none; border-radius: 5px; color: #fff; display: inline-block; fill: #fff; height: 40px; margin: 8px; overflow: hidden; stroke: none; text-decoration: none; transition: all .25s ease-out; width: 40px; }
+#jcSharingPanel a:hover { background: linear-gradient(to right, #ddd,#fff,#ddd); height: 48px; margin: 4px; width: 48px; }
 #jcSharingPanel > a > svg { height: 20px; margin: 10px; transition: all .15s ease-out; width: 20px; }
-#jcSharingPanel > a:hover > svg, #jcSharingPanel > a:active > svg { height: 34px; margin: 3px; width: 34px; }
+#jcSharingPanel > a:hover > svg,
+#jcSharingPanel > a:active > svg { height: 40px; margin: 4px; width: 40px; }
 .jcSharing-facebook { background: #3b5998; }
 #jcSharingPanel > a.jcSharing-facebook:hover, #jcSharingPanel > a.jcSharing-facebook:active { fill: #3b5998; }
 .jcSharing-twitter { background: #55acee; }
