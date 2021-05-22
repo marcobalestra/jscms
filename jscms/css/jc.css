@@ -119,16 +119,16 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 #jcSharingPanel a:hover { border-radius: 8px; height: 54px; margin: 1px; width: 54px; }
 #jcSharingPanel > a > svg { height: 50%; margin: 25%; transition: all .15s ease-out; width: 50%; }
 #jcSharingPanel > a:hover > svg, #jcSharingPanel > a:active > svg { height: 80%; margin: 10%; width: 80%; }
-.jcSharing-facebook { background: #3b5998; }
-.jcSharing-twitter { background: #55acee; }
-.jcSharing-tumblr { background: #35465c; }
-.jcSharing-email { background: #777; }
-.jcSharing-pinterest { background: #bd081c; }
-.jcSharing-linkedin { background: #0077b5; }
-.jcSharing-reddit { background: #5f99cf; }
-.jcSharing-vk { background: #507299; }
-.jcSharing-telegram { background: #54a9eb; }
-.jcSharing-whatsapp { background: #25d366; }
+#jcSharingPanel .jcSharing-facebook { background: #3b5998; }
+#jcSharingPanel .jcSharing-twitter { background: #55acee; }
+#jcSharingPanel .jcSharing-tumblr { background: #35465c; }
+#jcSharingPanel .jcSharing-email { background: #777; }
+#jcSharingPanel .jcSharing-pinterest { background: #bd081c; }
+#jcSharingPanel .jcSharing-linkedin { background: #0077b5; }
+#jcSharingPanel .jcSharing-reddit { background: #5f99cf; }
+#jcSharingPanel .jcSharing-vk { background: #507299; }
+#jcSharingPanel .jcSharing-telegram { background: #54a9eb; }
+#jcSharingPanel .jcSharing-whatsapp { background: #25d366; }
 
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }
