@@ -397,35 +397,6 @@ jc.dav = {
 			success : (data) => { success.call(window,data); }
 		});
 	},
-	put : ( url, data, success, fail ) => {
-		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
-		success = jc.evalFunc(success)||(()=>{});
-		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
-		jc.console('jc.dav.put',url,data);
-		$.ajax( url, {
-			method: 'PUT',
-			dataType: 'text',
-			processData: false,  // Important!
-			cache: false,
-			contentType: 'text/plain; charset=UTF-8',
-			data: data,
-			error: (...errs) => { fail.call(window,false,errs); },
-			success : () => { success.call(window,true); }
-		});
-	},
-	mkdir : ( url, success, fail ) => {
-		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
-		success = jc.evalFunc(success)||(()=>{});
-		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
-		jc.console('jc.dav.mkdir',url);
-		$.ajax( url, {
-			method: 'MKCOL',
-			cache: false,
-			dataType: 'text',
-			error: (...errs) => { fail.call(window,false,errs); },
-			success : () => { success.call(window,true); }
-		});
-	},
 	info : ( url, success, fail ) => {
 		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
 		success = jc.evalFunc(success)||(()=>{});
@@ -446,124 +417,25 @@ jc.dav = {
 			}
 		});
 	},
-	rm : ( url, success, fail ) => {
+};
+
+jc.jdav = {
+	get : ( url, success, fail ) => {
 		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
 		success = jc.evalFunc(success)||(()=>{});
 		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
-		jc.console('jc.dav.rm',url);
-		$.ajax( url, {
-			method: 'DELETE',
-			cache: false,
-			contentType: 'text/xml; charset=UTF-8',
-			dataType: 'text',
-			error: (...errs) => { fail.call(window,false,errs); },
-			success : (xt) => { success.call(window,xt); }
-		});
-	},
-	purge : ( ...args ) => {
-		let success,fail,options={};
-		args.forEach( (a) => {
-			if ( AS.test.obj(a)) {
-				if ( a.dir ) options.dir = a.dir;
-				if ( a.ext ) options.ext = a.ext;
-				if ( a.match ) options.match = a.match;
-				return;
-			}
-			let f = jc.evalFunc(a);
-			if ( AS.test.func(f) ) {
-				if ( success ) fail = f;
-				else success = f;
-			}
-			if ( AS.test.str(a) ) {
-				options.dir = a;
-			}
-		} );
-		fail = fail||success||jc.getError;
-		success = success||(()=>{});
-		if (options.dir) options.dir = options.dir.replace(/\/$/,'');
-		jc.dav.ls( options, (out)=>{
-			let count = 0;
-			let proc = ()=>{
-				if ( out.list.length ) {
-					count++;
-					let url = (out.dir ? out.dir + '/' : '') + out.list.shift();
-					jc.dav.rm( url, proc );
-				} else {
-					if ( AS.test.func(success) ) success.call( window, count );
-				}
-			};
-			proc();
-		}, fail);
-	},
-	ls : ( ...args ) => {
-		let success,fail,options={};
-		args.forEach( (a) => {
-			if ( AS.test.obj(a)) {
-				if ( a.dir ) options.dir = a.dir;
-				if ( a.ext ) options.ext = a.ext;
-				if ( a.match ) options.match = a.match;
-				return;
-			}
-			let f = jc.evalFunc(a);
-			if ( AS.test.func(f) ) {
-				if ( success ) fail = f;
-				else success = f;
-			}
-			if ( AS.test.str(a) ) {
-				options.dir = a;
-			}
-		} );
-		fail = fail||success||jc.getError;
-		success = success||(()=>{});
-		let url = AS.path('jsauth') + 'auth/lsdata';
-		jc.console('jc.dav.ls',url);
+		jc.console('jc.jdav.get',url);
 		$.ajax( url, {
 			method: 'GET',
 			cache: false,
 			dataType: 'json',
-			data : options,
 			error: (...errs) => { fail.call(window,false,errs); },
-			success : (data) => {
-				Object.keys( options ).forEach( k => {
-					if ( options[k] ) data[k] = options[k];
-				} );
-				success.call(window,data);
-			}
+			success : (data) => { success.call(window,data); }
 		});
-	},
+	}
 };
 
-jc.jdav = {};
-Object.keys( jc.dav ).forEach( (k) => { jc.jdav[k] = jc.dav[k]; } );
-
-jc.jdav.get = ( url, success, fail ) => {
-	fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
-	success = jc.evalFunc(success)||(()=>{});
-	if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
-	jc.console('jc.jdav.get',url);
-	$.ajax( url, {
-		method: 'GET',
-		cache: false,
-		dataType: 'json',
-		error: (...errs) => { fail.call(window,false,errs); },
-		success : (data) => { success.call(window,data); }
-	});
-};
-jc.jdav.put = ( url, data, success, fail ) => {
-	fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
-	success = jc.evalFunc(success)||(()=>{});
-	if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
-	jc.console('jc.jdav.put',url,data);
-	$.ajax( url, {
-		method: 'PUT',
-		cache: false,
-		dataType: 'json',
-		contentType: 'application/json; charset=UTF-8',
-		data: AS.test.obj(data) ? JSON.stringify(data) : data,
-		error: (...errs) => { fail.call(window,false,errs); },
-		success : () => { success.call(window,true); }
-	});
-};
+Object.keys( jc.dav ).forEach( (k) => { if (AS.test.udef(jc.jdav[k])) jc.jdav[k] = jc.dav[k]; } );
 
 jc.menu = (ev,menu)=>{
 	ev.preventDefault();
@@ -1269,31 +1141,10 @@ jc.lists = {
 			if ( AS.test.func(callback)) callback.call(window,JSON.parse(JSON.stringify(list)));
 			else return JSON.parse(JSON.stringify(list));
 		},
-		set : ( ...args ) => {
-			const type = args.find(a=>AS.test.str(a))||'_all';
-			const list = args.find(a=>AS.test.obj(a))||{};
-			const callback = args.find(a=>AS.test.func(a));
-			let commit = args.find(a=>AS.test.bool(a));
-			if ( AS.test.udef(commit)) commit=true;
-			jc.lists.prop.lists[type] = list;
-			if ( commit ) return jc.lists.list.commit.apply(window,args);
-			if ( AS.test.func(callback)) callback.call(window);
-		},
 		fetch : ( ...args ) => {
 			const type = args.find(a=>AS.test.str(a))||'_all';
 			delete jc.lists.prop.lists[type];
 			jc.lists.list.get.apply(window,args);
-		},
-		commit : ( ...args ) => {
-			const type = args.find(a=>AS.test.str(a))||'_all';
-			let list = args.find(a=>AS.test.obj(a));
-			const callback = args.find(a=>AS.test.func(a));
-			if ( list ) jc.lists.prop.lists[type] = list;
-			else if ( jc.lists.prop.lists[type] ) list = jc.lists.prop.lists[type];
-			else list = {};
-			jc.jdav.put( jc.lists.list.uri(type), list, (r)=>{
-				if ( AS.test.func(callback)) callback.call(window,r);
-			});
 		},
 	},
 	last : {
@@ -1319,54 +1170,12 @@ jc.lists = {
 			if ( AS.test.func(callback)) callback.call(window,JSON.parse(JSON.stringify(list)));
 			else return JSON.parse(JSON.stringify(list));
 		},
-		set : ( ...args ) => {
-			const type = args.find(a=>AS.test.str(a))||'_all';
-			const qt = args.find(a=>AS.test.num(a));
-			const list = args.find(a=>AS.test.arr(a))||[];
-			const callback = args.find(a=>AS.test.func(a));
-			let commit = args.find(a=>AS.test.bool(a));
-			if ( AS.test.udef(commit)) commit=true;
-			if ( ! jc.lists.prop.lasts[type] ) jc.lists.prop.lasts[type] = {};
-			jc.lists.prop.lasts[type][String(qt)] = list;
-			if ( commit ) return jc.lists.last.commit.apply(window, args);
-			if (AS.test.func(callback)) callback.call(window);
-		},
 		fetch : ( ...args ) => {
 			const type = args.find(a=>AS.test.str(a))||'_all';
 			const qt = args.find(a=>AS.test.num(a));
 			if ( ! jc.lists.prop.lasts[type] ) jc.lists.prop.lasts[type] = {};
 			delete jc.lists.prop.lasts[type][String(qt)];
 			jc.lists.last.get.apply(window,args);
-		},
-		commit : ( ...args ) => {
-			const type = args.find(a=>AS.test.str(a))||'_all';
-			const qt = args.find(a=>AS.test.num(a));
-			let list = args.find(a=>AS.test.arr(a));
-			const callback = args.find(a=>AS.test.func(a));
-			if ( list ) jc.lists.prop.lasts[type][String(qt)] = list;
-			else if ( jc.lists.prop.lasts[type][String(qt)] ) list = jc.lists.prop.lasts[type][String(qt)];
-			else list = [];
-			let uri = jc.lists.last.uri(type,qt);
-			jc.jdav.put( uri, list, (r)=>{
-				uri = uri.replace(/\.json/,'.rss');
-				let feed = '<?xml version="1.0" encoding="UTF-8" ?>\n<rss version="2.0">\n<channel>\n';
-				feed += '<title>'+$('head title',document.documentElement).html().escape()+'</title>\n';
-				let baseuri = window.location.protocol + '//' + window.location.hostname + '/';
-				feed += '<link>'+baseuri+'</link>\n';
-				list.forEach( i => {
-					let pt = i.page||type;
-					feed += '<item>\n';
-					feed += '\t<link>'+baseuri+pt+(i.id||'')+'/</link>\n';
-					feed += '\t<pubDate>'+ (new Date(i.upd)).toUTCString() +'</pubDate>\n';
-					feed += '\t<title>'+i.title.escape()+'</title>\n';
-					if ( i.desc && i.desc.length ) feed += '\t<description><![CDATA['+i.desc+']]></description>\n';
-					feed += '</item>\n';
-				} );
-				feed += '</channel>\n</rss>\n';
-				jc.dav.put( uri, feed, (r)=>{
-					if ( AS.test.func(callback)) callback.call(window,r);
-				});
-			});
 		},
 	},
 };
