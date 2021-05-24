@@ -33,7 +33,7 @@ if ( AS.test.udef(jc.prop.prefs.prefsVersion)) jc.prop.prefs.prefsVersion = 1;
 /* paths integrate defaults */
 ( ()=>{
 	let lp = AS.path('jsroot');
-	let bp = AS.path('jscndroot')||AS.path('jsroot');
+	let bp = AS.path('jscdn')||AS.path('jsroot');
 	if ( AS.test.udef(lp) ) {
 		lp = '/jscms/';
 		AS.path({jsroot:lp});
@@ -58,7 +58,7 @@ jc.prop.loadModules = {
 		'wait:()=>( window.Swal && jQuery.fn.select2 )',
 	],
 	'edit' : [
-		AS.path('jscdn') + '/js/jc-edit'+(jc.prop.isDeveloper?'':'.min')+'.js',
+		AS.path('jscdn') + 'js/jc-edit'+(jc.prop.isDeveloper?'':'.min')+'.js',
 		'https://cdn.altersoftware.org/js-as-form/as-form.js',
 		'wait:()=>( jc.edit && AS.form )',
 	],
