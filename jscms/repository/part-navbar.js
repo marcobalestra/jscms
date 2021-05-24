@@ -42,10 +42,10 @@
 			};
 		},
 		render : ( data ) => {
-			let $navbar = $(`<nav class="navbar navbar-expand-lg ${data.theme}"></nav>`);
+			let $navbar = $(`<nav class="jcNavbar navbar navbar-expand-lg ${data.theme}"></nav>`);
 			let cid = data.id || AS.generateId('jcNavbar');
 			$navbar.append(`<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#${cid}" aria-controls="${cid}" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>`);
-			$navbar.append(`<div class="collapse navbar-collapse" id="${cid}"><ul class="navbar-nav mr-auto"></ul></div>`);
+			$navbar.append(`<div class="collapse navbar-collapse" id="${cid}"><ul class="navbar-nav mr-auto jcNavBarLeft"></ul><ul class="navbar-nav ml-auto jcNavBarRight"></ul></div>`);
 			const render = ( item, $parent ) => {
 				let $li = $(`<li class="nav-item"></li>`);
 				if ( item.type == "item" ) {
@@ -68,13 +68,12 @@
 						let $a = $(`<a class="dropdown-item" onclick="jc.page.open('${si.item.page}'${ si.item.id ? ','+si.item.id : ''})">${si.label.escape()}</a>`);
 						if ( (jc.page.current() == si.item.page) && ( si.item.id == jc.page.data().id) ) $a.addClass('active');
 						$div.append($a);
-
 					});
 					$li.append($div);
 				}
 				$parent.append($li);
 			};
-			data.menu.forEach( (item) => { render( item, $('div>ul',$navbar) ); } );
+			data.menu.forEach( (item) => { render( item, $('div>ul.jcNavBarLeft',$navbar) ); } );
 			return $navbar;
 		},
 	};

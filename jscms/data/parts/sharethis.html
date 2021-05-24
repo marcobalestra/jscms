@@ -13,23 +13,39 @@
 <script type="text/javascript">
 /* <![CDATA[ */
 $( ()=>{
-	const fix = (pd)=>{
-		const uri = encodeURIComponent(window.location.href);
-		const title = encodeURIComponent(((pd.metadata && pd.metadata.title && pd.metadata.title.length) ? pd.metadata.title : 'Look at this page')+': ');
-		const desc = ((pd.metadata && pd.metadata.desc && pd.metadata.desc.length) ? encodeURIComponent(pd.metadata.desc) : title);
-		$('.jcSharing-facebook').attr('href','https://facebook.com/sharer.php?display=page&u='+uri);
-		$('.jcSharing-twitter').attr('href','https://twitter.com/intent/tweet/?text='+title+'&url='+uri);
-		$('.jcSharing-telegram').attr('href','https://telegram.me/share/url?text='+title+'&url='+uri);
-		$('.jcSharing-whatsapp').attr('href','https://api.whatsapp.com/send?text='+title+'+'+uri);
-		$('.jcSharing-email').attr('href','mailto:?subject='+title+'&body='+uri);
-		$('.jcSharing-tumblr').attr('href','https://www.tumblr.com/widgets/share/tool?posttype=link&title='+title+'&url='+uri+'&shareSource=tumblr_share_button');
-		$('.jcSharing-pinterest').attr('href','https://pinterest.com/pin/create/button/?url='+uri+'&media='+uri+'&description='+title);
-		$('.jcSharing-linkedin').attr('href','https://www.linkedin.com/shareArticle?mini=true&url='+uri+'&title='+title+'&summary='+desc+'&source='+uri);
-		$('.jcSharing-reddit').attr('href','https://reddit.com/submit/?url='+uri+'&resubmit=true&title='+title);
-		$('.jcSharing-vk').attr('href','http://vk.com/share.php?title='+title+'&url='+uri);
+	const review = () => {
+		//$(document.body).off('jc_render_end',review);
+		let $ul = $('nav.jcNavbar div>ul.jcNavBarLeft');
+		if ( $ul.length && (! $('.jcNavSharing',$ul).length) ) {
+			let $li = $(`<li class="nav-item dropdown jcNavSharing"></li>`);
+			let id = AS.generateId('jcMenu');
+			$li.append(`<a class="nav-link dropdown-toggle" href="#" id="${id}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${AS.icon('social-share')}</a>`);
+			let $div = $(`<div class="dropdown-menu" aria-labelledby="${id}"></div>`);
+			$('#jcSharingPanel a[class*="jcSharing-"]').each( (idx,a) => {
+				$div.append( $(`<a class="dropdown-item ${ a.className }" href="#"><span class="jcicon">${ a.innerHTML }</span> ${ a.getAttribute('title') }</a>`) );
+			});
+			$li.append($div)
+			$ul.append($li);
+		}
+		const fix = (pd)=>{
+			const uri = encodeURIComponent(window.location.href);
+			const title = encodeURIComponent(((pd.metadata && pd.metadata.title && pd.metadata.title.length) ? pd.metadata.title : 'Look at this page')+': ');
+			const desc = ((pd.metadata && pd.metadata.desc && pd.metadata.desc.length) ? encodeURIComponent(pd.metadata.desc) : title);
+			$('.jcSharing-facebook').attr('href','https://facebook.com/sharer.php?display=page&u='+uri);
+			$('.jcSharing-twitter').attr('href','https://twitter.com/intent/tweet/?text='+title+'&url='+uri);
+			$('.jcSharing-telegram').attr('href','https://telegram.me/share/url?text='+title+'&url='+uri);
+			$('.jcSharing-whatsapp').attr('href','https://api.whatsapp.com/send?text='+title+'+'+uri);
+			$('.jcSharing-email').attr('href','mailto:?subject='+title+'&body='+uri);
+			$('.jcSharing-tumblr').attr('href','https://www.tumblr.com/widgets/share/tool?posttype=link&title='+title+'&url='+uri+'&shareSource=tumblr_share_button');
+			$('.jcSharing-pinterest').attr('href','https://pinterest.com/pin/create/button/?url='+uri+'&media='+uri+'&description='+title);
+			$('.jcSharing-linkedin').attr('href','https://www.linkedin.com/shareArticle?mini=true&url='+uri+'&title='+title+'&summary='+desc+'&source='+uri);
+			$('.jcSharing-reddit').attr('href','https://reddit.com/submit/?url='+uri+'&resubmit=true&title='+title);
+			$('.jcSharing-vk').attr('href','http://vk.com/share.php?title='+title+'&url='+uri);
+		};
+		if (! $(document.body).data('jcSharingEvent')) $(document.body).data('jcSharingEvent',true).on('jc_page_data_loaded',(e,pd) =>{ fix(pd) } );
+		fix( jc.page.data().pageContent );
 	};
-	if (! $(document.body).data('jcSharingEvent')) $(document.body).data('jcSharingEvent',true).on('jc_page_data_loaded',(e,pd) =>{ fix(pd) } );
-	fix( jc.page.data().pageContent );
+	if (! $(document.body).data('jcSharingEvent')) $(document.body).on('jc_render_end',review);
 });
 /* ]]> */
 </script>
