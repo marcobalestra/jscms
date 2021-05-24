@@ -14,7 +14,6 @@
 /* <![CDATA[ */
 $( ()=>{
 	const review = () => {
-		//$(document.body).off('jc_render_end',review);
 		let $ul = $('nav.jcNavbar div>ul.jcNavBarLeft');
 		if ( $ul.length && (! $('.jcNavSharing',$ul).length) ) {
 			let $li = $(`<li class="nav-item dropdown jcNavSharing"></li>`);
@@ -22,7 +21,7 @@ $( ()=>{
 			$li.append(`<a class="nav-link dropdown-toggle" href="#" id="${id}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${AS.icon('social-share')}</a>`);
 			let $div = $(`<div class="dropdown-menu" aria-labelledby="${id}"></div>`);
 			$('#jcSharingPanel a[class*="jcSharing-"]').each( (idx,a) => {
-				$div.append( $(`<a class="dropdown-item ${ a.className }" href="#"><span class="jcicon">${ a.innerHTML }</span> ${ a.getAttribute('title') }</a>`) );
+				$div.append( $(`<a class="dropdown-item ${ a.className }" target="_blank" href="#"><span class="jcicon">${ a.innerHTML }</span> ${ a.getAttribute('title') }</a>`) );
 			});
 			$li.append($div)
 			$ul.append($li);
