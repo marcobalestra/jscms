@@ -1316,12 +1316,20 @@ jc.page = {
 		if ( user ) {
 			jc.springLoad('module:edit');
 			$(document.body).addClass('jcUserAuth');
-			$menu.append(`<div class="jcicon jcAuth">${ AS.icon('user') }</div><div class="jcUser">${ user }</div>`);
+			if ( $menu.hasClass('jcMenuText') ) {
+				$menu.append(`<span class="jcicon">${ AS.icon('user') }</span><span>${ user }</span>`);
+			} else {
+				$menu.append(`<div class="jcicon jcAuth">${ AS.icon('user') }</div><div class="jcUser">${ user }</div>`);
+			}
 			$menu.on('click contextmenu',jc.actionsMenu);
 			$(document.body).on('contextmenu',jc.actionsMenu);
 		} else {
 			$(document.body).removeClass('jcUserAuth');
-			$menu.append(`<span class="jcicon jcUnauth">${ AS.icon('lock') }</span>`);
+			if ( $menu.hasClass('jcMenuText') ) {
+				$menu.append(`<span class="jcicon">${ AS.icon('lock') }</span><span>${ AS.label('Login') }</span>`);
+			} else {
+				$menu.append(`<span class="jcicon jcUnauth">${ AS.icon('lock') }</span>`);
+			}
 			$menu.off('click contextmenu',jc.actionsMenu);
 			$(document.body).off('contextmenu',jc.actionsMenu);
 			$('.jcUnauth',$menu).on('click',jc.page.login);

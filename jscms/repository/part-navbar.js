@@ -37,6 +37,7 @@
 					['type','hidden',{value:"navbar"}],
 					['theme','select',{asLabel:'Theme',options:[{label:'Light',value:"navbar-light bg-light"},{label:'Dark',value:"navbar-dark bg-dark"},{label:'Blue',value:"navbar-dark bg-primary"}]}],
 					['id','text',{label:'ID',skipempty:true,trim:true}],
+					['login','bool',{asLabel:'Login'}],
 					['menu','subform',{asLabel:'Content',subform:'item',mandatory:true}],
 				],
 			};
@@ -73,6 +74,9 @@
 				}
 				$parent.append($li);
 			};
+			if ( data.login ) {
+				$('div>ul.jcNavBarRight',$navbar).append('<li class="nav-item"><a class="nav-link jcMenu jcMenuText">Login</a></li>');
+			}
 			data.menu.forEach( (item) => { render( item, $('div>ul.jcNavBarLeft',$navbar) ); } );
 			$navbar.append( $('<script type="text/javascript">$( ()=>{ $(document.body).trigger("jc_navbar_prepared");} )</script>'))
 			return $navbar;

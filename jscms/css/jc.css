@@ -58,7 +58,10 @@ a[href^="http://"]:hover::after, #jcToplevelContainer a[href^="https://"]:hover:
 a[href^="mailto:"]::after { content: ' ✉'; }
 
 .jcMenu { background-color: #fff; cursor: pointer; text-align: center; }
+.jcMenu.jcMenuText { background-color : transparent; }
 .jcMenu .jcicon svg { height: 32px; width: 32px; }
+.jcMenu.jcMenuText .jcicon { display: inline-block; margin: -4px 4px; vertical-align: 2px; }
+.jcMenu.jcMenuText .jcicon svg { width: 20px; height: 20px; }
 .jcMenu .jcUnauth { fill: #966; }
 .jcMenu:hover .jcUnauth { fill: #900; }
 .jcMenu .jcAuth { fill: #696; }
