@@ -1569,9 +1569,7 @@ jc.render = {
 				});
 				return;
 			}
-			o.editable = { type: 'part', src: o.content, raw: other.raw };
-		} else {
-			delete o.editable;
+			if ( o.editable ) o.editable = { type: 'part', src: o.content, raw: other.raw };
 		}
 		jc.render.main(o);
 		jc.render.queue(-1);
@@ -1692,10 +1690,18 @@ jc.render = {
 				if ( d.title ) div.append( $('<h4></h4>').append(d.title) );
 				let $ol = $('<'+nodes[0]+' class="jcLastsEntries"></'+nodes[0]+'>');
 				list.splice( d.max -1 );
+				let cp = jc.page.current();
+				let cid = jc.page.data().id;
 				list.forEach( i => {
+					let p = i.page||d.ptype;
 					let $li = $('<'+nodes[1]+' class="jcLastsEntry"></'+nodes[1]+'>');
-					let $a = $(`<a class="title"></span>`).html(i.title);
-					$a.on('click',()=>{ jc.page.open( i.page||d.ptype, i.id ) });
+					let $a;
+					if ( (cp==p ) && (i.id == cid ) ) {
+						$a = $(`<span class="title"></span>`).html(i.title);
+					} else {
+						$a = $(`<a class="title"></a>`).html(i.title);
+						$a.on('click',()=>{ jc.page.open( p, i.id ) });
+					}
 					$li.append( $a );
 					if ( d.showdate ) {
 						let dt = new Date(i.upd);
