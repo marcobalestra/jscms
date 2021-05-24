@@ -74,6 +74,7 @@
 				$parent.append($li);
 			};
 			data.menu.forEach( (item) => { render( item, $('div>ul.jcNavBarLeft',$navbar) ); } );
+			$navbar.append( $('<script type="text/javascript">$( ()=>{ $(document.body).trigger("jc_navbar_prepared");} )</script>'))
 			return $navbar;
 		},
 	};

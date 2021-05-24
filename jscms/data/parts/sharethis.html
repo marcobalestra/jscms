@@ -13,7 +13,23 @@
 <script type="text/javascript">
 /* <![CDATA[ */
 $( ()=>{
-	const review = () => {
+	const fix = ()=>{
+		const pd = jc.page.data().pageContent;
+		const uri = encodeURIComponent(window.location.href);
+		const title = encodeURIComponent(((pd.metadata && pd.metadata.title && pd.metadata.title.length) ? pd.metadata.title : 'Look at this page')+': ');
+		const desc = ((pd.metadata && pd.metadata.desc && pd.metadata.desc.length) ? encodeURIComponent(pd.metadata.desc) : title);
+		$('.jcSharing-facebook').attr('href','https://facebook.com/sharer.php?display=page&u='+uri);
+		$('.jcSharing-twitter').attr('href','https://twitter.com/intent/tweet/?text='+title+'&url='+uri);
+		$('.jcSharing-telegram').attr('href','https://telegram.me/share/url?text='+title+'&url='+uri);
+		$('.jcSharing-whatsapp').attr('href','https://api.whatsapp.com/send?text='+title+'+'+uri);
+		$('.jcSharing-email').attr('href','mailto:?subject='+title+'&body='+uri);
+		$('.jcSharing-tumblr').attr('href','https://www.tumblr.com/widgets/share/tool?posttype=link&title='+title+'&url='+uri+'&shareSource=tumblr_share_button');
+		$('.jcSharing-pinterest').attr('href','https://pinterest.com/pin/create/button/?url='+uri+'&media='+uri+'&description='+title);
+		$('.jcSharing-linkedin').attr('href','https://www.linkedin.com/shareArticle?mini=true&url='+uri+'&title='+title+'&summary='+desc+'&source='+uri);
+		$('.jcSharing-reddit').attr('href','https://reddit.com/submit/?url='+uri+'&resubmit=true&title='+title);
+		$('.jcSharing-vk').attr('href','http://vk.com/share.php?title='+title+'&url='+uri);
+	};
+	const nfix = () => {
 		let $ul = $('nav.jcNavbar div>ul.jcNavBarLeft');
 		if ( $ul.length && (! $('.jcNavSharing',$ul).length) ) {
 			let $li = $(`<li class="nav-item dropdown jcNavSharing"></li>`);
@@ -26,25 +42,22 @@ $( ()=>{
 			$li.append($div)
 			$ul.append($li);
 		}
-		const fix = ()=>{
-			const pd = jc.page.data().pageContent;
-			const uri = encodeURIComponent(window.location.href);
-			const title = encodeURIComponent(((pd.metadata && pd.metadata.title && pd.metadata.title.length) ? pd.metadata.title : 'Look at this page')+': ');
-			const desc = ((pd.metadata && pd.metadata.desc && pd.metadata.desc.length) ? encodeURIComponent(pd.metadata.desc) : title);
-			$('.jcSharing-facebook').attr('href','https://facebook.com/sharer.php?display=page&u='+uri);
-			$('.jcSharing-twitter').attr('href','https://twitter.com/intent/tweet/?text='+title+'&url='+uri);
-			$('.jcSharing-telegram').attr('href','https://telegram.me/share/url?text='+title+'&url='+uri);
-			$('.jcSharing-whatsapp').attr('href','https://api.whatsapp.com/send?text='+title+'+'+uri);
-			$('.jcSharing-email').attr('href','mailto:?subject='+title+'&body='+uri);
-			$('.jcSharing-tumblr').attr('href','https://www.tumblr.com/widgets/share/tool?posttype=link&title='+title+'&url='+uri+'&shareSource=tumblr_share_button');
-			$('.jcSharing-pinterest').attr('href','https://pinterest.com/pin/create/button/?url='+uri+'&media='+uri+'&description='+title);
-			$('.jcSharing-linkedin').attr('href','https://www.linkedin.com/shareArticle?mini=true&url='+uri+'&title='+title+'&summary='+desc+'&source='+uri);
-			$('.jcSharing-reddit').attr('href','https://reddit.com/submit/?url='+uri+'&resubmit=true&title='+title);
-			$('.jcSharing-vk').attr('href','http://vk.com/share.php?title='+title+'&url='+uri);
-		};
 		fix();
 	};
-	if (! $(document.body).data('jcSharingEvent')) $(document.body).data('jcSharingEvent',true).on('jc_render_end',()=>{ window.setTimeout( review, 10); } );
+	const usenavbar = () => {
+		$(document.body)
+			.off('jc_navbar_prepared',usenavbar )
+			.off('jc_render_end',fix )
+			.on('jc_navbar_prepared', nfix )
+			.data('jcSharingEvent','nfix')
+		;
+		nfix();
+	};
+	if (! $(document.body).data('jcSharingEvent')) $(document.body)
+		.data('jcSharingEvent','usenavbar fix')
+		.on('jc_navbar_prepared', usenavbar )
+		.on('jc_render_end', fix )
+	;
 });
 /* ]]> */
 </script>
