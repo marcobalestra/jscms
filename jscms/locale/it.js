@@ -75,4 +75,3 @@ AS.labels.load('it',[{
 	'Warning' : 'Attenzione',
 	'WholeSite' : 'Tutto il sito',
 }]);
-

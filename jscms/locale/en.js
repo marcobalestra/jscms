@@ -65,4 +65,3 @@ AS.labels.load('en',[{
 	'ThisPage' : 'This page',
 	'WholeSite' : 'The whole site',
 }]);
-
