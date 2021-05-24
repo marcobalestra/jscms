@@ -26,7 +26,8 @@ $( ()=>{
 			$li.append($div)
 			$ul.append($li);
 		}
-		const fix = (pd)=>{
+		const fix = ()=>{
+			const pd = jc.page.data().pageContent;
 			const uri = encodeURIComponent(window.location.href);
 			const title = encodeURIComponent(((pd.metadata && pd.metadata.title && pd.metadata.title.length) ? pd.metadata.title : 'Look at this page')+': ');
 			const desc = ((pd.metadata && pd.metadata.desc && pd.metadata.desc.length) ? encodeURIComponent(pd.metadata.desc) : title);
@@ -41,10 +42,9 @@ $( ()=>{
 			$('.jcSharing-reddit').attr('href','https://reddit.com/submit/?url='+uri+'&resubmit=true&title='+title);
 			$('.jcSharing-vk').attr('href','http://vk.com/share.php?title='+title+'&url='+uri);
 		};
-		if (! $(document.body).data('jcSharingEvent')) $(document.body).data('jcSharingEvent',true).on('jc_page_data_loaded',(e,pd) =>{ fix(pd) } );
-		fix( jc.page.data().pageContent );
+		fix();
 	};
-	if (! $(document.body).data('jcSharingEvent')) $(document.body).on('jc_render_end',review);
+	if (! $(document.body).data('jcSharingEvent')) $(document.body).data('jcSharingEvent',true).on('jc_render_end',review);
 });
 /* ]]> */
 </script>
