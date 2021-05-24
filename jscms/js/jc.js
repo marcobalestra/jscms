@@ -30,7 +30,7 @@ if ( AS.test.udef(jc.prop.prefs)) jc.prop.prefs = {};
 if ( AS.test.udef(jc.prop.prefs.debugURI)) jc.prop.prefs.debugURI = false;
 if ( AS.test.udef(jc.prop.prefs.debugLevel)) jc.prop.prefs.debugLevel = 0;
 if ( AS.test.udef(jc.prop.prefs.prefsVersion)) jc.prop.prefs.prefsVersion = 1;
-/* paths integrate defaults */
+/* paths integrate defaults */ 
 ( ()=>{
 	let lp = AS.path('jsroot');
 	let bp = AS.path('jscdn')||AS.path('jsroot');
