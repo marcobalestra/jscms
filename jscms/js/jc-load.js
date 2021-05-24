@@ -7,7 +7,7 @@ AS.path({
 	jsroot : '/jscms/',
 	jscndroot : jc.prop.isDeveloper ? '/jscms/' : 'https://cdn.altersoftware.org/js-as-cms/',
 	jsdataroot: '/jscms/data/',
-	jsauth: '/jscms/data/login/',
+	jsauth: '/jscms/login/',
 });
 ( ()=>{
 	let h = document.documentElement.querySelector('head');
