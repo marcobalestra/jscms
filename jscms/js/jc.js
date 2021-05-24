@@ -32,22 +32,23 @@ if ( AS.test.udef(jc.prop.prefs.debugLevel)) jc.prop.prefs.debugLevel = 0;
 if ( AS.test.udef(jc.prop.prefs.prefsVersion)) jc.prop.prefs.prefsVersion = 1;
 /* paths integrate defaults */
 ( ()=>{
-	let bp = AS.path('jsroot');
-	if ( AS.test.udef(bp) ) {
-		bp = '/jscms/';
-		AS.path({jsroot:bp});
+	let lp = AS.path('jsroot');
+	let bp = AS.path('jscndroot')||AS.path('jsroot');
+	if ( AS.test.udef(lp) ) {
+		lp = '/jscms/';
+		AS.path({jsroot:lp});
 	}
 	if ( AS.test.udef(AS.path('jstemplates'))) AS.path({jstemplates:bp+'templates/'});
 	if ( AS.test.udef(AS.path('jsrenderers'))) AS.path({jsrenderers:AS.path('jstemplates')+'renderers/'});
 	if ( AS.test.udef(AS.path('jsextensions'))) AS.path({jsextensions:AS.path('jstemplates')+'extensions/'});
-	if ( AS.test.udef(AS.path('jsdataroot'))) AS.path({jsdataroot:bp+'data/'});
-	if ( AS.test.udef(AS.path('jsauth'))) AS.path({jsauth:bp+'login/'});
+	if ( AS.test.udef(AS.path('jsdataroot'))) AS.path({jsdataroot:lp+'data/'});
+	if ( AS.test.udef(AS.path('jsauth'))) AS.path({jsauth:lp+'login/'});
 	if ( AS.test.udef(AS.path('jsreporoot'))) AS.path({jsreporoot:bp+'repository/'});
 })()
 
 jc.prop.loadModules = {
 	'basic' : [
-		AS.path('jsroot') + 'css/jc.css',
+		AS.path('jscndroot') + 'css/jc.css',
 		{ type:'js', src:'https://cdn.jsdelivr.net/npm/sweetalert2@10'},
 		{ type:'js', src:'https:////cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js'},
 		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
@@ -57,7 +58,7 @@ jc.prop.loadModules = {
 		'wait:()=>( window.Swal && jQuery.fn.select2 )',
 	],
 	'edit' : [
-		AS.path('jsroot') + '/js/jc-edit'+(jc.prop.isDeveloper?'':'.min')+'.js',
+		AS.path('jscndroot') + '/js/jc-edit'+(jc.prop.isDeveloper?'':'.min')+'.js',
 		'https://cdn.altersoftware.org/js-as-form/as-form.js',
 		'wait:()=>( jc.edit && AS.form )',
 	],

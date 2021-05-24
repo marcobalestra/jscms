@@ -5,7 +5,9 @@ jc.prop.mainContainerId = 'jcToplevelContainer';
 jc.prop.prefs.prefsVersion = 1;
 AS.path({
 	jsroot : '/jscms/',
-	jscndroot : jc.prop.isDeveloper ? '/jscms/' : 'https://cdn.altersoftware.org/js-as-cms/'
+	jscndroot : jc.prop.isDeveloper ? '/jscms/' : 'https://cdn.altersoftware.org/js-as-cms/',
+	jsdataroot: '/jscms/data/',
+	jsauth: '/jscms/data/login/',
 });
 ( ()=>{
 	let h = document.documentElement.querySelector('head');
