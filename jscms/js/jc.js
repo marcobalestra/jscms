@@ -1698,6 +1698,7 @@ jc.render = {
 					let $li = $('<'+nodes[1]+' class="jcLastsEntry"></'+nodes[1]+'>');
 					let $a;
 					if ( (cp==p ) && (i.id == cid ) ) {
+						$li.append('➤ ');
 						$a = $(`<span class="title"></span>`).html(i.title);
 					} else {
 						$a = $(`<a class="title"></a>`).html(i.title);
