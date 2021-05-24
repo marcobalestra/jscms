@@ -67,7 +67,10 @@
 							return;
 						}
 						let $a = $(`<a class="dropdown-item" onclick="jc.page.open('${si.item.page}'${ si.item.id ? ','+si.item.id : ''})">${si.label.escape()}</a>`);
-						if ( (jc.page.current() == si.item.page) && ( si.item.id == jc.page.data().id) ) $a.addClass('active');
+						if ( (jc.page.current() == si.item.page) && ( si.item.id == jc.page.data().id) ) {
+							$a.addClass('active');
+							$li.addClass('active');
+						}
 						$div.append($a);
 					});
 					$li.append($div);
