@@ -1695,7 +1695,7 @@ jc.render = {
 				list.forEach( i => {
 					let $li = $('<'+nodes[1]+' class="jcLastsEntry"></'+nodes[1]+'>');
 					let $a = $(`<a class="title"></span>`).html(i.title);
-					$a.on('click',()=>{ jc.page.open(d.ptype, i.id ) });
+					$a.on('click',()=>{ jc.page.open( i.page||d.ptype, i.id ) });
 					$li.append( $a );
 					if ( d.showdate ) {
 						let dt = new Date(i.upd);
