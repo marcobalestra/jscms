@@ -7,7 +7,7 @@ The idea is to create a CMS as a SPA (Single-page application) that is entirely 
 
 JSCMS is currently under development.
 
-A first preview of the state of the art is available on https://casadelcuoco.it
+A first preview of the state of the art is available on https://jbloud.com
 
 ## Key factors
 
