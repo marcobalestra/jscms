@@ -3,11 +3,14 @@ jc.prop.isDeveloper = window.location.host.includes('.lan.');
 jc.prop.uriPrefixPlain = '/!';
 jc.prop.mainContainerId = 'jcToplevelContainer';
 jc.prop.prefs.prefsVersion = 1;
-AS.path({jsroot : '/jscms/'});
+AS.path({
+	jsroot : '/jscms/',
+	jscndroot : jc.prop.isDeveloper ? '/jscms/' : 'https://cdn.altersoftware.org/js-as-cms/'
+});
 ( ()=>{
 	let h = document.documentElement.querySelector('head');
 	if ( ! h ) h = document.body;
-	let uri = h.querySelector('script[src$="/jc-load.js"]').getAttribute('src').replace(/\/jc-load\.js$/,"/jc"+(jc.prop.isDeveloper?'':'.min')+".js");
+	let uri = AS.path('jscndroot') + 'js/jc'+(jc.prop.isDeveloper?'':'.min')+'.js';
 	let s = document.createElement('script');
 	s.setAttribute('type','text/javascript');
 	s.setAttribute('language','javascript');
