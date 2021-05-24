@@ -18,7 +18,7 @@
 
 /* jc.prop integrate defaults */
 jc.prop.lastHiEntry = '';
-jc.prop.absUriMatcher = ( new RegExp("^([^a-z]+:/)?/","i") );
+jc.prop.absUriMatcher = ( new RegExp("^([a-z]+:/)?/","i") );
 if ( AS.test.udef(jc.prop.maxUploadSize)) jc.prop.maxUploadSize = 8388608; // 8MiB
 if ( AS.test.udef(jc.prop.uriPrefixPlain)) jc.prop.uriPrefixPlain = '/-jscms/';
 if ( AS.test.udef(jc.prop.uriPrefixOfbs)) jc.prop.uriPrefixOfbs = '/_jscms/';
