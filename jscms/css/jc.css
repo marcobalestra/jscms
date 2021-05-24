@@ -53,7 +53,9 @@ h { display: none; }
 .flip-vertical { transform: scaleY(-1); }
 .modal .asFormWrap .asFakeForm { width: 100%; resize:  unset; }
 
-#jcToplevelContainer a[href*="//"]::after { content: ' →'; margin-left: -2px; }
+a[href^="http://"]::after, #jcToplevelContainer a[href^="https://"]::after { content: ' →'; opacity: .5; }
+a[href^="http://"]:hover::after, #jcToplevelContainer a[href^="https://"]:hover::after { opacity: 1; }
+a[href^="mailto:"]::after { content: ' ✉'; }
 
 .jcMenu { background-color: #fff; cursor: pointer; text-align: center; }
 .jcMenu .jcicon svg { height: 32px; width: 32px; }
