@@ -1579,6 +1579,8 @@ jc.render = {
 				return;
 			}
 			if ( o.editable ) o.editable = { type: 'part', src: o.content, raw: other.raw };
+		} else {
+			if (o.editable) o.editable = true;
 		}
 		jc.render.main(o);
 		jc.render.queue(-1);
