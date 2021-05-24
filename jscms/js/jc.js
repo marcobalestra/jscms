@@ -1326,7 +1326,7 @@ jc.page = {
 		} else {
 			$(document.body).removeClass('jcUserAuth');
 			if ( $menu.hasClass('jcMenuText') ) {
-				$menu.append(`<span class="jcicon">${ AS.icon('lock') }</span><span>${ AS.label('Login') }</span>`);
+				$menu.append(`<span class="jcicon jcUnauth">${ AS.icon('lock') }</span><span>${ AS.label('Login') }</span>`);
 			} else {
 				$menu.append(`<span class="jcicon jcUnauth">${ AS.icon('lock') }</span>`);
 			}
