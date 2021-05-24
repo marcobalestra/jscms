@@ -48,7 +48,7 @@ if ( AS.test.udef(jc.prop.prefs.prefsVersion)) jc.prop.prefs.prefsVersion = 1;
 
 jc.prop.loadModules = {
 	'basic' : [
-		AS.path('jscndroot') + 'css/jc.css',
+		AS.path('jscdn') + 'css/jc.css',
 		{ type:'js', src:'https://cdn.jsdelivr.net/npm/sweetalert2@10'},
 		{ type:'js', src:'https:////cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js'},
 		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
@@ -58,7 +58,7 @@ jc.prop.loadModules = {
 		'wait:()=>( window.Swal && jQuery.fn.select2 )',
 	],
 	'edit' : [
-		AS.path('jscndroot') + '/js/jc-edit'+(jc.prop.isDeveloper?'':'.min')+'.js',
+		AS.path('jscdn') + '/js/jc-edit'+(jc.prop.isDeveloper?'':'.min')+'.js',
 		'https://cdn.altersoftware.org/js-as-form/as-form.js',
 		'wait:()=>( jc.edit && AS.form )',
 	],
