@@ -1103,7 +1103,7 @@ jc.template = {
 			let data = jc.template.prop.partrepo[repo];
 			if ( ! data ) {
 				data = '_loading_';
-				jc.springLoad( AS.path('jsreporoot')+'/part-'+repo+'.js' );
+				jc.springLoad( AS.path('jsreporoot')+'/part-'+repo+(jc.prop.isDeveloper?'':'.min')+'.js' );
 			}
 			if ( data == '_loading_') {
 				window.setTimeout( ()=>{ jc.template.repo.get(repo,callback); }, 100 );
