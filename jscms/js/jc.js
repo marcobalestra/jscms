@@ -57,7 +57,7 @@ jc.prop.loadModules = {
 		'wait:()=>( window.Swal && jQuery.fn.select2 )',
 	],
 	'edit' : [
-		AS.path('jsroot') + '/js/jc-edit.js',
+		AS.path('jsroot') + '/js/jc-edit'+(jc.prop.isDeveloper?'':'.min')+'.js',
 		'https://cdn.altersoftware.org/js-as-form/as-form.js',
 		'wait:()=>( jc.edit && AS.form )',
 	],
@@ -1700,7 +1700,7 @@ jc.render = {
 						$a = $(`<span class="title"></span>`).html(i.title);
 					} else {
 						$a = $(`<a class="title"></a>`).html(i.title);
-						$a.on('click',()=>{ jc.page.open( p, i.id ) });
+						$a.on('click',()=>{ jc.page.open( p, i.id ) }); 
 					}
 					$li.append( $a );
 					if ( d.showdate ) {
