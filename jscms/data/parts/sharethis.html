@@ -54,9 +54,9 @@ $( ()=>{
 		nfix();
 	};
 	if (! $(document.body).data('jcSharingEvent')) $(document.body)
-		.data('jcSharingEvent','usenavbar fix')
 		.on('jc_navbar_prepared', usenavbar )
 		.on('jc_render_end', fix )
+		.data('jcSharingEvent','usenavbar fix')
 	;
 });
 /* ]]> */
