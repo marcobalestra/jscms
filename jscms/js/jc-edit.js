@@ -801,7 +801,7 @@ jc.edit = {
 		}
 		jc.edit.prop.formPlugins.forEach( p => { AS.form.plugin(p); });
 		// Plugins without locales and CSS
-		jc.springLoad( AS.path('jsroot')+'libs/as-form-jcplugins'+(jc.prop.isDeveloper?'':'.min')+'.js' );
+		jc.springLoad( AS.path('jscdn')+'libs/as-form-jcplugins'+(jc.prop.isDeveloper?'':'.min')+'.js' );
 	},
 	getRepository : ( pagetype, callback ) => {
 		if ( AS.test.udef(pagetype)) pagetype = jc.page.current();
