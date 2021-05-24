@@ -1317,7 +1317,7 @@ jc.page = {
 			jc.springLoad('module:edit');
 			$(document.body).addClass('jcUserAuth');
 			if ( $menu.hasClass('jcMenuText') ) {
-				$menu.append(`<span class="jcicon">${ AS.icon('user') }</span><span>${ user }</span>`);
+				$menu.append(`<span class="jcicon">${ AS.icon('user') }</span><span class="jcUser">${ user }</span>`);
 			} else {
 				$menu.append(`<div class="jcicon jcAuth">${ AS.icon('user') }</div><div class="jcUser">${ user }</div>`);
 			}

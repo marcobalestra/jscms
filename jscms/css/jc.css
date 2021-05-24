@@ -62,12 +62,12 @@ a[href^="mailto:"]::after { content: ' ✉'; }
 .jcMenu .jcicon svg { height: 32px; width: 32px; }
 .jcMenu.jcMenuText .jcicon { display: inline-block; margin: -4px 4px; vertical-align: 2px; }
 .jcMenu.jcMenuText .jcicon svg { width: 20px; height: 20px; }
-.jcMenu .jcUnauth { fill: #966; }
-.jcMenu:hover .jcUnauth { fill: #900; }
-.jcMenu .jcAuth { fill: #696; }
-.jcMenu:hover .jcAuth { fill: #090; }
-.jcMenu .jcUser { color: #696; }
-.jcMenu:hover .jcUser { color: #090; }
+.jcMenu:not(.jcMenuText) .jcUnauth { fill: #966; }
+.jcMenu:not(.jcMenuText):hover .jcUnauth { fill: #900; }
+.jcMenu:not(.jcMenuText) .jcAuth { fill: #696; }
+.jcMenu:not(.jcMenuText):hover .jcAuth { fill: #090; }
+.jcMenu:not(.jcMenuText) .jcUser { color: #696; }
+.jcMenu:not(.jcMenuText):hover .jcUser { color: #090; }
 .jcEditable, .jcEditable * { box-sizing: border-box; }
 .jcPlaceHolder { font-weight: bold; font-style: italic; color: #ccc; }
 .jcEditable { border: #ccc dashed 1px; margin: 2px 0; min-height: 30px; min-width: 30px; overflow: auto; overflow: visible; position: relative; }
