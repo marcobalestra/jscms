@@ -44,7 +44,7 @@ $( ()=>{
 		};
 		fix();
 	};
-	if (! $(document.body).data('jcSharingEvent')) $(document.body).data('jcSharingEvent',true).on('jc_render_end',review);
+	if (! $(document.body).data('jcSharingEvent')) $(document.body).data('jcSharingEvent',true).on('jc_render_end',()=>{ window.setTimeout( review, 10); } );
 });
 /* ]]> */
 </script>
