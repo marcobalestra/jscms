@@ -6,6 +6,7 @@ AS.labels.load('en',[{
 	'blockTextAspect' : 'Behavior',
 	'blockType' : 'Content type',
 	'BlocksFromPage' : 'Include contents from:',
+	'BrowserMediaRecorderMissing' : 'This browser cannot record directly audio or video, sorry.',
 	'CantDeleteIndex' : 'The homepage can’t be deleted.',
 	'DeleteThisPage' : 'Delete this page',
 	'editYetItBody' : 'Resume previous edit or restart?',

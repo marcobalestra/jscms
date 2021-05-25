@@ -7,6 +7,7 @@ AS.labels.load('it',[{
 	'blockTextAspect' : 'Aspetto',
 	'blockType' : 'Tipo di contenuto',
 	'BlocksFromPage' : 'Includi i contenuti di:',
+	'BrowserMediaRecorderMissing' : 'Spiacente, ma questo browser bib può registrare direttamente audio o video.',
 	'Cancel' : 'Annulla',
 	'CantDeleteIndex' : 'La homepage non può essere cancellata.',
 	'Caption' : 'Didascalia',

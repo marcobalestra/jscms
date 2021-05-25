@@ -997,7 +997,7 @@ jc.template = {
 		get: ( template, callback ) => {
 			let v = jc.template.prop.info[template];
 			if ( ! v ) {
-				let url = AS.path('jstemplates') + 'info/'+ template + '.js';
+				let url = AS.path('jstemplates') + 'info/'+ template + (jc.prop.isDeveloper?'':'.min')+ '.js';
 				jc.console('jc.template.info.get :',url);
 				jc.template.prop.info[template] = '_loading_';
 				jc.springLoadJs(url);

@@ -778,6 +778,7 @@ jc.edit = {
 		blockTypes : [
 			{type:'text',label:'TextOrHtml',menu:true},
 			{type:'gallery',label:'Gallery',menu:true},
+			{type:'audio',label:'Audio'},
 			{type:'lasts',label:'LastChangedPages'},
 			{type:'subpage',label:'IncludePage'},
 			{type:'part',label:'IncludePagePart'},
@@ -1331,6 +1332,84 @@ jc.edit.meta = {
 };
 
 jc.edit.custom = {
+	audio : {
+		getModal : ( empty ) => {
+			let $mod = jc.edit.getModal(empty);
+			if ( empty ) {
+				$('.modal-dialog',$mod).append(`<div class="modal-content">
+					<div class="modal-header bg-info text-white">
+						<p class="modal-title">
+							<span class="jcicon">${ AS.icon('audio') }</span> 
+							<b>${ AS.label('Audio') }</b>
+						</p>
+						<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
+							<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>
+						</button>
+					</div>
+					<div class="modal-body" id="jcPageAudio"></div></div>`);
+			}
+			return $mod;
+		},
+		add : (b,d) => {
+			const canRecord = (!! window.MediaRecorder);
+			let $mod = jc.edit.custom.audio.getModal(true);
+			if ( canRecord ) {
+				let blob, mediaRecorder;
+				const $audio = $('<audio controls>Your browser doesn’t support audio</audio>');
+				const $bt = $('<button type="button" class="btn btn-primary jcAudioToggler"><span class="jcicon">'+AS.icon('mic')+'</span></button>');
+				const $btp = $('<button type="button" class="btn btn-secondary jcAudioPauser" style="display:none;"><span class="jcicon">'+AS.icon('pause')+'</span></button>');
+				const $hflex = $('<hflex class="wrap"></hflex>');
+				$hflex.append($audio,$bt,$btp)
+				$('.modal-body',$mod).append($hflex);
+				const startRecording = async () => {
+					let chunks = [];
+					const doBlob = () => {
+						if (!chunks.length) return blob = false;
+						return blob = new Blob(chunks, { type: mediaRecorder.mimeType });
+					};
+					let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+					mediaRecorder = new MediaRecorder(stream);
+					mediaRecorder.addEventListener("start", e => {
+						$bt.removeClass('btn-primary btn-danger');
+						$btp.removeClass('btn-secondary btn-warning');
+						$bt.addClass('btn-danger');
+						$('span',$bt).html( AS.icon('stop') );
+						$btp.addClass('btn-secondary').show();
+					});
+					mediaRecorder.addEventListener("dataavailable", e => { if ( e.data) chunks.push(e.data); });
+					mediaRecorder.addEventListener("stop", e => {
+						$bt.removeClass('btn-primary btn-danger');
+						$btp.removeClass('btn-secondary btn-warning');
+						$bt.addClass('btn-primary');
+						$('span',$bt).html( AS.icon('mic') );
+						$btp.hide();
+						stream.getTracks().forEach(track => track.stop());
+						doBlob();
+						if ( blob ) $audio.get(0).src = URL.createObjectURL( blob );
+						mediaRecorder = false;
+					});
+					mediaRecorder.addEventListener("pause", e => {
+						$btp.removeClass('btn-secondary').addClass('btn-warning');
+						doBlob();
+						if ( blob ) $audio.get(0).src = URL.createObjectURL( blob );
+					});
+					mediaRecorder.addEventListener("resume", e => {
+						$btp.removeClass('btn-warning').addClass('btn-secondary');
+					});
+					// Let's receive 300 second chunks
+					mediaRecorder.start(300000);
+				};
+				$bt.on('click',()=>{ if ( mediaRecorder ) { mediaRecorder.stop(); } else { startRecording(); } });
+				$btp.on('click',()=>{ if ( ! mediaRecorder ) return; if ( mediaRecorder.state == 'paused' ) { mediaRecorder.resume(); } else { mediaRecorder.pause(); } });
+			} else {
+				$('.modal-body',$mod).append('<div class="alert alert-warning" role="alert">'+AS.label('BrowserMediaRecorderMissing')+'</div>');
+			}
+			$mod.modal({show:true,keyboard:false});
+		},
+		edit : (b,d) => {
+			
+		},
+	},
 	gallery : {
 		getModal : ( empty ) => {
 			let $mod = jc.edit.getModal(empty);

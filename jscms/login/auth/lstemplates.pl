@@ -2,12 +2,13 @@
 opendir my $dir, "../../templates/info" or die "Cannot open directory: $!";
 my @files = readdir $dir;
 closedir $dir;
-my @l;
+my %L;
 foreach my $f (@files) {
 	next if $f =~ /^\./;
+	next unless $f =~ s/^(.+?)(\.min)?\.js$/$1/;
 	next if -d "$dir/$f";
-	next unless $f =~ s/\.js$//;
 	$f =~ s/"/\\"/g;
-	push @l,'"'.$f.'"';
+	$L{$f}++;
 }
-print join(',',@l);
+@files = map {'"'.$_.'"'} sort { lc($a) cmp lc($b) } keys %L;
+print join(',', @files);
