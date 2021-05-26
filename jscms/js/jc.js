@@ -1678,8 +1678,8 @@ jc.render = {
 					$a.append(`<img src="${ u.uri }" alt="${ u.caption }" />`);
 				}  else {
 					if (u.fb) {
-						if ( u.au ) {
-							$a.append( AS.icon('audio') );
+						if ( u.au || u.vid ) {
+							$a.append( AS.icon(u.au ? 'audio' : 'video') );
 							$a.attr('data-type','iframe');
 							$a.attr('data-src', u.uri );
 							$a.attr('data-download', u.name );
