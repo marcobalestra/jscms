@@ -66,6 +66,6 @@ AS.labels.load('en',[{
 	'Text' : 'Text',
 	'TextOrHtml' : 'Text or HTML',
 	'ThisPage' : 'This page',
-	'UnsupportedAudio' : 'The browser can’t reproduce this audio <tt>{{type|unknown}}</tt><br />In alternative you can <a href="{{uri}}" download="{{name}}"><b>download</b></a> the audio file.',
+	'UnsupportedMedia' : 'The browser can’t reproduce this item <tt>{{type|unknown}}</tt><br />In alternative you can <a href="{{uri}}" download="{{name}}"><b>download it</b></a> as a file.',
 	'WholeSite' : 'The whole site',
 }]);

@@ -1676,9 +1676,15 @@ jc.render = {
 				$a.attr('title',u.caption);
 				if ( u.img ) {
 					$a.append(`<img src="${ u.uri }" alt="${ u.caption }" />`);
-				} else {
+				}  else {
 					if (u.fb) {
 						$a.append( AS.icon('file') );
+						if ( u.au ) {
+							$a.attr('data-type','iframe');
+							$a.attr('data-src', u.uri );
+							$a.attr('data-download', u.name );
+							$a.attr('href', 'javascript:;');
+						}
 					} else {
 						$a.attr('download',u.name);
 						$a.append( AS.icon('downloadPublic') );
@@ -1777,7 +1783,7 @@ jc.render = {
 			if ( ! adata ) return undefined;
 			let $a = $(`<audio src="${ adata.uri }" type="${ adata.type }" download="${ adata.name }" controls="controls">This browser doesn’t support HTML5 audio</audio>`);
 			let $d = $(`<div class="jcAudio"></div>`);
-			$a.on('error',()=>{ $d.html('<div style="max-width:640px;" class="alert alert-warning" role="alert">'+AS.label('UnsupportedAudio',adata)+'</div>') });
+			$a.on('error',()=>{ $d.html('<div style="max-width:640px;" class="alert alert-warning" role="alert">'+AS.label('UnsupportedMedia',adata)+'</div>') });
 			$d.append($a);
 			return $d;
 		},

@@ -112,6 +112,10 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcGallery a:hover svg {  width: 90%; height: 90%; margin: 5%; fill: #336; }
 .jcGallery a span { position: absolute; bottom: 25%; right: 10%; color: #999; border: solid 1px #999; font-size: 75%; background-color : #fff; padding: 0 2px; }
 .jcGallery a:hover span { bottom: 10%; right: 2%; font-size: 100%; border-color: #336; color: #336; }
+.fancybox-slide--iframe .fancybox-content {
+    min-width : 320px;
+    min-height : 320px;
+}
 
 .jcLasts a { cursor: pointer; }
 .jcLastsEntry .title { font-weight: bold; }

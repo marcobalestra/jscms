@@ -1782,7 +1782,9 @@ jc.edit.uploads = {
 					$tr.append('<td></td>');
 					$('td',$tr).append($i);
 				}
-				if ( u.fb ) {
+				if ( u.au ) {
+					$tr.append(`<td class="fn"><a data-type="iframe" data-src="${u.uri}" href="javascript:;" data-fancybox="uploads" data-caption="${u.caption.escape()}">${u.name.escape()}</a></td>`);
+				} else if ( u.fb ) {
 					$tr.append(`<td class="fn"><a href="${u.uri}" data-fancybox="uploads" data-caption="${u.caption.escape()}">${u.name.escape()}</a></td>`);
 				} else {
 					$tr.append('<td class="fn">'+u.name.escape()+'</td>');
