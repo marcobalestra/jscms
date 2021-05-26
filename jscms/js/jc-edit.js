@@ -1,19 +1,50 @@
 /* jc.dav edit extensions */
 
-jc.dav.put = ( url, data, success, fail ) => {
+jc.dav.put = ( url, data, success, fail, progf ) => {
 	fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
 	success = jc.evalFunc(success)||(()=>{});
 	if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
 	jc.console('jc.dav.put',url,data);
-	$.ajax( url, {
+	let progress = ( (data instanceof DataView) && (data.byteLength > 32768) );
+	$.ajax(url,{
+		xhr: ()=>{
+			let xhr = $.ajaxSettings.xhr();
+			if (progress) xhr.upload.onprogress = (e) => {
+				if ( ! e.lengthComputable ) return;
+				if ( AS.test.func(progf) ) {
+					progf.call(window,e.loaded,e.total,(e.loaded/e.total));
+				} else {
+					jc.progress('Upload: '+(parseInt(100*e.loaded/e.total))+'%' );
+				}
+			};
+			return xhr;
+		},
 		method: 'PUT',
 		dataType: 'text',
 		processData: false,  // Important!
 		cache: false,
 		contentType: 'text/plain; charset=UTF-8',
 		data: data,
-		error: (...errs) => { fail.call(window,false,errs); },
-		success : () => { success.call(window,true); }
+		error: (...errs) => {
+			if ( progress ) {
+				if ( AS.test.func(progf) ) {
+					progf.call(window,false);
+				} else {
+					jc.progress();
+				}
+			}
+			fail.call(window,false,errs);
+		},
+		success : () => {
+			if ( progress ) {
+				if ( AS.test.func(progf) ) {
+					progf.call(window,true);
+				} else {
+					jc.progress();
+				}
+			}
+			success.call(window,true);
+		}
 	});
 };
 jc.dav.mkdir = ( url, success, fail ) => {
