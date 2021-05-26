@@ -1660,7 +1660,6 @@ jc.render = {
 			return div;
 		},
 		gallery : (b,d,pdata) => {
-// 			let pdata = jc.page.data().pageContent;
 			if ( ! (AS.test.arr(d[b.prop]) && d[b.prop].length ) ) return '';
 			let gid = AS.generateId('jcGallery');
 			let $div = $('<div class="jcGallery"></div>');
@@ -1787,6 +1786,16 @@ jc.render = {
 			let $d = $(`<div class="jcAudio"></div>`);
 			$a.on('error',()=>{ $d.html('<div style="max-width:640px;" class="alert alert-warning" role="alert">'+AS.label('UnsupportedMedia',adata)+'</div>') });
 			$d.append($a);
+			return $d;
+		},
+		video : (b,d,pdata) => {
+			if ( AS.test.udef(d[b.prop]) || ( ! AS.test.obj(d[b.prop]) ) || (! d[b.prop].uri ) ) return undefined;
+			let vdata = pdata.uploads.find( x => ( x.uri == d[b.prop].uri ));
+			if ( ! vdata ) return undefined;
+			let $v = $(`<video src="${ vdata.uri }" type="${ vdata.type }" download="${ vdata.name }" controls="controls">This browser doesn’t support HTML5 video</video>`);
+			let $d = $(`<div class="jcVideo"></div>`);
+			$v.on('error',()=>{ $d.html('<div style="max-width:640px;" class="alert alert-warning" role="alert">'+AS.label('UnsupportedMedia',vdata)+'</div>') });
+			$d.append($v);
 			return $d;
 		},
 	},

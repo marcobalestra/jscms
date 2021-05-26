@@ -785,8 +785,8 @@ jc.page.uploadBlob = (blob,...args) => {
 		else if ( AS.test.obj(a) ) options = a;
 	} );
 	if ( AS.test.udef(info) ) info = {};
-	let prevuri = info.uri;
 	if ( AS.test.udef(options) ) options = {};
+	let prevuri = info.uri;
 	const page = options.page||jc.page.current();
 	let pdata = jc.page.data().pageContent;
 	const id = options.id||pdata.id;
@@ -797,8 +797,8 @@ jc.page.uploadBlob = (blob,...args) => {
 		if ( AS.test.func(callback)) callback.call(window,false,uploads);
 		return;
 	}
-	if ( blob.type ) info.type = blob.type;
-	if ( ! info.type ) info.type = 'application/octet-stream';
+	if ( blob.type && blob.type.length ) info.type = blob.type;
+	if ( ! info.type ) info.type = options.type||'application/octet-stream';
 	if ( (! info.ext) && blob.name ) info.ext = blob.name.replace(/^.*\.([^.]+)$/,"$1").toLowerCase();
 	if ( (! info.ext) && info.type ) info.ext = info.type.replace(/^[^\/]+\/([^ ;]+).*$/,"$1").toLowerCase();
 	if ( info.type.indexOf('audio/')==0) info.fb =info.au = true;
@@ -827,6 +827,7 @@ jc.page.uploadBlob = (blob,...args) => {
 		});
 		return;
 	}
+	uploads = uploads.filter( x => ( x.uri != info.uri) );
 	info.added = (new Date()).getTime();
 	if ( ! info.caption ) info.caption = options.caption ? options.caption : info.name.replace(/^(.*)\.[^.]+$/,"$1").replace(/[._ -]+/g,' ').trim();
 	blob.arrayBuffer().then( buffer => {
@@ -871,6 +872,7 @@ jc.page.rmUpload = ( item, callback ) => {
 		return n;
 	}
 	let pdata = recurse(jc.page.data().pageContent);
+	jc.page.data().pageContent.uploads.splice(0).push(...pdata.uploads);
 	jc.page.save( {
 		data : pdata,
 		page: jc.page.current(),
@@ -893,7 +895,8 @@ jc.edit = {
 		blockTypes : [
 			{type:'text',label:'TextOrHtml',menu:true},
 			{type:'gallery',label:'Gallery',menu:true},
-			{type:'audio',label:'Audio',menu:true},
+			{type:'audio',label:'Audio'},
+			{type:'video',label:'Video'},
 			{type:'lasts',label:'LastChangedPages'},
 			{type:'subpage',label:'IncludePage'},
 			{type:'part',label:'IncludePagePart'},
@@ -1464,7 +1467,7 @@ jc.edit.custom = {
 					<div class="modal-body" id="jcPageAudio"></div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" onclick="jc.edit.noModal()">${ AS.label('Cancel') }</button>
-						<button type="button" disabled="disabled" class="btn btn-primary jcAudioSaver">${ AS.label('Save') }</button>
+						<button type="button" disabled="disabled" class="btn btn-primary jcMediaSaver">${ AS.label('Save') }</button>
 					</div>
 				</div>`);
 			}
@@ -1476,7 +1479,7 @@ jc.edit.custom = {
 			if (prevb) prevd = prevb.uri ? prevb : prevb.audio;
 			let pdata = jc.page.data().pageContent;
 			if ( pdata.uploads && pdata.uploads.filter( x => (x.au && ((!prevd)||(x.uri!=prevd.uri)) ) ).length ) {
-				let $sa = $('<div class="jcAudioSelectArea"></div>');
+				let $sa = $('<div class="jcMediaSelectArea"></div>');
 				let $s = $('<select></select>');
 				let preva = prevd ? pdata.uploads.find( x => ( x.uri == prevd.uri) ) : false;
 				$s.append('<option value="">'+(preva ? '['+preva.ext+': '+preva.caption+']' : AS.label('Choose')+'…')+'</option>');
@@ -1485,21 +1488,21 @@ jc.edit.custom = {
 				} );
 				$sa.on('change',()=>{
 					let issel = $s.val().length;
-					$('.jcRecorderArea, .jcAudioUploadArea',$mod).toggle(! issel);
-					$('.jcAudioSaver',$mod).attr('disabled',!issel);
+					$('.jcMediaRecordArea, .jcMediaUploadArea',$mod).toggle(! issel);
+					$('.jcMediaSaver',$mod).attr('disabled',!issel);
 				});
 				const $hflex = $('<hflex class="wrap"></hflex>');
 				$hflex.append(`<div>${ AS.label('ChooseAudio')}:</div>`,$s);
 				$('.modal-body',$mod).append($sa.append($hflex));
 			}
-			let $ra = $('<div class="jcRecorderArea"></div>');
+			let $ra = $('<div class="jcMediaRecordArea"></div>');
 			if ( $ra ) {
 				if ( canRecord ) {
 					let chunks=[],mediaRecorder;
 					const $audio = $('<audio src="" controls="controls">This browser doesn’t support HTML5 audio</audio>');
-					const $bt = $('<button type="button" class="btn btn-primary jcAudioToggler"><span class="jcicon">'+AS.icon('mic')+'</span></button>');
-					const $btd = $('<button type="button" class="btn btn-danger jcAudioDeleter" disabled="disabled"><span class="jcicon">'+AS.icon('editRemove')+'</span></button>');
-					const $btp = $('<button type="button" class="btn btn-secondary jcAudioPauser ml-2" style="display:none;"><span class="jcicon">'+AS.icon('pause')+'</span></button>');
+					const $bt = $('<button type="button" class="btn btn-primary jcMediaToggler"><span class="jcicon">'+AS.icon('mic')+'</span></button>');
+					const $btd = $('<button type="button" class="btn btn-danger jcMediaDeleter" disabled="disabled"><span class="jcicon">'+AS.icon('editRemove')+'</span></button>');
+					const $btp = $('<button type="button" class="btn btn-secondary jcMediaPauser ml-2" style="display:none;"><span class="jcicon">'+AS.icon('pause')+'</span></button>');
 					const $hflex = $('<hflex class="wrap"></hflex>');
 					if ( AS.test.obj(prevd) && prevd.uri ) {
 						$audio.attr('src',prevd.uri);
@@ -1514,42 +1517,78 @@ jc.edit.custom = {
 							if ( mediaRecorder && mediaRecorder.state && (mediaRecorder.state == 'paused') ) {
 								// do nothing
 							} else {
-								$('.jcAudioSaver, .jcAudioDeleter',$mod).attr('disabled',false);
+								$('.jcMediaSaver, .jcMediaDeleter',$mod).attr('disabled',false);
 								mediaRecorder = false;
 							}
 						} else {
 							$audio.get(0).src = '';
-							$('.jcAudioSaver, .jcAudioDeleter',$mod).attr('disabled',true);
+							$('.jcMediaSaver, .jcMediaDeleter',$mod).attr('disabled',true);
 						}
-						$('.jcAudioSelectArea, .jcAudioUploadArea',$mod).toggle(! blob);
+						$('.jcMediaSelectArea, .jcMediaUploadArea',$mod).toggle(! blob);
 					};
 					const doBlob = () => {
 						if (!chunks.length) return blob = false;
 						return blob = new Blob(chunks, { type: mediaRecorder.mimeType });
 					};
 					const startRecording = async () => {
+						let e;
 						chunks = [];
-						let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-						mediaRecorder = new MediaRecorder(stream);
+						let supported = {};
+						let constraints = {};
+						try { supported = navigator.mediaDevices.getSupportedConstraints(); } catch(e) {}
+						constraints.audio = {};
+						constraints.video = false;
+						if ( supported.latency ) constraints.latency = constraints.audio.latency = { ideal: 0 };
+						if ( supported.channelCount ) constraints.channelCount = constraints.audio.channelCount = { ideal: 1 };
+						if ( supported.sampleSize ) constraints.sampleSize = constraints.audio.sampleSize = { ideal: 8, max: 16 };
+						if ( supported.noiseSuppression ) constraints.noiseSuppression = constraints.audio.noiseSuppression = { ideal: true };
+						if ( supported.echoCancellation ) constraints.echoCancellation = constraints.audio.echoCancellation = { ideal: true };
+						if ( supported.sampleRate ) constraints.sampleRate = constraints.audio.sampleRate = { min: 16000, ideal: 32000, max: 48000  };
+						if ( ! Object.keys(constraints.audio).length ) constraints.audio = true;
+						let stream;
+						while ( ! stream ) {
+							try {
+								stream = await navigator.mediaDevices.getUserMedia(constraints);
+							} catch(e) {
+								delete constraints[e.constraint];
+								if ( AS.test.obj(constraints.audio)) delete constraints.audio[e.constraint];
+								if ( ! Object.keys(constraints.audio).length ) constraints.audio = true;
+							}
+						}
+						let options = { mimeType: 'audio/mp4"', audioBitsPerSecond : 9600 };
+						try {
+							mediaRecorder = new MediaRecorder(stream,options);
+						} catch(e) {
+							delete options.mimeType;
+							try {
+								mediaRecorder = new MediaRecorder(stream,options);
+							} catch(e) {
+								mediaRecorder = new MediaRecorder(stream);
+							}
+						}
 						mediaRecorder.addEventListener("start", e => {
 							$bt.removeClass('btn-primary').addClass('btn-danger');
 							if ( mediaRecorder.pause ) $btp.removeClass('btn-warning').addClass('btn-secondary').show();
-							$('.jcAudioSaver, .jcAudioDeleter',$mod).attr('disabled',true);
+							$('.jcMediaSaver, .jcMediaDeleter',$mod).attr('disabled',true);
 							$('span',$bt).html( AS.icon('stop') );
+							$ra.addClass('recording');
 						});
 						mediaRecorder.addEventListener("dataavailable", e => { if ( e.data) chunks.push(e.data); });
 						mediaRecorder.addEventListener("stop", e => {
 							$bt.removeClass('btn-danger').addClass('btn-primary');
 							if ( mediaRecorder.pause ) $btp.removeClass('btn-warning').addClass('btn-secondary').hide();
+							$ra.removeClass('recording');
 							$('span',$bt).html( AS.icon('mic') );
 							stream.getTracks().forEach(track => track.stop());
 							doPreview();
 						});
 						mediaRecorder.addEventListener("pause", e => {
+							$ra.removeClass('recording');
 							$btp.removeClass('btn-secondary').addClass('btn-warning');
 							doPreview();
 						});
 						mediaRecorder.addEventListener("resume", e => {
+							$ra.addClass('recording');
 							$btp.removeClass('btn-warning').addClass('btn-secondary');
 						});
 						mediaRecorder.start(300000);
@@ -1562,23 +1601,24 @@ jc.edit.custom = {
 				}
 				$('.modal-body',$mod).append($ra);
 			}
-			let $ua = $(`<div class="jcAudioUploadArea"></div>`);
+			let $ua = $(`<div class="jcMediaUploadArea"></div>`);
 			if ( $ua ) {
-				let $uf = $('<input type="file" class="jcAudioUploadField" accept="audio/*" />');
+				let $uf = $('<input type="file" class="jcMediaUploadField" accept="audio/*" />');
 				const $hflex = $('<hflex class="wrap"></hflex>');
 				$hflex.append(`<div>${ AS.label('ChooseAudio')}:</div>`,$uf);
 				$uf.on('change',()=>{
 					let issel = $uf.val().length;
-					$('.jcRecorderArea, .jcAudioSelectArea',$mod).toggle(! issel);
-					$('.jcAudioSaver',$mod).attr('disabled',!issel);
+					$('.jcMediaRecordArea, .jcMediaSelectArea',$mod).toggle(! issel);
+					$('.jcMediaSaver',$mod).attr('disabled',!issel);
 				});
 				$('.modal-body',$mod).append($ua.append($hflex));
 			}
 			$mod.on('shown.bs.modal',()=>{
-				$('button.jcAudioSaver',$mod).on('click',()=>{
-					if ( (! blob) && $('.jcAudioUploadField').val().length ) blob = $('.jcAudioUploadField').get(0).files[0];
+				$('button.jcMediaSaver',$mod).on('click',()=>{
+					if ( (! blob) && $('.jcMediaUploadField').val().length ) blob = $('.jcMediaUploadField').get(0).files[0];
 					if ( blob ) {
-						jc.page.uploadBlob( blob,(prevd||{}),( news, uploads )=>{
+						let options = { type: 'audio/webm' };
+						jc.page.uploadBlob( blob,(prevd||{}),options,( news, uploads )=>{
 							let na = news[0];
 							if (! na ) return;
 							let nd = { type: 'audio', audio: { uri: na.uri } };
@@ -1586,9 +1626,9 @@ jc.edit.custom = {
 						});
 						return;
 					}
-					if ( $('.jcAudioSelectArea select',$mod).val().length ) {
+					if ( $('.jcMediaSelectArea select',$mod).val().length ) {
 						let finalize = () => {
-							let nd = { type: 'audio', audio: { uri: $('.jcAudioSelectArea select',$mod).val() } };
+							let nd = { type: 'audio', audio: { uri: $('.jcMediaSelectArea select',$mod).val() } };
 							jc.edit.custom.audio.save(b,d,nd,prevb);
 						};
 						if ( prevd && prevd.uri && prevd.uri.length ) {
@@ -1602,6 +1642,224 @@ jc.edit.custom = {
 			$mod.modal({show:true,keyboard:false});
 		},
 		edit : (b,d) => { jc.edit.custom.audio.add(b,d,d[b.prop][b._.idx]); },
+		save : (b,d,newd,oldd) => {
+			if ( AS.test.obj(oldd) ) {
+				d[b.prop].splice( b._.idx, 1, newd );
+			} else {
+				if ( b._ && AS.test.def(b._.qt)) {
+					d[b.prop].splice( b._.idx, 1, d[b.prop][b._.idx], newd );
+				} else {
+					if ( ! AS.test.arr(d[b.prop])) d[b.prop] = [];
+					d[b.prop].push(newd);
+				}
+			}
+			jc.edit.fixBlocks(b,d);
+			jc.edit.noModal();
+			jc.page.reload();
+		},
+	},
+	video : {
+		getModal : ( empty ) => {
+			let $mod = jc.edit.getModal(empty);
+			if ( empty ) {
+				$('.modal-dialog',$mod).append(`<div class="modal-content">
+					<div class="modal-header bg-info text-white">
+						<p class="modal-title">
+							<span class="jcicon">${ AS.icon('video') }</span> 
+							<b>${ AS.label('Video') }</b>
+						</p>
+						<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
+							<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>
+						</button>
+					</div>
+					<div class="modal-body" id="jcPageVideo"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" onclick="jc.edit.noModal()">${ AS.label('Cancel') }</button>
+						<button type="button" disabled="disabled" class="btn btn-primary jcMediaSaver">${ AS.label('Save') }</button>
+					</div>
+				</div>`);
+			}
+			return $mod;
+		},
+		add : (b,d,prevb) => {
+			const canRecord = (!! window.MediaRecorder);
+			let prevd, blob,$mod = jc.edit.custom.video.getModal(true);
+			if (prevb) prevd = prevb.uri ? prevb : prevb.video;
+			let pdata = jc.page.data().pageContent;
+			if ( pdata.uploads && pdata.uploads.filter( x => (x.vid && ((!prevd)||(x.uri!=prevd.uri)) ) ).length ) {
+				let $sa = $('<div class="jcMediaSelectArea"></div>');
+				let $s = $('<select></select>');
+				let preva = prevd ? pdata.uploads.find( x => ( x.uri == prevd.uri) ) : false;
+				$s.append('<option value="">'+(preva ? '['+preva.ext+': '+preva.caption+']' : AS.label('Choose')+'…')+'</option>');
+				pdata.uploads.filter( x => (x.vid && ((!prevd)||(x.uri!=prevd.uri)) ) ).forEach( u => {
+					$s.append(`<option value="${ u.uri }">${u.ext}: ${ u.caption }</option>`);
+				} );
+				$sa.on('change',()=>{
+					let issel = $s.val().length;
+					$('.jcMediaRecordArea, .jcMediaUploadArea',$mod).toggle(! issel);
+					$('.jcMediaSaver',$mod).attr('disabled',!issel);
+				});
+				const $hflex = $('<hflex class="wrap"></hflex>');
+				$hflex.append(`<div>${ AS.label('ChooseVideo')}:</div>`,$s);
+				$('.modal-body',$mod).append($sa.append($hflex));
+			}
+			let $ra = $('<div class="jcMediaRecordArea"></div>');
+			if ( $ra ) {
+				if ( canRecord ) {
+					let chunks=[],mediaRecorder;
+					const $video = $('<video src="" style="max-height:'+parseInt($(window).height() -300)+'px;" controls="controls">This browser doesn’t support HTML5 video</video>');
+					const $bt = $('<button type="button" class="btn btn-primary jcMediaToggler"><span class="jcicon">'+AS.icon('video')+'</span></button>');
+					const $btd = $('<button type="button" class="btn btn-danger jcMediaDeleter" disabled="disabled"><span class="jcicon">'+AS.icon('editRemove')+'</span></button>');
+					const $btp = $('<button type="button" class="btn btn-secondary jcMediaPauser ml-2" style="display:none;"><span class="jcicon">'+AS.icon('pause')+'</span></button>');
+					const $hflex = $('<hflex class="wrap"></hflex>');
+					if ( AS.test.obj(prevd) && prevd.uri ) {
+						$video.attr('src',prevd.uri);
+						$btd.attr('disabled',false);
+					}
+					$hflex.append(`<div>${ AS.label('RecordVideo')}:</div>`,$video,$('<div class="btn-group"></div>').append($bt,$btd),$btp);
+					$ra.append($hflex);
+					const doPreview = () => {
+						doBlob();
+						if ( blob ) {
+							if ( mediaRecorder && mediaRecorder.state && (mediaRecorder.state == 'paused') ) {
+								// do nothing
+							} else {
+								$('.jcMediaSaver, .jcMediaDeleter',$mod).attr('disabled',false);
+								mediaRecorder = false;
+							}
+						} else {
+							$video.get(0).src = null;
+							$('.jcMediaSaver, .jcMediaDeleter',$mod).attr('disabled',true);
+						}
+						$('.jcMediaSelectArea, .jcMediaUploadArea',$mod).toggle(! blob);
+					};
+					const doBlob = () => {
+						if (!chunks.length) return blob = false;
+						return blob = new Blob(chunks, { type: mediaRecorder.mimeType });
+					};
+					const startRecording = async () => {
+						chunks = [];
+						let e;
+						let supported = {};
+						let constraints = {};
+						try { supported = navigator.mediaDevices.getSupportedConstraints(); } catch(e) {}
+						constraints.audio = {};
+						constraints.video = {};
+						if ( supported.latency ) constraints.latency = constraints.audio.latency = { ideal: 0 };
+						if ( supported.channelCount ) constraints.channelCount = constraints.audio.channelCount = { ideal: 1 };
+						if ( supported.sampleSize ) constraints.sampleSize = constraints.audio.sampleSize = { ideal: 8, max: 16 };
+						if ( supported.noiseSuppression ) constraints.noiseSuppression = constraints.audio.noiseSuppression = { ideal: true };
+						if ( supported.echoCancellation ) constraints.echoCancellation = constraints.audio.echoCancellation = { ideal: true };
+						if ( supported.sampleRate ) constraints.sampleRate = constraints.audio.sampleRate = { min: 16000, ideal: 32000, max: 48000  };
+						if ( supported.width ) constraints.width = constraints.video.width = { min: 480, ideal: 640, max: 1280 };
+						if ( supported.height ) constraints.height = constraints.video.height = { min: 270, ideal: 304, max: 720 };
+						if ( supported.aspectRatio ) constraints.aspectRatio = constraints.video.aspectRatio = { ideal: (16/9) };
+						if ( supported.frameRate) constraints.frameRate = constraints.video.frameRate = { min:10, ideal: 15, max: 30 };
+						if ( supported.facingMode) constraints.facingMode = constraints.video.facingMode = { exact: "user" };
+						if ( ! Object.keys(constraints.audio).length ) constraints.audio = true;
+						if ( ! Object.keys(constraints.video).length ) constraints.video = true;
+						let stream;
+						while ( ! stream ) {
+							try {
+								stream = await navigator.mediaDevices.getUserMedia(constraints);
+							} catch(e) {
+								console.log(e);
+								delete constraints[e.constraint];
+								if ( AS.test.obj(constraints.video)) delete constraints.video[e.constraint];
+								if ( AS.test.obj(constraints.audio)) delete constraints.audio[e.constraint];
+								if ( ! Object.keys(constraints.audio).length ) constraints.audio = true;
+								if ( ! Object.keys(constraints.video).length ) constraints.video = true;
+							}
+						}
+						let options = { mimeType: 'video/mp4"', audioBitsPerSecond : 9600, videoBitsPerSecond : 640000 };
+						try {
+							mediaRecorder = new MediaRecorder(stream,options);
+						} catch(e) {
+							options = { mimeType: 'video/webm;codecs="opus,vp8"' };
+							try {
+								mediaRecorder = new MediaRecorder(stream,options);
+							} catch(e) {
+								mediaRecorder = new MediaRecorder(stream);
+							}
+						}
+						mediaRecorder.addEventListener("start", e => {
+							$bt.removeClass('btn-primary').addClass('btn-danger');
+							if ( mediaRecorder.pause ) $btp.removeClass('btn-warning').addClass('btn-secondary').show();
+							$('.jcMediaSaver, .jcMediaDeleter',$mod).attr('disabled',true);
+							$('span',$bt).html( AS.icon('stop') );
+							$ra.addClass('recording');
+						});
+						mediaRecorder.addEventListener("dataavailable", e => { if ( e.data) chunks.push(e.data); });
+						mediaRecorder.addEventListener("stop", e => {
+							$bt.removeClass('btn-danger').addClass('btn-primary');
+							if ( mediaRecorder.pause ) $btp.removeClass('btn-warning').addClass('btn-secondary').hide();
+							$('span',$bt).html( AS.icon('video') );
+							$ra.removeClass('recording');
+							stream.getTracks().forEach(track => track.stop());
+							doPreview();
+						});
+						mediaRecorder.addEventListener("pause", e => {
+							$btp.removeClass('btn-secondary').addClass('btn-warning');
+							$ra.removeClass('recording');
+							doPreview();
+						});
+						mediaRecorder.addEventListener("resume", e => {
+							$ra.addClass('recording');
+							$btp.removeClass('btn-warning').addClass('btn-secondary');
+						});
+						mediaRecorder.start(300000);
+					};
+					$bt.on('click',()=>{ if ( mediaRecorder ) { mediaRecorder.stop(); } else { startRecording(); } });
+					$btp.on('click',()=>{ if ( ! mediaRecorder ) return; if ( mediaRecorder.state == 'paused' ) { mediaRecorder.resume(); } else { mediaRecorder.pause(); } });
+					$btd.on('click',()=>{ if ( mediaRecorder ) return; chunks=[]; doPreview(); });
+				} else {
+					$ra.append('<div class="alert alert-warning" role="alert">'+AS.label('BrowserMediaRecorderMissing')+'</div>');
+				}
+				$('.modal-body',$mod).append($ra);
+			}
+			let $ua = $(`<div class="jcMediaUploadArea"></div>`);
+			if ( $ua ) {
+				let $uf = $('<input type="file" class="jcMediaUploadField" accept="video/*" />');
+				const $hflex = $('<hflex class="wrap"></hflex>');
+				$hflex.append(`<div>${ AS.label('ChooseVideo')}:</div>`,$uf);
+				$uf.on('change',()=>{
+					let issel = $uf.val().length;
+					$('.jcMediaRecordArea, .jcMediaSelectArea',$mod).toggle(! issel);
+					$('.jcMediaSaver',$mod).attr('disabled',!issel);
+				});
+				$('.modal-body',$mod).append($ua.append($hflex));
+			}
+			$mod.on('shown.bs.modal',()=>{
+				$('button.jcMediaSaver',$mod).on('click',()=>{
+					if ( (! blob) && $('.jcMediaUploadField').val().length ) blob = $('.jcMediaUploadField').get(0).files[0];
+					if ( blob ) {
+						let options = { type: 'video/webm' };
+						let pd = {};
+						if ( prevd ) pd.uri = prevd.uri;
+						jc.page.uploadBlob( blob,pd,options,( news, uploads )=>{
+							let na = news[0];
+							if (! na ) return;
+							let nd = { type: 'video', video: { uri: na.uri } };
+							jc.edit.custom.video.save(b,d,nd,prevb);
+						});
+						return;
+					}
+					if ( $('.jcMediaSelectArea select',$mod).val().length ) {
+						let finalize = () => {
+							let nd = { type: 'video', video: { uri: $('.jcMediaSelectArea select',$mod).val() } };
+							jc.edit.custom.video.save(b,d,nd,prevb);
+						};
+						if ( prevd && prevd.uri && prevd.uri.length ) {
+							jc.page.rmUpload( prevd, finalize );
+						} else {
+							finalize();
+						}
+					}
+				});
+			});
+			$mod.modal({show:true,keyboard:false});
+		},
+		edit : (b,d) => { jc.edit.custom.video.add(b,d,d[b.prop][b._.idx]); },
 		save : (b,d,newd,oldd) => {
 			if ( AS.test.obj(oldd) ) {
 				d[b.prop].splice( b._.idx, 1, newd );

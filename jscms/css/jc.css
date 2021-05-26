@@ -124,6 +124,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcLastsEntry .time::before { content: ', '; }
 
 .jcAudio audio { width: 80%; height: 64px; margin: 10px 10%; }
+.jcVideo video { max-width: 90%; margin: 10px auto; display: block; }
 
 #jcSharingPanel { align-items: start; border-top: 1px solid #ddd; display: flex; flex-wrap: wrap; justify-content: center; margin: 24px 0; padding: 8px; }
 #jcToplevelContainer #jcSharingPanel > a::after { content: ''; }
@@ -145,8 +146,10 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcNavbar .jcNavSharing .dropdown-menu .jcicon { fill: #999; margin-right: 12px; }
 
 #jcPageAudio > div { margin: 1em 0; }
-#jcPageAudio audio { width: 300px; height: 38px; }
-#jcPageAudio audio[src=""] { opacity: .5; }
+.jcMediaRecordArea audio { width: 300px; height: 38px; display: block; }
+.jcMediaRecordArea audio[src=""] { opacity: .5; }
+.jcMediaRecordArea video { max-width: 100%; display: block; }
+.jcMediaRecordArea.recording video, .jcMediaRecordArea.recording audio { opacity: .3; background-color : #c00; }
 
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }
