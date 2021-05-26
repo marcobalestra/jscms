@@ -706,8 +706,10 @@ jc.page.upload = (fld,...args) => {
 				if ( result ) {
 					let no = { name: oname, ext: ext, uri: url, size: tf.size, type: tf.type, added: (new Date()).getTime() };
 					if ( no.type && no.type.length ) {
-						if (no.type.match(/^image\//) ) no.img = true;
-						if (no.img||no.type.match(/\/pdf$/)  ) no.fb = true;
+						if ( no.type.indexOf('audio/')==0) no.fb = no.au = true;
+						else if ( no.type.indexOf('video/')==0) no.fb = no.vid = true;
+						else if ( no.type.indexOf('image/')==0) no.fb = no.img = true;
+						else if ( no.type.match(/\/pdf$/) ) no.fb = true;
 					} else {
 						no.type = 'application/octet-stream';
 					}
@@ -744,6 +746,83 @@ jc.page.upload = (fld,...args) => {
 	process();
 };
 
+jc.page.uploadBlob = (blob,...args) => {
+	let options,callback,info;
+	args.forEach( (a) => {
+		if ( AS.test.func(a) ) callback = a;
+		else if ( AS.test.obj(a) && a.uri ) info = a;
+		else if ( AS.test.obj(a) ) options = a;
+	} );
+	if ( AS.test.udef(info) ) info = {};
+	let prevuri = info.uri;
+	if ( AS.test.udef(options) ) options = {};
+	const page = options.page||jc.page.current();
+	let pdata = jc.page.data().pageContent;
+	const id = options.id||pdata.id;
+	let uploads = AS.def.arr( pdata.uploads );
+	if ( options.purged ) uploads = uploads.filter( x => ( x.uri != options.purged ));
+	if ( blob.size ) info.size = blob.size;
+	if ( blob.type ) info.type = blob.type;
+	if ( ! info.type ) info.type = 'application/octet-stream';
+	if ( (! info.ext) && blob.name ) info.ext = blob.name.replace(/^.*\.([^.]+)$/,"$1").toLowerCase();
+	if ( (! info.ext) && info.type ) info.ext = info.type.replace(/^[^\/]+\/([^ ;]+).*$/,"$1").toLowerCase();
+	if ( info.type.indexOf('audio/')==0) info.fb =info.au = true;
+	else if ( info.type.indexOf('video/')==0) info.fb = info.vid = true;
+	else if ( info.type.indexOf('image/')==0) info.fb = info.img = true;
+	else if ( info.type.match(/\/pdf$/) ) info.fb = true;
+	let news=[];
+	if ( info.name ) {
+		info.name = info.name.replace(/\.[^.]+$/,'')+'.'+info.ext;
+	} else if ( blob.name ) {
+		info.name = blob.name;
+	} else {
+		info.name = info.type.replace(/\/.*/,'') +'_'+((new Date()).tosqldate().replace(/[^0-9]+/g,'-'))+'.'+info.ext;
+		if ( ! info.caption ) info.caption = options.caption || ( info.type.replace(/\/.*/,'') +' '+(new Date()).tosql() );
+	}
+	if ( ! info.caption ) info.caption = options.caption || info.name.replace(/^(.*)\.[^.]+$/,"$1").replace(/[._-]+/g,' ');
+	if ( info.uri && (info.uri.indexOf(AS.path('jsdataroot'))==0) ) {
+		info.uri = info.uri.replace(/\.[^.]+$/,'.'+info.ext);
+	} else {
+		info.uri = AS.path('jsdataroot') + 'uploads/' + AS.generateId(page+(id||''))+'.'+info.ext;
+	}
+	if ( prevuri && ( info.uri != prevuri ) && (! options.purged)) {
+		jc.page.rmUpload( { uri: prevuri }, ()=>{
+			options.purged = prevuri;
+			jc.page.uploadBlob( blob, info, options, callback );
+		});
+		return;
+	}
+	info.added = (new Date()).getTime();
+	if ( ! info.caption ) info.caption = options.caption ? options.caption : info.name.replace(/^(.*)\.[^.]+$/,"$1").replace(/[._ -]+/g,' ').trim();
+	blob.arrayBuffer().then( buffer => {
+		let binary = new DataView(buffer);
+		jc.dav.put( info.uri, binary, (result)=>{
+			if ( result ) {
+				uploads.push( info );
+				news.push( info );
+			}
+			const sortf = (a,b)=>(a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1 );
+			uploads.sort(sortf);
+			news.sort(sortf);
+			pdata.uploads = uploads;
+			let params = {
+				data : pdata,
+				page: page,
+				noLasts : true,
+				noFullList : true,
+				noDialog : true,
+				mute : !! options.mute,
+				callback : ()=>{
+					if ( ! options.mute ) jc.progress();
+					if ( AS.test.func(callback)) callback.call(window,news,uploads);
+				}
+			}
+			if (AS.test.def(id)) params.id = id;
+			jc.page.save( params );
+		});
+	});
+};
+
 jc.page.rmUpload = ( item, callback ) => {
 	let recurse = (n) => {
 		if ( AS.test.arr(n) ) {
@@ -763,6 +842,7 @@ jc.page.rmUpload = ( item, callback ) => {
 		id: jc.page.data().pageContent.id,
 		noLasts : true,
 		noFullList : true,
+		mute : true,
 		noDialog : true,
 		callback : ()=>{ jc.dav.rm( item.uri,()=>{
 			jc.progress();
@@ -778,7 +858,7 @@ jc.edit = {
 		blockTypes : [
 			{type:'text',label:'TextOrHtml',menu:true},
 			{type:'gallery',label:'Gallery',menu:true},
-			{type:'audio',label:'Audio'},
+			{type:'audio',label:'Audio',menu:true},
 			{type:'lasts',label:'LastChangedPages'},
 			{type:'subpage',label:'IncludePage'},
 			{type:'part',label:'IncludePagePart'},
@@ -1346,68 +1426,161 @@ jc.edit.custom = {
 							<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>
 						</button>
 					</div>
-					<div class="modal-body" id="jcPageAudio"></div></div>`);
+					<div class="modal-body" id="jcPageAudio"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" onclick="jc.edit.noModal()">${ AS.label('Cancel') }</button>
+						<button type="button" disabled="disabled" class="btn btn-primary jcAudioSaver">${ AS.label('Save') }</button>
+					</div>
+				</div>`);
 			}
 			return $mod;
 		},
-		add : (b,d) => {
+		add : (b,d,prevb) => {
 			const canRecord = (!! window.MediaRecorder);
-			let $mod = jc.edit.custom.audio.getModal(true);
-			if ( canRecord ) {
-				let blob, mediaRecorder;
-				const $audio = $('<audio controls>Your browser doesn’t support audio</audio>');
-				const $bt = $('<button type="button" class="btn btn-primary jcAudioToggler"><span class="jcicon">'+AS.icon('mic')+'</span></button>');
-				const $btp = $('<button type="button" class="btn btn-secondary jcAudioPauser" style="display:none;"><span class="jcicon">'+AS.icon('pause')+'</span></button>');
+			let prevd, blob,$mod = jc.edit.custom.audio.getModal(true);
+			if (prevb) prevd = prevb.uri ? prevb : prevb.audio;
+			let pdata = jc.page.data().pageContent;
+			if ( pdata.uploads && pdata.uploads.filter( x => (x.au && ((!prevd)||(x.uri!=prevd.uri)) ) ).length ) {
+				let $sa = $('<div class="jcAudioSelectArea"></div>');
+				let $s = $('<select></select>');
+				let preva = prevd ? pdata.uploads.find( x => ( x.uri == prevd.uri) ) : false;
+				$s.append('<option value="">'+(preva ? '['+preva.ext+': '+preva.caption+']' : AS.label('Choose')+'…')+'</option>');
+				pdata.uploads.filter( x => (x.au && ((!prevd)||(x.uri!=prevd.uri)) ) ).forEach( u => {
+					$s.append(`<option value="${ u.uri }">${u.ext}: ${ u.caption }</option>`);
+				} );
+				$sa.on('change',()=>{
+					let issel = $s.val().length;
+					$('.jcRecorderArea, .jcAudioUploadArea',$mod).toggle(! issel);
+					$('.jcAudioSaver',$mod).attr('disabled',!issel);
+				});
 				const $hflex = $('<hflex class="wrap"></hflex>');
-				$hflex.append($audio,$bt,$btp)
-				$('.modal-body',$mod).append($hflex);
-				const startRecording = async () => {
-					let chunks = [];
+				$hflex.append(`<div>${ AS.label('ChooseAudio')}:</div>`,$s);
+				$('.modal-body',$mod).append($sa.append($hflex));
+			}
+			let $ra = $('<div class="jcRecorderArea"></div>');
+			if ( $ra ) {
+				if ( canRecord ) {
+					let chunks=[],mediaRecorder;
+					const $audio = $('<audio src="" controls="controls">This browser doesn’t support HTML5 audio</audio>');
+					const $bt = $('<button type="button" class="btn btn-primary jcAudioToggler"><span class="jcicon">'+AS.icon('mic')+'</span></button>');
+					const $btd = $('<button type="button" class="btn btn-danger jcAudioDeleter" disabled="disabled"><span class="jcicon">'+AS.icon('editRemove')+'</span></button>');
+					const $btp = $('<button type="button" class="btn btn-secondary jcAudioPauser ml-2" style="display:none;"><span class="jcicon">'+AS.icon('pause')+'</span></button>');
+					const $hflex = $('<hflex class="wrap"></hflex>');
+					if ( AS.test.obj(prevd) && prevd.uri ) {
+						$audio.attr('src',prevd.uri);
+						$btd.attr('disabled',false);
+					}
+					$hflex.append(`<div>${ AS.label('RecordAudio')}:</div>`,$audio,$('<div class="btn-group"></div>').append($bt,$btd),$btp);
+					$ra.append($hflex);
+					const doPreview = () => {
+						doBlob();
+						if ( blob ) {
+							$audio.get(0).src = URL.createObjectURL( blob );
+							if ( mediaRecorder && mediaRecorder.state && (mediaRecorder.state == 'paused') ) {
+								// do nothing
+							} else {
+								$('.jcAudioSaver, .jcAudioDeleter',$mod).attr('disabled',false);
+								mediaRecorder = false;
+							}
+						} else {
+							$audio.get(0).src = '';
+							$('.jcAudioSaver, .jcAudioDeleter',$mod).attr('disabled',true);
+						}
+						$('.jcAudioSelectArea, .jcAudioUploadArea',$mod).toggle(! blob);
+					};
 					const doBlob = () => {
 						if (!chunks.length) return blob = false;
 						return blob = new Blob(chunks, { type: mediaRecorder.mimeType });
 					};
-					let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-					mediaRecorder = new MediaRecorder(stream);
-					mediaRecorder.addEventListener("start", e => {
-						$bt.removeClass('btn-primary btn-danger');
-						$btp.removeClass('btn-secondary btn-warning');
-						$bt.addClass('btn-danger');
-						$('span',$bt).html( AS.icon('stop') );
-						$btp.addClass('btn-secondary').show();
-					});
-					mediaRecorder.addEventListener("dataavailable", e => { if ( e.data) chunks.push(e.data); });
-					mediaRecorder.addEventListener("stop", e => {
-						$bt.removeClass('btn-primary btn-danger');
-						$btp.removeClass('btn-secondary btn-warning');
-						$bt.addClass('btn-primary');
-						$('span',$bt).html( AS.icon('mic') );
-						$btp.hide();
-						stream.getTracks().forEach(track => track.stop());
-						doBlob();
-						if ( blob ) $audio.get(0).src = URL.createObjectURL( blob );
-						mediaRecorder = false;
-					});
-					mediaRecorder.addEventListener("pause", e => {
-						$btp.removeClass('btn-secondary').addClass('btn-warning');
-						doBlob();
-						if ( blob ) $audio.get(0).src = URL.createObjectURL( blob );
-					});
-					mediaRecorder.addEventListener("resume", e => {
-						$btp.removeClass('btn-warning').addClass('btn-secondary');
-					});
-					// Let's receive 300 second chunks
-					mediaRecorder.start(300000);
-				};
-				$bt.on('click',()=>{ if ( mediaRecorder ) { mediaRecorder.stop(); } else { startRecording(); } });
-				$btp.on('click',()=>{ if ( ! mediaRecorder ) return; if ( mediaRecorder.state == 'paused' ) { mediaRecorder.resume(); } else { mediaRecorder.pause(); } });
-			} else {
-				$('.modal-body',$mod).append('<div class="alert alert-warning" role="alert">'+AS.label('BrowserMediaRecorderMissing')+'</div>');
+					const startRecording = async () => {
+						chunks = [];
+						let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+						mediaRecorder = new MediaRecorder(stream);
+						mediaRecorder.addEventListener("start", e => {
+							$bt.removeClass('btn-primary').addClass('btn-danger');
+							if ( mediaRecorder.pause ) $btp.removeClass('btn-warning').addClass('btn-secondary').show();
+							$('.jcAudioSaver, .jcAudioDeleter',$mod).attr('disabled',true);
+							$('span',$bt).html( AS.icon('stop') );
+						});
+						mediaRecorder.addEventListener("dataavailable", e => { if ( e.data) chunks.push(e.data); });
+						mediaRecorder.addEventListener("stop", e => {
+							$bt.removeClass('btn-danger').addClass('btn-primary');
+							if ( mediaRecorder.pause ) $btp.removeClass('btn-warning').addClass('btn-secondary').hide();
+							$('span',$bt).html( AS.icon('mic') );
+							stream.getTracks().forEach(track => track.stop());
+							doPreview();
+						});
+						mediaRecorder.addEventListener("pause", e => {
+							$btp.removeClass('btn-secondary').addClass('btn-warning');
+							doPreview();
+						});
+						mediaRecorder.addEventListener("resume", e => {
+							$btp.removeClass('btn-warning').addClass('btn-secondary');
+						});
+						mediaRecorder.start(300000);
+					};
+					$bt.on('click',()=>{ if ( mediaRecorder ) { mediaRecorder.stop(); } else { startRecording(); } });
+					$btp.on('click',()=>{ if ( ! mediaRecorder ) return; if ( mediaRecorder.state == 'paused' ) { mediaRecorder.resume(); } else { mediaRecorder.pause(); } });
+					$btd.on('click',()=>{ if ( mediaRecorder ) return; chunks=[]; doPreview(); });
+				} else {
+					$ra.append('<div class="alert alert-warning" role="alert">'+AS.label('BrowserMediaRecorderMissing')+'</div>');
+				}
+				$('.modal-body',$mod).append($ra);
 			}
+			let $ua = $(`<div class="jcAudioUploadArea"></div>`);
+			if ( $ua ) {
+				let $uf = $('<input type="file" class="jcAudioUploadField" accept="audio/*" />');
+				const $hflex = $('<hflex class="wrap"></hflex>');
+				$hflex.append(`<div>${ AS.label('ChooseAudio')}:</div>`,$uf);
+				$uf.on('change',()=>{
+					let issel = $uf.val().length;
+					$('.jcRecorderArea, .jcAudioSelectArea',$mod).toggle(! issel);
+					$('.jcAudioSaver',$mod).attr('disabled',!issel);
+				});
+				$('.modal-body',$mod).append($ua.append($hflex));
+			}
+			$mod.on('shown.bs.modal',()=>{
+				$('button.jcAudioSaver',$mod).on('click',()=>{
+					if ( (! blob) && $('.jcAudioUploadField').val().length ) blob = $('.jcAudioUploadField').get(0).files[0];
+					if ( blob ) {
+						jc.page.uploadBlob( blob,(prevd||{}),( news, uploads )=>{
+							let na = news[0];
+							if (! na ) return;
+							let nd = { type: 'audio', audio: { uri: na.uri } };
+							jc.edit.custom.audio.save(b,d,nd,prevb);
+						});
+						return;
+					}
+					if ( $('.jcAudioSelectArea select',$mod).val().length ) {
+						let finalize = () => {
+							let nd = { type: 'audio', audio: { uri: $('.jcAudioSelectArea select',$mod).val() } };
+							jc.edit.custom.audio.save(b,d,nd,prevb);
+						};
+						if ( prevd && prevd.uri && prevd.uri.length ) {
+							jc.page.rmUpload( prevd, finalize );
+						} else {
+							finalize();
+						}
+					}
+				});
+			});
 			$mod.modal({show:true,keyboard:false});
 		},
-		edit : (b,d) => {
-			
+		edit : (b,d) => { jc.edit.custom.audio.add(b,d,d[b.prop][b._.idx]); },
+		save : (b,d,newd,oldd) => {
+			if ( AS.test.obj(oldd) ) {
+				d[b.prop].splice( b._.idx, 1, newd );
+			} else {
+				if ( b._ && AS.test.def(b._.qt)) {
+					d[b.prop].splice( b._.idx, 1, d[b.prop][b._.idx], newd );
+				} else {
+					if ( ! AS.test.arr(d[b.prop])) d[b.prop] = [];
+					d[b.prop].push(newd);
+				}
+			}
+			jc.edit.fixBlocks(b,d);
+			jc.edit.noModal();
+			jc.page.reload();
 		},
 	},
 	gallery : {

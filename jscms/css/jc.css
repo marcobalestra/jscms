@@ -119,6 +119,8 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcLastsEntry .date::before { content: ' — '; }
 .jcLastsEntry .time::before { content: ', '; }
 
+.jcAudio audio { width: 80%; height: 64px; margin: 10px 10%; }
+
 #jcSharingPanel { align-items: start; border-top: 1px solid #ddd; display: flex; flex-wrap: wrap; justify-content: center; margin: 24px 0; padding: 8px; }
 #jcToplevelContainer #jcSharingPanel > a::after { content: ''; }
 #jcSharingPanel a { border: none; border-radius: 20px; display: inline-block; fill: #fff; height: 40px; margin: 8px; overflow: hidden; stroke: none; text-decoration: none; transition: all .15s ease-out; width: 40px; }
@@ -137,6 +139,10 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 #jcSharingPanel .jcSharing-whatsapp { background: #25d366; }
 
 .jcNavbar .jcNavSharing .dropdown-menu .jcicon { fill: #999; margin-right: 12px; }
+
+#jcPageAudio > div { margin: 1em 0; }
+#jcPageAudio audio { width: 300px; height: 38px; }
+#jcPageAudio audio[src=""] { opacity: .5; }
 
 /* Bootstrap enhancements */
 .text-white { fill: #fff; }

@@ -8,6 +8,7 @@ AS.labels.load('en',[{
 	'BlocksFromPage' : 'Include contents from:',
 	'BrowserMediaRecorderMissing' : 'This browser cannot record directly audio or video, sorry.',
 	'CantDeleteIndex' : 'The homepage can’t be deleted.',
+	'ChooseAudio' : 'Choose an audio',
 	'DeleteThisPage' : 'Delete this page',
 	'editYetItBody' : 'Resume previous edit or restart?',
 	'editYetItCancel' : 'Restart',
@@ -49,6 +50,7 @@ AS.labels.load('en',[{
 	'PageTitleHelp' : 'Page name that will appear in browser’s title bar (or tabs bar).',
 	'PageType' : 'Page type',
 	'PageUriHelp' : 'A customizable address that will be the leading section of page URI.',
+	'RecordAudio' : 'Record audio',
 	'SaveChangesBody' : 'Do you want to save changes to this page?',
 	'SaveChangesTitle': 'Closing editor',
 	'SavingArticleList' : 'Saving comprehensive article list…',
@@ -64,5 +66,6 @@ AS.labels.load('en',[{
 	'Text' : 'Text',
 	'TextOrHtml' : 'Text or HTML',
 	'ThisPage' : 'This page',
+	'UnsupportedAudio' : 'The browser can’t reproduce this audio <tt>{{type|unknown}}</tt><br />In alternative you can <a href="{{uri}}" download="{{name}}"><b>download</b></a> the audio file.',
 	'WholeSite' : 'The whole site',
 }]);

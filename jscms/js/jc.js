@@ -458,7 +458,7 @@ jc.menu = (ev,menu)=>{
 	if ( testNode( menu.content ) ) {
 		$cm.append( menu.content );
 	} else if ( Array.isArray(menu.content) ) {
-		let $ul = $('<ul class="dropdown-menu appContextMenuContent" role="menu" aria-labelledby="dropdownMenu"></ul>');
+		let $ul = $('<ul class="dropdown-menu appContextMenuContent" role="menu" aria-labelledby="dropdownMenu" style="max-width:'+$(window.width)+'px;"></ul>');
 		let parseli = v => {
 			let $li = $('<li></li>');
 			if ( typeof v == 'string' ) {
@@ -564,6 +564,8 @@ jc.menu = (ev,menu)=>{
 			left -= (cmw -40);
 		}
 	}
+	if ( left < 0 ) left = 0;
+	if ( top < 0 ) top = 0;
 	let hl = false;
 	if ( menu.highlight ) {
 		hl = $(ev.target).closest(menu.highlight);
@@ -1768,6 +1770,16 @@ jc.render = {
 				});
 			});
 			return div;
+		},
+		audio : (b,d,pdata) => {
+			if ( AS.test.udef(d[b.prop]) || ( ! AS.test.obj(d[b.prop]) ) || (! d[b.prop].uri ) ) return undefined;
+			let adata = pdata.uploads.find( x => ( x.uri == d[b.prop].uri ));
+			if ( ! adata ) return undefined;
+			let $a = $(`<audio src="${ adata.uri }" type="${ adata.type }" download="${ adata.name }" controls="controls">This browser doesn’t support HTML5 audio</audio>`);
+			let $d = $(`<div class="jcAudio"></div>`);
+			$a.on('error',()=>{ $d.html('<div style="max-width:640px;" class="alert alert-warning" role="alert">'+AS.label('UnsupportedAudio',adata)+'</div>') });
+			$d.append($a);
+			return $d;
 		},
 	},
 };
