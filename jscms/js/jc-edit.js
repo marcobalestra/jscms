@@ -5,7 +5,7 @@ jc.dav.put = ( url, data, success, fail, progf ) => {
 	success = jc.evalFunc(success)||(()=>{});
 	if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
 	jc.console('jc.dav.put',url,data);
-	let progress = ( (data instanceof DataView) && (data.byteLength > 32768) );
+	let progress = ( (data instanceof DataView) && (data.byteLength > 65536) );
 	$.ajax(url,{
 		xhr: ()=>{
 			let xhr = $.ajaxSettings.xhr();
