@@ -872,7 +872,6 @@ jc.page.rmUpload = ( item, callback ) => {
 		return n;
 	}
 	let pdata = recurse(jc.page.data().pageContent);
-	jc.page.data().pageContent.uploads.splice(0).push(...pdata.uploads);
 	jc.page.save( {
 		data : pdata,
 		page: jc.page.current(),
