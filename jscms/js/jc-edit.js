@@ -793,6 +793,10 @@ jc.page.uploadBlob = (blob,...args) => {
 	let uploads = AS.def.arr( pdata.uploads );
 	if ( options.purged ) uploads = uploads.filter( x => ( x.uri != options.purged ));
 	if ( blob.size ) info.size = blob.size;
+	if ( info.size > jc.prop.maxUploadSize ) {
+		if ( AS.test.func(callback)) callback.call(window,false,uploads);
+		return;
+	}
 	if ( blob.type ) info.type = blob.type;
 	if ( ! info.type ) info.type = 'application/octet-stream';
 	if ( (! info.ext) && blob.name ) info.ext = blob.name.replace(/^.*\.([^.]+)$/,"$1").toLowerCase();
