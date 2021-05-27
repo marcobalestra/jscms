@@ -18,7 +18,7 @@
 					{ type:"mixed",prop:"blocks" },
 				]
 			},
-			{ type:"part", content: "sharethis.html", editable: false },
+			{ type:"part", content: "sharethis.json" },
 		]},
 	];
 	jc.template.info.set('index',ti);

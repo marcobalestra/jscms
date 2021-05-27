@@ -20,7 +20,7 @@
 					{ type:"mixed",prop:"blocks" }
 				]
 			},
-			{ type:"part", content: "sharethis.html", editable: false },
+			{ type:"part", content: "sharethis.json" },
 		]},
 	];
 	ti.metadata = {
