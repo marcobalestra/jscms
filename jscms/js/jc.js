@@ -1053,7 +1053,10 @@ jc.template = {
 					jc.jdav.get( 'parts/'+ key, j =>{
 						jc.template.part.set(key,j);
 						jc.template.part.get(key,callback,options);
-					},jc.getError);
+					},()=>{
+						jc.template.part.set(key,{ type: key.replace(/\.json$/,'') });
+						jc.template.part.get(key,callback,options);
+					});
 				} else if ( key.match(/\.x?html?$/) ) {
 					jc.dav.get( 'parts/'+ key, j =>{
 						jc.template.part.set(key,j);

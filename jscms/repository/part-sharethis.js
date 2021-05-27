@@ -28,6 +28,7 @@
 		},
 		render : ( blockdata ) => {
 			let div=$('<div></div>'),slang={};
+			if ( ! blockdata.show ) blockdata.show = 'mb';
 			shares.forEach( s => {
 				if ( blockdata['hide-'+s.key] ) return;
 				slang[s.key] = s.href;
