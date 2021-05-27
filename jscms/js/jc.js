@@ -1834,7 +1834,7 @@ jc.actionsMenu = (e) => {
 // 		tm.content.push( {icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('parts');} } );
 		ws.content.push(
 			{icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.create();} },
-			{icon:'jcicon',iconKey:'pageEdit',label:AS.label('IncludedParts'),action:()=>{jc.page.edit('parts');} }
+			{icon:'jcicon',iconKey:'pageParts',label:AS.label('IncludedParts'),action:()=>{jc.page.edit('parts');} }
 		);
 		acts.push(AS.label('menuActionsTitle'),tp,ws);
 	}
