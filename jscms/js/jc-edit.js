@@ -1,242 +1,251 @@
 /* jc.dav edit extensions */
 
-jc.dav.put = ( url, data, success, fail, progf ) => {
-	fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
-	success = jc.evalFunc(success)||(()=>{});
-	if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
-	jc.console('jc.dav.put',url,data);
-	let progress = ( (data instanceof DataView) && (data.byteLength > 65536) );
-	$.ajax(url,{
-		xhr: ()=>{
-			let xhr = $.ajaxSettings.xhr();
-			if (progress) xhr.upload.onprogress = (e) => {
-				if ( ! e.lengthComputable ) return;
-				if ( AS.test.func(progf) ) {
-					progf.call(window,e.loaded,e.total,(e.loaded/e.total));
+$.extend( jc.dav, {
+	put : ( url, data, success, fail, progf ) => {
+		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
+		success = jc.evalFunc(success)||(()=>{});
+		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
+		jc.console('jc.dav.put',url,data);
+		let progress = ( (data instanceof DataView) && (data.byteLength > 65536) );
+		$.ajax(url,{
+			xhr: ()=>{
+				let xhr = $.ajaxSettings.xhr();
+				if (progress) xhr.upload.onprogress = (e) => {
+					if ( ! e.lengthComputable ) return;
+					if ( AS.test.func(progf) ) {
+						progf.call(window,e.loaded,e.total,(e.loaded/e.total));
+					} else {
+						jc.progress('Upload: '+(parseInt(100*e.loaded/e.total))+'%' );
+					}
+				};
+				return xhr;
+			},
+			method: 'PUT',
+			dataType: 'text',
+			processData: false,  // Important!
+			cache: false,
+			contentType: 'text/plain; charset=UTF-8',
+			data: data,
+			error: (...errs) => {
+				if ( progress ) {
+					if ( AS.test.func(progf) ) {
+						progf.call(window,false);
+					} else {
+						jc.progress();
+					}
+				}
+				fail.call(window,false,errs);
+			},
+			success : () => {
+				if ( progress ) {
+					if ( AS.test.func(progf) ) {
+						progf.call(window,true);
+					} else {
+						jc.progress();
+					}
+				}
+				success.call(window,true);
+			}
+		});
+	},
+	mkdir : ( url, success, fail ) => {
+		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
+		success = jc.evalFunc(success)||(()=>{});
+		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
+		jc.console('jc.dav.mkdir',url);
+		$.ajax( url, {
+			method: 'MKCOL',
+			cache: false,
+			dataType: 'text',
+			error: (...errs) => { fail.call(window,false,errs); },
+			success : () => { success.call(window,true); }
+		});
+	},
+	rm : ( url, success, fail ) => {
+		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
+		success = jc.evalFunc(success)||(()=>{});
+		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
+		jc.console('jc.dav.rm',url);
+		$.ajax( url, {
+			method: 'DELETE',
+			cache: false,
+			contentType: 'text/xml; charset=UTF-8',
+			dataType: 'text',
+			error: (...errs) => { fail.call(window,false,errs); },
+			success : (xt) => { success.call(window,xt); }
+		});
+	},
+	purge : ( ...args ) => {
+		let success,fail,options={};
+		args.forEach( (a) => {
+			if ( AS.test.obj(a)) {
+				if ( a.dir ) options.dir = a.dir;
+				if ( a.ext ) options.ext = a.ext;
+				if ( a.match ) options.match = a.match;
+				return;
+			}
+			let f = jc.evalFunc(a);
+			if ( AS.test.func(f) ) {
+				if ( success ) fail = f;
+				else success = f;
+			}
+			if ( AS.test.str(a) ) {
+				options.dir = a;
+			}
+		} );
+		fail = fail||success||jc.getError;
+		success = success||(()=>{});
+		if (options.dir) options.dir = options.dir.replace(/\/$/,'');
+		jc.dav.ls( options, (out)=>{
+			let count = 0;
+			let proc = ()=>{
+				if ( out.list.length ) {
+					count++;
+					let url = (out.dir ? out.dir + '/' : '') + out.list.shift();
+					jc.dav.rm( url, proc );
 				} else {
-					jc.progress('Upload: '+(parseInt(100*e.loaded/e.total))+'%' );
+					if ( AS.test.func(success) ) success.call( window, count );
 				}
 			};
-			return xhr;
-		},
-		method: 'PUT',
-		dataType: 'text',
-		processData: false,  // Important!
-		cache: false,
-		contentType: 'text/plain; charset=UTF-8',
-		data: data,
-		error: (...errs) => {
-			if ( progress ) {
-				if ( AS.test.func(progf) ) {
-					progf.call(window,false);
-				} else {
-					jc.progress();
-				}
+			proc();
+		}, fail);
+	},
+	ls : ( ...args ) => {
+		let success,fail,options={};
+		args.forEach( (a) => {
+			if ( AS.test.obj(a)) {
+				if ( a.dir ) options.dir = a.dir;
+				if ( a.ext ) options.ext = a.ext;
+				if ( a.match ) options.match = a.match;
+				return;
 			}
-			fail.call(window,false,errs);
-		},
-		success : () => {
-			if ( progress ) {
-				if ( AS.test.func(progf) ) {
-					progf.call(window,true);
-				} else {
-					jc.progress();
-				}
+			let f = jc.evalFunc(a);
+			if ( AS.test.func(f) ) {
+				if ( success ) fail = f;
+				else success = f;
 			}
-			success.call(window,true);
-		}
-	});
-};
-jc.dav.mkdir = ( url, success, fail ) => {
-	fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
-	success = jc.evalFunc(success)||(()=>{});
-	if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
-	jc.console('jc.dav.mkdir',url);
-	$.ajax( url, {
-		method: 'MKCOL',
-		cache: false,
-		dataType: 'text',
-		error: (...errs) => { fail.call(window,false,errs); },
-		success : () => { success.call(window,true); }
-	});
-};
-jc.dav.rm = ( url, success, fail ) => {
-	fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
-	success = jc.evalFunc(success)||(()=>{});
-	if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
-	jc.console('jc.dav.rm',url);
-	$.ajax( url, {
-		method: 'DELETE',
-		cache: false,
-		contentType: 'text/xml; charset=UTF-8',
-		dataType: 'text',
-		error: (...errs) => { fail.call(window,false,errs); },
-		success : (xt) => { success.call(window,xt); }
-	});
-};
-jc.dav.purge = ( ...args ) => {
-	let success,fail,options={};
-	args.forEach( (a) => {
-		if ( AS.test.obj(a)) {
-			if ( a.dir ) options.dir = a.dir;
-			if ( a.ext ) options.ext = a.ext;
-			if ( a.match ) options.match = a.match;
-			return;
-		}
-		let f = jc.evalFunc(a);
-		if ( AS.test.func(f) ) {
-			if ( success ) fail = f;
-			else success = f;
-		}
-		if ( AS.test.str(a) ) {
-			options.dir = a;
-		}
-	} );
-	fail = fail||success||jc.getError;
-	success = success||(()=>{});
-	if (options.dir) options.dir = options.dir.replace(/\/$/,'');
-	jc.dav.ls( options, (out)=>{
-		let count = 0;
-		let proc = ()=>{
-			if ( out.list.length ) {
-				count++;
-				let url = (out.dir ? out.dir + '/' : '') + out.list.shift();
-				jc.dav.rm( url, proc );
-			} else {
-				if ( AS.test.func(success) ) success.call( window, count );
+			if ( AS.test.str(a) ) {
+				options.dir = a;
 			}
-		};
-		proc();
-	}, fail);
-};
-jc.dav.ls = ( ...args ) => {
-	let success,fail,options={};
-	args.forEach( (a) => {
-		if ( AS.test.obj(a)) {
-			if ( a.dir ) options.dir = a.dir;
-			if ( a.ext ) options.ext = a.ext;
-			if ( a.match ) options.match = a.match;
-			return;
-		}
-		let f = jc.evalFunc(a);
-		if ( AS.test.func(f) ) {
-			if ( success ) fail = f;
-			else success = f;
-		}
-		if ( AS.test.str(a) ) {
-			options.dir = a;
-		}
-	} );
-	fail = fail||success||jc.getError;
-	success = success||(()=>{});
-	let url = AS.path('jsauth') + 'auth/lsdata';
-	jc.console('jc.dav.ls',url);
-	$.ajax( url, {
-		method: 'GET',
-		cache: false,
-		dataType: 'json',
-		data : options,
-		error: (...errs) => { fail.call(window,false,errs); },
-		success : (data) => {
-			Object.keys( options ).forEach( k => {
-				if ( options[k] ) data[k] = options[k];
-			} );
-			success.call(window,data);
-		}
-	});
-};
-
-jc.jdav.put = ( url, data, success, fail ) => {
-	fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
-	success = jc.evalFunc(success)||(()=>{});
-	if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
-	jc.console('jc.jdav.put',url,data);
-	$.ajax( url, {
-		method: 'PUT',
-		cache: false,
-		dataType: 'json',
-		contentType: 'application/json; charset=UTF-8',
-		data: AS.test.obj(data) ? JSON.stringify(data) : data,
-		error: (...errs) => { fail.call(window,false,errs); },
-		success : () => { success.call(window,true); }
-	});
-};
-
+		} );
+		fail = fail||success||jc.getError;
+		success = success||(()=>{});
+		let url = AS.path('jsauth') + 'auth/lsdata';
+		jc.console('jc.dav.ls',url);
+		$.ajax( url, {
+			method: 'GET',
+			cache: false,
+			dataType: 'json',
+			data : options,
+			error: (...errs) => { fail.call(window,false,errs); },
+			success : (data) => {
+				Object.keys( options ).forEach( k => {
+					if ( options[k] ) data[k] = options[k];
+				} );
+				success.call(window,data);
+			}
+		});
+	},
+});
+$.extend( jc.jdav,{
+	put : ( url, data, success, fail ) => {
+		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
+		success = jc.evalFunc(success)||(()=>{});
+		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
+		jc.console('jc.jdav.put',url,data);
+		$.ajax( url, {
+			method: 'PUT',
+			cache: false,
+			dataType: 'json',
+			contentType: 'application/json; charset=UTF-8',
+			data: AS.test.obj(data) ? JSON.stringify(data) : data,
+			error: (...errs) => { fail.call(window,false,errs); },
+			success : () => { success.call(window,true); }
+		});
+	}
+});
 Object.keys( jc.dav ).forEach( (k) => { if (AS.test.udef(jc.jdav[k])) jc.jdav[k] = jc.dav[k]; } );
 
 
 /* jc.lists edit extension */
 
-jc.lists.list.set = ( ...args ) => {
-	const type = args.find(a=>AS.test.str(a))||'_all';
-	const list = args.find(a=>AS.test.obj(a))||{};
-	const callback = args.find(a=>AS.test.func(a));
-	let commit = args.find(a=>AS.test.bool(a));
-	if ( AS.test.udef(commit)) commit=true;
-	jc.lists.prop.lists[type] = list;
-	if ( commit ) return jc.lists.list.commit.apply(window,args);
-	if ( AS.test.func(callback)) callback.call(window);
-};
-jc.lists.list.commit = ( ...args ) => {
-	const type = args.find(a=>AS.test.str(a))||'_all';
-	let list = args.find(a=>AS.test.obj(a));
-	const callback = args.find(a=>AS.test.func(a));
-	if ( list ) jc.lists.prop.lists[type] = list;
-	else if ( jc.lists.prop.lists[type] ) list = jc.lists.prop.lists[type];
-	else list = {};
-	jc.jdav.put( jc.lists.list.uri(type), list, (r)=>{
-		if ( AS.test.func(callback)) callback.call(window,r);
-	});
-};
-jc.lists.last.set = ( ...args ) => {
-	const type = args.find(a=>AS.test.str(a))||'_all';
-	const qt = args.find(a=>AS.test.num(a));
-	const list = args.find(a=>AS.test.arr(a))||[];
-	const callback = args.find(a=>AS.test.func(a));
-	let commit = args.find(a=>AS.test.bool(a));
-	if ( AS.test.udef(commit)) commit=true;
-	if ( ! jc.lists.prop.lasts[type] ) jc.lists.prop.lasts[type] = {};
-	jc.lists.prop.lasts[type][String(qt)] = list;
-	if ( commit ) return jc.lists.last.commit.apply(window, args);
-	if (AS.test.func(callback)) callback.call(window);
-};
-jc.lists.last.commit = ( ...args ) => {
-	const type = args.find(a=>AS.test.str(a))||'_all';
-	const qt = args.find(a=>AS.test.num(a));
-	let list = args.find(a=>AS.test.arr(a));
-	const callback = args.find(a=>AS.test.func(a));
-	if ( ! list ) list = jc.lists.prop.lasts[type][String(qt)]||[];
-	let uri = jc.lists.last.uri(type,qt);
-	jc.jdav.put( uri, list, (r)=>{
-		if ( AS.test.func(callback)) callback.call(window,r);
-	});
-};
-jc.lists.last.dorss = ( ...args ) => {
-	const type = args.find(a=>AS.test.str(a))||'_all';
-	const qt = args.find(a=>AS.test.num(a));
-	let list = args.find(a=>AS.test.arr(a));
-	const callback = args.find(a=>AS.test.func(a));
-	if ( ! list ) list = jc.lists.prop.lasts[type][String(qt)]||[];
-	let uri = jc.lists.last.uri(type,qt).replace(/\.json/,'.rss');
-	let feed = '<?xml version="1.0" encoding="UTF-8" ?>\n<rss version="2.0">\n<channel>\n';
-	feed += '<title>'+$('head title',document.documentElement).html().escape()+'</title>\n';
-	let baseuri = window.location.protocol + '//' + window.location.hostname + '/';
-	feed += '<link>'+baseuri+'</link>\n';
-	feed += '<generator>jBloud CMS - jscms</generator>\n';
-	list.forEach( i => {
-		let pt = i.page||type;
-		feed += '<item>\n';
-		feed += '\t<link>'+baseuri+pt+(i.id||'')+'/</link>\n';
-		feed += '\t<pubDate>'+ (new Date(i.upd)).toUTCString() +'</pubDate>\n';
-		feed += '\t<title>'+i.title.escape()+'</title>\n';
-		if ( i.desc && i.desc.length ) feed += '\t<description><![CDATA['+i.desc+']]></description>\n';
-		feed += '</item>\n';
-	} );
-	feed += '</channel>\n</rss>\n';
-	jc.dav.put( uri, feed, (r)=>{
-		if ( AS.test.func(callback)) callback.call(window,r);
-	});
-};
+$.extend( true, jc.lists, {
+	list: {
+		set : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			const list = args.find(a=>AS.test.obj(a))||{};
+			const callback = args.find(a=>AS.test.func(a));
+			let commit = args.find(a=>AS.test.bool(a));
+			if ( AS.test.udef(commit)) commit=true;
+			jc.lists.prop.lists[type] = list;
+			if ( commit ) return jc.lists.list.commit.apply(window,args);
+			if ( AS.test.func(callback)) callback.call(window);
+		},
+		commit : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			let list = args.find(a=>AS.test.obj(a));
+			const callback = args.find(a=>AS.test.func(a));
+			if ( list ) jc.lists.prop.lists[type] = list;
+			else if ( jc.lists.prop.lists[type] ) list = jc.lists.prop.lists[type];
+			else list = {};
+			jc.jdav.put( jc.lists.list.uri(type), list, (r)=>{
+				if ( AS.test.func(callback)) callback.call(window,r);
+			});
+		},
+	},
+	last: {
+		set : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			const qt = args.find(a=>AS.test.num(a));
+			const list = args.find(a=>AS.test.arr(a))||[];
+			const callback = args.find(a=>AS.test.func(a));
+			let commit = args.find(a=>AS.test.bool(a));
+			if ( AS.test.udef(commit)) commit=true;
+			if ( ! jc.lists.prop.lasts[type] ) jc.lists.prop.lasts[type] = {};
+			jc.lists.prop.lasts[type][String(qt)] = list;
+			if ( commit ) return jc.lists.last.commit.apply(window, args);
+			if (AS.test.func(callback)) callback.call(window);
+		},
+		commit : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			const qt = args.find(a=>AS.test.num(a));
+			let list = args.find(a=>AS.test.arr(a));
+			const callback = args.find(a=>AS.test.func(a));
+			if ( ! list ) list = jc.lists.prop.lasts[type][String(qt)]||[];
+			let uri = jc.lists.last.uri(type,qt);
+			jc.jdav.put( uri, list, (r)=>{
+				if ( AS.test.func(callback)) callback.call(window,r);
+			});
+		},
+		dorss : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'_all';
+			const qt = args.find(a=>AS.test.num(a));
+			let list = args.find(a=>AS.test.arr(a));
+			const callback = args.find(a=>AS.test.func(a));
+			if ( ! list ) list = jc.lists.prop.lasts[type][String(qt)]||[];
+			let uri = jc.lists.last.uri(type,qt).replace(/\.json/,'.rss');
+			let feed = '<?xml version="1.0" encoding="UTF-8" ?>\n<rss version="2.0">\n<channel>\n';
+			feed += '<title>'+$('head title',document.documentElement).html().escape()+'</title>\n';
+			let baseuri = window.location.protocol + '//' + window.location.hostname + '/';
+			feed += '<link>'+baseuri+'</link>\n';
+			feed += '<generator>jBloud CMS - jscms</generator>\n';
+			list.forEach( i => {
+				let pt = i.page||type;
+				feed += '<item>\n';
+				feed += '\t<link>'+baseuri+pt+(i.id||'')+'/</link>\n';
+				feed += '\t<pubDate>'+ (new Date(i.upd)).toUTCString() +'</pubDate>\n';
+				feed += '\t<title>'+i.title.escape()+'</title>\n';
+				if ( i.desc && i.desc.length ) feed += '\t<description><![CDATA['+i.desc+']]></description>\n';
+				feed += '</item>\n';
+			} );
+			feed += '</channel>\n</rss>\n';
+			jc.dav.put( uri, feed, (r)=>{
+				if ( AS.test.func(callback)) callback.call(window,r);
+			});
+		},
+	},
+});
+
 
 /* jc.page edit extension */
 
@@ -556,6 +565,30 @@ jc.page.save = ( params ) => {
 			});
 		},100);
 	}
+	let makeStatic = () => {
+		if ( $('.jcEditable').length ) return;
+		$(document.body).off('jc_render_end', makeStatic );
+		const uri = 'static/'+params.page+(params.id||'')+'.html';
+		let cn = document.body.className;
+		let html = '<html>'+$(document.documentElement).html()+'</html>';
+		document.body.className = cn;
+		let cleaning = 100;
+		while ( cleaning ) {
+			cleaning--;
+			if ( html.match(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)<script/) ) {
+				html = html.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)[^<]*<script[^>]+>[^<]*<\/script>[^<]*/,"$1");
+			} else if ( html.match(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)<link/) ) {
+				html = html.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)<link[^>]+>[^<]*/,"$1");
+			} else if ( html.match(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)<style/) ) {
+				html = html.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)<style[^>]*>.+<\/style>[^<]*/,"$1");
+			} else {
+				cleaning = false;
+			}
+		}
+		html = html.replace(/<nav .+<\/nav>/,"");
+		jc.dav.put( uri, html );
+	};
+	$(document.body).on('jc_render_end', makeStatic );
 	if ( AS.test.func(params.callback) ) {
 		params.callback.call(window,params.page,params.id,params.data);
 		return;

@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-<title>Once upon a time…</title>
+<title>JSCMS tech info</title>
 <link>https://ricette.lan.crossbow.it/</link>
 <generator>jBloud CMS - jscms</generator>
 <item>
-	<link>https://ricette.lan.crossbow.it/blog1/</link>
-	<pubDate>Thu, 27 May 2021 10:04:23 GMT</pubDate>
-	<title>Once upon a time…</title>
-	<description><![CDATA[From the beginning to JSCMS, then to JBLOUD - Thanks to some god for IE is dead]]></description>
+	<link>https://ricette.lan.crossbow.it/index1/</link>
+	<pubDate>Thu, 27 May 2021 18:29:23 GMT</pubDate>
+	<title>JSCMS tech info</title>
 </item>
 <item>
 	<link>https://ricette.lan.crossbow.it/index2/</link>
-	<pubDate>Thu, 27 May 2021 07:52:11 GMT</pubDate>
+	<pubDate>Thu, 27 May 2021 18:29:15 GMT</pubDate>
 	<title>Overview</title>
 	<description><![CDATA[A quick overview on the CMS]]></description>
 </item>
 <item>
-	<link>https://ricette.lan.crossbow.it/index1/</link>
-	<pubDate>Mon, 24 May 2021 09:22:15 GMT</pubDate>
-	<title>JSCMS tech info</title>
-</item>
-<item>
 	<link>https://ricette.lan.crossbow.it/index/</link>
-	<pubDate>Mon, 24 May 2021 09:18:01 GMT</pubDate>
+	<pubDate>Thu, 27 May 2021 18:28:39 GMT</pubDate>
 	<title>JSCMS is here!</title>
 	<description><![CDATA[JSCMS home page (preview, still under development): the CMS without DB and without server-side languages.]]></description>
+</item>
+<item>
+	<link>https://ricette.lan.crossbow.it/blog1/</link>
+	<pubDate>Thu, 27 May 2021 13:40:59 GMT</pubDate>
+	<title>Once upon a time…</title>
+	<description><![CDATA[From the beginning to JSCMS, then to JBLOUD - Thanks to some god for IE is dead]]></description>
 </item>
 </channel>
 </rss>

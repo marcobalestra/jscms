@@ -50,7 +50,7 @@ jc.prop.loadModules = {
 	'basic' : [
 		AS.path('jscdn') + 'css/jc.css',
 		{ type:'js', src:'https://cdn.jsdelivr.net/npm/sweetalert2@10'},
-		{ type:'js', src:'https:////cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js'},
+		{ type:'js', src:'https:///cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js'},
 		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
 		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js',
 		'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
@@ -99,9 +99,9 @@ $(() => {
 	let foo = () => {
 		if ( window.Swal && jQuery.fn.select2 ) {
 			window.name='jcmain';
-			if ( /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream ) {
-				$(document.body).addClass('iOS');
-			}
+// 			if ( /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream ) {
+// 				$(document.body).addClass('iOS');
+// 			}
 			/* 1st page */
 			let sp = jc.URI.decode();
 			if ( AS.test.str(sp.page) ) jc.page.open(sp.page,sp.id,sp.data);

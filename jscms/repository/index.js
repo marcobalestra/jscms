@@ -16,5 +16,5 @@
 			},
 		}
 	};
-	jc.edit.setRepository('index',data);
+	jc.template.repo.set('index',data);
 })(window);

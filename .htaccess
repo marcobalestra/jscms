@@ -12,9 +12,13 @@
 # site styles
 	RewriteRule ^style:(.+) styles/$1 [L]
 
-# Determine Template - if any -> tmpl
-	RewriteRule ^[!]([^0-9,/]+) - [E=tmpl:$1]
+# Determine Template - if any -> tmpl, id
+	RewriteRule ^[!]([^0-9,/]+)([0-9]*) - [E=tmpl:$1,E=id:$2]
 
+# Goto static, if exists
+	RewriteCond %{ENV:tmpl} !=""
+	RewriteCond %{DOCUMENT_ROOT}/jscms/data/static/%{ENV:tmpl}%{ENV:id}.html -f
+	RewriteRule .* jscms/data/static/%{ENV:tmpl}%{ENV:id}.html [L]
 
 # Specific template, if exists
 	RewriteCond %{ENV:tmpl} !=""

@@ -3,5 +3,5 @@
 		form : {
 		}
 	};
-	jc.edit.setRepository('blog',data);
+	jc.template.repo.set('blog',data);
 })(window);
