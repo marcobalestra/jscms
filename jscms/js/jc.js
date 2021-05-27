@@ -1623,7 +1623,7 @@ jc.render = {
 		},
 		date : (b,d) => {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
-			return '<div class="date">'+(new Date()).fromsql(d[b.prop]).toLocaleDateString(navigator.language,{ weekday:'long', year:'numeric', month:'long', day:'numeric' })+'</div>';
+			return '<div class="jcDate date">'+(new Date()).fromsql(d[b.prop]).toLocaleDateString(navigator.language,{ weekday:'long', year:'numeric', month:'long', day:'numeric' })+'</div>';
 		},
 		mixed : (b,d) => {
 			if ( ! d[b.prop] ) return '';
