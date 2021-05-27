@@ -570,7 +570,7 @@ jc.page.save = ( params ) => {
 		$(document.body).off('jc_render_end', makeStatic );
 		const uri = 'static/'+params.page+(params.id||'')+'.html';
 		let cn = document.body.className;
-		let html = '<html>'+$(document.documentElement).html()+'</html>';
+		let html = '<!DOCTYPE HTML>\n<html>'+$(document.documentElement).html()+'</html>';
 		document.body.className = cn;
 		let cleaning = 100;
 		while ( cleaning ) {
