@@ -119,6 +119,9 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
     min-height : 320px;
 }
 
+.jcAbstract { font-weight: normal; font-style: italic;  font-size: 110%; display: block; margin: 1em 0;  line-height: 1em; color: #999; }
+.jcAbstract::before { content: '“'; font-size: 400%; color: #ddd; vertical-align: -.4em; font-family: serif; }
+
 .jcLasts a { cursor: pointer; }
 .jcLastsEntry .title { font-weight: bold; }
 .jcLastsEntry .date,.jcLastsEntry .time { font-style: italic; color: #999; font-size: smaller; }

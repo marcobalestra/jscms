@@ -511,6 +511,7 @@ jc.page.save = ( params ) => {
 	}
 	if ( ! params.saved ) {
 		jc.jdav.put( AS.path('jsdatapages') + params.page + ( params.id || '') + '.json', params.data, ()=>{
+			$(document.body).trigger('jc_saved_page_data',params);
 			params.saved = true;
 			jc.page.save( params );
 		});
@@ -521,6 +522,7 @@ jc.page.save = ( params ) => {
 		params.fulllist[params.page][String(params.id?params.id:0)] = params.tpd;
 		if ( ! params.mute ) jc.progress(AS.label('SavingArticleList'));
 		jc.lists.list.set(params.fulllist,()=>{
+			$(document.body).trigger('jc_saved_page_fulllist',params);
 			params.savedFullList = true;
 			jc.page.save( params );
 		});
@@ -529,6 +531,7 @@ jc.page.save = ( params ) => {
 	if ( (! params.noFullList) && (! params.savedTypeList) ) {
 		params.typelist[String(params.id?params.id:0)] = params.tpd;
 		jc.lists.list.set(params.page,params.typelist,()=>{
+			$(document.body).trigger('jc_saved_page_typelist',params);
 			params.savedTypeList = true;
 			jc.page.save( params );
 		});
@@ -537,6 +540,7 @@ jc.page.save = ( params ) => {
 	if ( ! ( params.noLasts) && (! params.savedLasts) ) {
 		if ( ! params.mute ) jc.progress(AS.label('SavingLasts'));
 		jc.page.makeLasts( params.fulllist, ()=>{
+			$(document.body).trigger('jc_saved_page_lasts',params);
 			jc.page.makeTypeLasts( params.page, params.typelist, ()=>{
 				params.savedLasts = true;
 				jc.page.save( params );
@@ -546,6 +550,7 @@ jc.page.save = ( params ) => {
 	}
 	if ( ! ( params.noLasts) && (! params.savedDates) ) {
 		jc.page.makeTypeDates( params.page, params.typelist, ()=>{
+			$(document.body).trigger('jc_saved_page_dates',params);
 			params.savedDates = true;
 			jc.page.save( params );
 		});
@@ -568,16 +573,25 @@ jc.page.save = ( params ) => {
 	let makeStatic = () => {
 		if ( $('.jcEditable').length ) return;
 		$(document.body).off('jc_render_end', makeStatic );
-		const uri = 'static/'+params.page+(params.id||'')+'.html';
+		$(document.body).trigger('jc_saving_static',params);
+		const uri = AS.path('jsdatapagestatics')+jc.page.current()+(jc.page.data().pageContent.id||'')+'.html';
 		let cn = document.body.className;
 		document.body.className = '';
 		let html = $(document.documentElement).html();
 		document.body.className = cn;
-		html = html.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)[\s\S]*?>\s*(<\/head>)/,"$1$2").replace(/<nav .+?<\/nav>/g,"");
+		html = html
+			.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)[\s\S]*?>\s*(<\/head>)/,"$1$2")
+			.replace(/<nav [\s\S]+?<\/nav>/g,"")
+			.replace(/<svg [\s\S]+?<\/svg>/g,"")
+			;
 		html = '<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html>\n<html>\n'+html+'\n</html>'
-		jc.dav.put( uri, html );
+		jc.dav.put( uri, html, ()=>{
+			$(document.body).trigger('jc_saved_static',params);
+			$(document.body).trigger('jc_saved_page_full',params);
+		});
 	};
 	$(document.body).on('jc_render_end', makeStatic );
+	$(document.body).trigger('jc_saved_page',params);
 	if ( AS.test.func(params.callback) ) {
 		params.callback.call(window,params.page,params.id,params.data);
 		return;

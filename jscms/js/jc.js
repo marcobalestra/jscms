@@ -43,6 +43,7 @@ if ( AS.test.udef(jc.prop.prefs.prefsVersion)) jc.prop.prefs.prefsVersion = 1;
 	if ( AS.test.udef(AS.path('jsextensions'))) AS.path({jsextensions:AS.path('jstemplates')+'extensions/'});
 	if ( AS.test.udef(AS.path('jsdataroot'))) AS.path({jsdataroot:lp+'data/'});
 	if ( AS.test.udef(AS.path('jsdatapages'))) AS.path({jsdatapages:AS.path('jsdataroot')+'pages/'});
+	if ( AS.test.udef(AS.path('jsdatapagestatics'))) AS.path({jsdatapagestatics:AS.path('jsdataroot')+'static/'});
 	if ( AS.test.udef(AS.path('jsauth'))) AS.path({jsauth:lp+'login/'});
 	if ( AS.test.udef(AS.path('jsreporoot'))) AS.path({jsreporoot:bp+'repository/'});
 })()
