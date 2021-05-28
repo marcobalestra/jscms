@@ -576,7 +576,8 @@ jc.page.save = ( params ) => {
 		},100);
 	}
 	let makeStatic = () => {
-		if ( $('.jcEditable, .swal2-container').length ) return;
+		if ( $('.jcEditable').length ) return;
+		if ( $('.swal2-container').length ) return setTimeout( makeStatic, 200 );
 		$(document.body).off('jc_render_end', makeStatic );
 		$(document.body).trigger('jc_saving_static',params);
 		const uri = AS.path('jsdatapagestatics')+jc.page.current()+(jc.page.data().pageContent.id||'')+'.html';
