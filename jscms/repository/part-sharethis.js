@@ -90,5 +90,5 @@
 			return div;
 		},
 	};
-	jc.template.repo.set('sharethis',data);
+	jc.template.repo.set('part-sharethis',data);
 })(window);

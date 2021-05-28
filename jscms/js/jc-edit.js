@@ -570,22 +570,11 @@ jc.page.save = ( params ) => {
 		$(document.body).off('jc_render_end', makeStatic );
 		const uri = 'static/'+params.page+(params.id||'')+'.html';
 		let cn = document.body.className;
-		let html = '<!DOCTYPE HTML>\n<html>'+$(document.documentElement).html()+'</html>';
+		document.body.className = '';
+		let html = $(document.documentElement).html();
 		document.body.className = cn;
-		let cleaning = 100;
-		while ( cleaning ) {
-			cleaning--;
-			if ( html.match(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)<script/) ) {
-				html = html.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)[^<]*<script[^>]+>[^<]*<\/script>[^<]*/,"$1");
-			} else if ( html.match(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)<link/) ) {
-				html = html.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)<link[^>]+>[^<]*/,"$1");
-			} else if ( html.match(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)<style/) ) {
-				html = html.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)<style[^>]*>.+<\/style>[^<]*/,"$1");
-			} else {
-				cleaning = false;
-			}
-		}
-		html = html.replace(/<nav .+<\/nav>/,"");
+		html = html.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)[\s\S]*?>\s*(<\/head>)/,"$1$2").replace(/<nav .+?<\/nav>/g,"");
+		html = '<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html>\n<html>\n'+html+'\n</html>'
 		jc.dav.put( uri, html );
 	};
 	$(document.body).on('jc_render_end', makeStatic );
@@ -956,18 +945,19 @@ jc.edit = {
 	},
 	getRepository : ( pagetype, callback ) => {
 		if ( AS.test.udef(pagetype)) pagetype = jc.page.current();
-		if ( ! jc.edit.prop.repo[pagetype]) {
-			jc.springLoad( AS.path('jsreporoot')+'/'+pagetype+'.js' );
-			jc.edit.prop.repo[pagetype] = '_loading_';
-		}
-		if ( jc.edit.prop.repo[pagetype] == '_loading_' ) {
-			setTimeout( ()=>{jc.edit.getRepository(pagetype,callback);},100);
-			return;
-		}
-		if ( AS.test.func(callback) ) callback.call( window,jc.edit.prop.repo[pagetype]);
-		else return jc.edit.prop.repo[pagetype];
+		jc.template.repo.get( pagetype, callback );
+// 		if ( ! jc.edit.prop.repo[pagetype]) {
+// 			jc.springLoad( AS.path('jsreporoot')+'/'+pagetype+'.js' );
+// 			jc.edit.prop.repo[pagetype] = '_loading_';
+// 		}
+// 		if ( jc.edit.prop.repo[pagetype] == '_loading_' ) {
+// 			setTimeout( ()=>{jc.edit.getRepository(pagetype,callback);},100);
+// 			return;
+// 		}
+// 		if ( AS.test.func(callback) ) callback.call( window,jc.edit.prop.repo[pagetype]);
+// 		else return jc.edit.prop.repo[pagetype];
 	},
-	setRepository : (pagetype,data) => { return jc.edit.prop.repo[pagetype] = data; },
+	setRepository : jc.template.repo.set,
 	loadPageTypes : ( force )=>{
 		if ( force || (! jc.edit.prop.pageTypes) ) {
 			jc.edit.prop.pageTypes = true;

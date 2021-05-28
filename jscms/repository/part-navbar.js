@@ -85,5 +85,5 @@
 			return $navbar;
 		},
 	};
-	jc.template.repo.set('navbar',data);
+	jc.template.repo.set('part-navbar',data);
 })(window);

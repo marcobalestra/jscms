@@ -993,7 +993,7 @@ jc.template = {
 		info : {},
 		html : {},
 		part : {},
-		partrepo : {},
+		repo : {},
 	},
 	info : {
 		get: ( template, callback ) => {
@@ -1069,7 +1069,7 @@ jc.template = {
 				return;
 			}
 			if ( AS.test.obj(v) && v.type && (! options.raw ) ) {
-				jc.template.repo.get( v.type, (repo)=>{
+				jc.template.repo.get( 'part-'+v.type, (repo)=>{
 					if ( options.repo ) v = repo;
 					else v = repo.render(v);
 					if ( AS.test.func(callback) ) callback.call( window, v );
@@ -1106,10 +1106,10 @@ jc.template = {
 	},
 	repo : {
 		get : ( repo, callback ) => {
-			let data = jc.template.prop.partrepo[repo];
+			let data = jc.template.prop.repo[repo];
 			if ( ! data ) {
 				data = '_loading_';
-				jc.springLoad( AS.path('jsreporoot')+'/part-'+repo+(jc.prop.isDeveloper?'':'.min')+'.js' );
+				jc.springLoad( AS.path('jsreporoot')+repo+(jc.prop.isDeveloper?'':'.min')+'.js' );
 			}
 			if ( data == '_loading_') {
 				window.setTimeout( ()=>{ jc.template.repo.get(repo,callback); }, 100 );
@@ -1118,7 +1118,7 @@ jc.template = {
 			if (AS.test.func(callback)) callback.call( window, data );
 			return data;
 		},
-		set : ( repo, data ) => { jc.template.prop.partrepo[repo] = data },
+		set : ( repo, data ) => { jc.template.prop.repo[repo] = data },
 	},
 };
 
