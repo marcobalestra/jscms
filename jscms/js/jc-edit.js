@@ -510,7 +510,7 @@ jc.page.save = ( params ) => {
 		if ( ! params.tpd.title.length ) params.tpd.title = params.page + ( params.id ? ' '+params.id : '');
 	}
 	if ( ! params.saved ) {
-		jc.jdav.put( params.page + ( params.id || '') + '.json', params.data, ()=>{
+		jc.jdav.put( AS.path('jsdatapages') + params.page + ( params.id || '') + '.json', params.data, ()=>{
 			params.saved = true;
 			jc.page.save( params );
 		});

@@ -42,6 +42,7 @@ if ( AS.test.udef(jc.prop.prefs.prefsVersion)) jc.prop.prefs.prefsVersion = 1;
 	if ( AS.test.udef(AS.path('jsrenderers'))) AS.path({jsrenderers:AS.path('jstemplates')+'renderers/'});
 	if ( AS.test.udef(AS.path('jsextensions'))) AS.path({jsextensions:AS.path('jstemplates')+'extensions/'});
 	if ( AS.test.udef(AS.path('jsdataroot'))) AS.path({jsdataroot:lp+'data/'});
+	if ( AS.test.udef(AS.path('jsdatapages'))) AS.path({jsdatapages:AS.path('jsdataroot')+'pages/'});
 	if ( AS.test.udef(AS.path('jsauth'))) AS.path({jsauth:lp+'login/'});
 	if ( AS.test.udef(AS.path('jsreporoot'))) AS.path({jsreporoot:bp+'repository/'});
 })()
@@ -1260,7 +1261,7 @@ jc.page = {
 			if ( AS.test.func(callback) ) callback.call( window, jc.edit.data() );
 			return;
 		}
-		let url = AS.path('jsdataroot') + page + ( id ? id : '') + '.json';
+		let url = AS.path('jsdatapages') + page + ( id||'') + '.json';
 		jc.jdav.get( url, (data) =>{ if ( AS.test.func(callback) ) callback.call( window, data ); });
 	},
 	reload : () => { jc.page.step.data( jc.page.current(), jc.page.data().id ); },
@@ -1761,7 +1762,7 @@ jc.render = {
 					});
 				});
 				if ( ! (AS.test.arr(blocks) && blocks.length) ) return jc.render.queue(-1);
-				jc.jdav.get(  AS.path('jsdataroot') + s.page + ( s.id ? s.id : '') + '.json', (pdata)=>{
+				jc.jdav.get(  AS.path('jsdatapages') + s.page + ( s.id||'') + '.json', (pdata)=>{
 					if ( (! d.force) && pdata.metadata && pdata.metadata.hidden ) return jc.render.queue(-1);
 					if ( AS.test.udef(pdata.blocks)) pdata.blocks = [];
 					if ( ! AS.test.arr(pdata.blocks)) pdata.blocks = [pdata.blocks];
