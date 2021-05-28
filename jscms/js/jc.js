@@ -105,9 +105,11 @@ $(() => {
 // 				$(document.body).addClass('iOS');
 // 			}
 			/* 1st page */
-			let sp = jc.URI.decode();
-			if ( AS.test.str(sp.page) ) jc.page.open(sp.page,sp.id,sp.data);
-			else jc.page.open('index');
+			if ( window.self == window.top) {
+				let sp = jc.URI.decode();
+				if ( AS.test.str(sp.page) ) jc.page.open(sp.page,sp.id,sp.data);
+				else jc.page.open('index');
+			}
 			jc.autoAdjustFields();
 		} else {
 			window.setTimeout( foo, 100 );
