@@ -63,6 +63,11 @@ Virtual site configuration file will look like this:
 
 ```
 	RewriteEngine On
+	AddType 'text/css; charset=UTF-8' .css
+	AddType 'text/javascript; charset=UTF-8' .js
+	AddType 'application/rss+xml; charset=UTF-8' .rss
+	AddType 'application/json; charset=UTF-8' .json
+	AddType 'image/svg+xml; charset=UTF-8' .svg
 	SetOutputFilter DEFLATE
 	AddOutputFilterByType DEFLATE application/javascript
 	AddOutputFilterByType DEFLATE application/json

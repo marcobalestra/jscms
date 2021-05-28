@@ -5,6 +5,7 @@
 	AddType 'text/xsl; charset=UTF-8' .xsl
 	AddType 'text/javascript; charset=UTF-8' .js
 	AddType 'application/rss+xml; charset=UTF-8' .rss
+	AddType 'application/json; charset=UTF-8' .json
 
 # Rewrite
 	RewriteEngine On
