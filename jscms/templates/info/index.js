@@ -22,4 +22,4 @@
 		]},
 	];
 	jc.template.info.set('index',ti);
-})(window);
+})();

@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-<title>JSCMS is here!</title>
+<title>Happy SEO</title>
 <link>https://ricette.lan.crossbow.it/</link>
 <generator>jBloud CMS - jscms</generator>
 <item>
+	<link>https://ricette.lan.crossbow.it/blog2/</link>
+	<pubDate>Fri, 28 May 2021 10:58:49 GMT</pubDate>
+	<title>Happy SEO</title>
+	<description><![CDATA[Building a static version of the page on page saving]]></description>
+</item>
+<item>
 	<link>https://ricette.lan.crossbow.it/index/</link>
-	<pubDate>Fri, 28 May 2021 09:44:52 GMT</pubDate>
+	<pubDate>Fri, 28 May 2021 10:31:12 GMT</pubDate>
 	<title>JSCMS is here!</title>
 	<description><![CDATA[JSCMS home page (preview, still under development): the CMS without DB and without server-side languages.]]></description>
 </item>
@@ -15,12 +21,6 @@
 	<pubDate>Fri, 28 May 2021 09:04:04 GMT</pubDate>
 	<title>JSCMS tech info</title>
 	<description><![CDATA[A few tech details on the jscms backing JBLOUD]]></description>
-</item>
-<item>
-	<link>https://ricette.lan.crossbow.it/blog2/</link>
-	<pubDate>Fri, 28 May 2021 08:33:13 GMT</pubDate>
-	<title>Happy SEO</title>
-	<description><![CDATA[Building a static version of the page on page saving]]></description>
 </item>
 <item>
 	<link>https://ricette.lan.crossbow.it/blog1/</link>

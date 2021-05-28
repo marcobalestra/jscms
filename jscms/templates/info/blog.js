@@ -40,4 +40,4 @@
 		
 	};
 	jc.template.info.set('blog',ti);
-})(window);
+})();

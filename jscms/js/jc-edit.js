@@ -172,48 +172,53 @@ Object.keys( jc.dav ).forEach( (k) => { if (AS.test.udef(jc.jdav[k])) jc.jdav[k]
 $.extend( true, jc.lists, {
 	list: {
 		set : ( ...args ) => {
-			const type = args.find(a=>AS.test.str(a))||'_all';
-			const list = args.find(a=>AS.test.obj(a))||{};
-			const callback = args.find(a=>AS.test.func(a));
 			let commit = args.find(a=>AS.test.bool(a));
 			if ( AS.test.udef(commit)) commit=true;
-			jc.lists.prop.lists[type] = list;
-			if ( commit ) return jc.lists.list.commit.apply(window,args);
-			if ( AS.test.func(callback)) callback.call(window);
+			if ( commit ) {
+				jc.lists.list.commit.apply(window,args);
+			} else {
+				const type = args.find(a=>AS.test.str(a))||'_all';
+				const list = JSON.parse(JSON.stringify(args.find(a=>AS.test.obj(a))||{}));
+				const callback = args.find(a=>AS.test.func(a));
+				if ( AS.test.udef())
+				if ( AS.test.func(callback)) callback.call(window);
+			}
 		},
 		commit : ( ...args ) => {
 			const type = args.find(a=>AS.test.str(a))||'_all';
-			let list = args.find(a=>AS.test.obj(a));
+			const list = JSON.parse(JSON.stringify(args.find(a=>AS.test.obj(a))||jc.lists.prop.lists[type]||{}));
 			const callback = args.find(a=>AS.test.func(a));
-			if ( list ) jc.lists.prop.lists[type] = list;
-			else if ( jc.lists.prop.lists[type] ) list = jc.lists.prop.lists[type];
-			else list = {};
 			jc.jdav.put( jc.lists.list.uri(type), list, (r)=>{
+				jc.lists.prop.lists[type] = list;
 				if ( AS.test.func(callback)) callback.call(window,r);
 			});
 		},
 	},
 	last: {
 		set : ( ...args ) => {
-			const type = args.find(a=>AS.test.str(a))||'_all';
-			const qt = args.find(a=>AS.test.num(a));
-			const list = args.find(a=>AS.test.arr(a))||[];
-			const callback = args.find(a=>AS.test.func(a));
 			let commit = args.find(a=>AS.test.bool(a));
 			if ( AS.test.udef(commit)) commit=true;
-			if ( ! jc.lists.prop.lasts[type] ) jc.lists.prop.lasts[type] = {};
-			jc.lists.prop.lasts[type][String(qt)] = list;
-			if ( commit ) return jc.lists.last.commit.apply(window, args);
-			if (AS.test.func(callback)) callback.call(window);
+			if ( commit ) {
+				jc.lists.last.commit.apply(window, args)
+			} else {
+				const type = args.find(a=>AS.test.str(a))||'_all';
+				const qt = args.find(a=>AS.test.num(a));
+				const list = JSON.parse(JSON.stringify(args.find(a=>AS.test.arr(a))||[]));
+				const callback = args.find(a=>AS.test.func(a));
+				if ( ! jc.lists.prop.lasts[type] ) jc.lists.prop.lasts[type] = {};
+				jc.lists.prop.lasts[type][String(qt)] = list;
+				if (AS.test.func(callback)) callback.call(window);
+			}
 		},
 		commit : ( ...args ) => {
 			const type = args.find(a=>AS.test.str(a))||'_all';
 			const qt = args.find(a=>AS.test.num(a));
-			let list = args.find(a=>AS.test.arr(a));
+			let list = JSON.parse(JSON.stringify(args.find(a=>AS.test.arr(a))||jc.lists.prop.lasts[type][String(qt)]||[]));
 			const callback = args.find(a=>AS.test.func(a));
-			if ( ! list ) list = jc.lists.prop.lasts[type][String(qt)]||[];
 			let uri = jc.lists.last.uri(type,qt);
 			jc.jdav.put( uri, list, (r)=>{
+				if ( ! jc.lists.prop.lasts[type] ) jc.lists.prop.lasts[type] = {};
+				jc.lists.prop.lasts[type][String(qt)] = list;
 				if ( AS.test.func(callback)) callback.call(window,r);
 			});
 		},
