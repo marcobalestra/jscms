@@ -132,7 +132,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcVideo video { max-width: 90%; margin: 10px auto; display: block; }
 
 #jcSharingPanel { align-items: start; border-top: 1px solid #ddd; display: flex; flex-wrap: wrap; justify-content: center; margin: 24px 0; padding: 8px; }
-#jcToplevelContainer #jcSharingPanel > a::after { content: ''; }
+#jcToplevelContainer #jcSharingPanel a[href]::after { content: ''; }
 #jcSharingPanel > div { border: none; display: inline-block; height: 56px; overflow: hidden; width: 56px; }
 #jcSharingPanel a { border: none; border-radius: 20px; display: block; fill: #fff; height: 40px; margin: 8px; stroke: none; text-decoration: none; transition: all .15s ease-out; width: 40px; }
 #jcSharingPanel a:hover { border-radius: 6px; height: 54px; margin: 1px; width: 54px; }
