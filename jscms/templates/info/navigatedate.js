@@ -27,34 +27,34 @@
 	jc.render.block.navigatebydate = (b,d) => {
 		const ntype = d[b.prop]||'blog';
 		const $div = $('<div class="jcDateNavigator" id="'+AS.generateId('datenavigator')+'"></div>');
-		const $tgt = $('<div class="jcDateNavigate" id="'+AS.generateId('datenavigate')+'"></div>');
 		jc.render.queue(1);
-		const makelist = ($b,cb) => {
-			if ( $tgt.data('selector') == $b.data('selector') ) return;
-			$('button[data-ismonth]',$div).each( (idx,b) => { b.className = 'btn btn-secondary' } );
-			$b.get(0).className = 'btn btn-danger';
-			jc.jdav.get( $b.data('src'),(l)=>{
-				$tgt.html('');
-				let $ul = $('<ul></ul>');
-				(AS.def.arr(l)).filter( e => (AS.test.obj(e)) ).sort( (a,b) => (jc.sql2date(b.date).getTime() - jc.sql2date(a.date).getTime() ) ).forEach( e => {
-					let $li = $('<li></li>');
-					$li.append(`<a class="" onclick="jc.page.open('${e.page||ntype}'${e.id?','+e.id:''})"><strong>${e.title}</strong></a>`);
-					$li.append(`<small class="jcDate date ml-2"> ${ (new Date()).fromsql(e.date).toLocaleDateString(navigator.language,{weekday:'long',day:'numeric'}) } </small>`);
-					if ( e.desc && e.desc.length ) $li.append('<br /><span class="jcDesc">'+e.desc+'</span>');
-					$ul.append($li);
-				} );
-				$tgt.append($ul);
-				$tgt.data('selector',$b.data('selector'));
-				$b.get(0).className = 'btn btn-primary';
-				if ( AS.test.func(cb)) cb.call(window,l);
-			});
-		};
 		const nocontent = () => {
-			$tgt.html( '<div class="alert alert-warning">'+AS.label('NoItemsFound')+'</div>' );
+			$div.html('<div class="alert alert-warning">'+AS.label('NoItemsFound')+' — <i>“'+ntype+'”</i>.</div>' );
 			jc.render.queue(-1);
 		};
 		jc.jdav.get('struct/'+ntype+'-bydate-index.json',(l)=>{
 			if ( ! (AS.test.obj(l) && AS.test.arr(l.byyear) && l.byyear.length ) ) return nocontent();
+			const $tgt = $('<div class="jcDateNavigate" id="'+AS.generateId('datenavigate')+'"></div>');
+			const makelist = ($b,cb) => {
+				if ( $tgt.data('selector') == $b.data('selector') ) return;
+				$('button[data-ismonth]',$div).each( (idx,b) => { b.className = 'btn btn-secondary' } );
+				$b.get(0).className = 'btn btn-danger';
+				jc.jdav.get( $b.data('src'),(l)=>{
+					$tgt.html('');
+					let $ul = $('<ul></ul>');
+					(AS.def.arr(l)).filter( e => (AS.test.obj(e)) ).sort( (a,b) => (jc.sql2date(b.date).getTime() - jc.sql2date(a.date).getTime() ) ).forEach( e => {
+						let $li = $('<li></li>');
+						$li.append(`<a class="" onclick="jc.page.open('${e.page||ntype}'${e.id?','+e.id:''})"><strong>${e.title}</strong></a>`);
+						$li.append(`<small class="jcDate date ml-2"> ${ (new Date()).fromsql(e.date).toLocaleDateString(navigator.language,{weekday:'long',day:'numeric'}) } </small>`);
+						if ( e.desc && e.desc.length ) $li.append('<br /><span class="jcDesc">'+e.desc+'</span>');
+						$ul.append($li);
+					} );
+					$tgt.append($ul);
+					$tgt.data('selector',$b.data('selector'));
+					$b.get(0).className = 'btn btn-primary';
+					if ( AS.test.func(cb)) cb.call(window,l);
+				});
+			};
 			const $tabs = $('<ul class="nav nav-tabs mt-4" role="tablist"></ul>');
 			const $panes = $('<div class="tab-content"></div>');
 			let tobelisted = false;

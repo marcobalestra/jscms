@@ -257,38 +257,33 @@ $.extend( true, jc.lists, {
 jc.page.create = ( options ) => {
 	options = AS.def.obj(options);
 	if ( AS.test.udef(options.page) ) {
-		jc.jdav.get(
-			AS.path('jsauth') + 'auth/lstemplates',
-			(l) => {
-				let opts = {};
-				l.list.sort();
-				l.list.forEach( (k) => { opts[k] = k; } );
-				Swal.fire({
-					title: AS.label('SelectPageType'),
-					text: AS.label('SelectPageTypeDesc'),
-					input: 'select',
-					icon: 'question',
-					inputOptions : opts,
-					inputPlaceholder: 'Select',
-					showCancelButton: true,
-					cancelButtonText: AS.label('Cancel'),
-					confirmButtonText: AS.label('OK'),
-					inputValidator : (v) => {
-						return new Promise((resolve) => {
-							if (v.length) {
-								resolve()
-							} else {
-								resolve(AS.label('SelectPageType'));
-							}
-						})
-					},
-				}).then( result => {
-					if ( ! result.isConfirmed ) return;
-					options.page = result.value;
-					jc.page.create( options );
-				});
-			}
-		)
+		let l = jc.edit.prop.pageTypes.clone().sort();
+		let opts = {};
+		l.list.forEach( (k) => { opts[k] = k; } );
+		Swal.fire({
+			title: AS.label('SelectPageType'),
+			text: AS.label('SelectPageTypeDesc'),
+			input: 'select',
+			icon: 'question',
+			inputOptions : opts,
+			inputPlaceholder: 'Select',
+			showCancelButton: true,
+			cancelButtonText: AS.label('Cancel'),
+			confirmButtonText: AS.label('OK'),
+			inputValidator : (v) => {
+				return new Promise((resolve) => {
+					if (v.length) {
+						resolve()
+					} else {
+						resolve(AS.label('SelectPageType'));
+					}
+				})
+			},
+		}).then( result => {
+			if ( ! result.isConfirmed ) return;
+			options.page = result.value;
+			jc.page.create( options );
+		});
 		return;
 	}
 	if ( AS.test.udef(options.template) ) {
