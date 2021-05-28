@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-<title>JSCMS tech info</title>
+<title>JSCMS is here!</title>
 <link>https://ricette.lan.crossbow.it/</link>
 <generator>jBloud CMS - jscms</generator>
+<item>
+	<link>https://ricette.lan.crossbow.it/index/</link>
+	<pubDate>Fri, 28 May 2021 09:44:52 GMT</pubDate>
+	<title>JSCMS is here!</title>
+	<description><![CDATA[JSCMS home page (preview, still under development): the CMS without DB and without server-side languages.]]></description>
+</item>
 <item>
 	<link>https://ricette.lan.crossbow.it/index1/</link>
 	<pubDate>Fri, 28 May 2021 09:04:04 GMT</pubDate>
@@ -27,12 +33,6 @@
 	<pubDate>Fri, 28 May 2021 07:12:24 GMT</pubDate>
 	<title>Overview</title>
 	<description><![CDATA[A quick overview on the CMS]]></description>
-</item>
-<item>
-	<link>https://ricette.lan.crossbow.it/index/</link>
-	<pubDate>Fri, 28 May 2021 07:08:04 GMT</pubDate>
-	<title>JSCMS is here!</title>
-	<description><![CDATA[JSCMS home page (preview, still under development): the CMS without DB and without server-side languages.]]></description>
 </item>
 </channel>
 </rss>
