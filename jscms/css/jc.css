@@ -157,7 +157,10 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcMediaRecordArea video { max-width: 100%; display: block; }
 .jcMediaRecordArea.recording video, .jcMediaRecordArea.recording audio { opacity: .3; background-color : #c00; }
 
+button[data-ismonth] { text-transform: capitalize; }
+
 /* Bootstrap enhancements */
+a[onclick] { cursor: pointer; }
 .text-white { fill: #fff; }
 .swal2-container .swal2-actions button { min-width: 80px; text-align: center; }
 .swal2-container .swal2-actions .swal2-cancel {order: 1; margin-right: auto; }

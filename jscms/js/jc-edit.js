@@ -952,6 +952,7 @@ jc.edit = {
 		jc.edit.getRepository();
 		jc.edit.loadPageTypes();
 		jc.edit.loadPageParts();
+		$(document.body).trigger('jc_edit_loaded');
 	},
 	loadFormPlugins : () => {
 		if ( ! (AS.form && AS.form.plugin) ) {

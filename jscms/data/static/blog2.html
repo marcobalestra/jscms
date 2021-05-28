@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html>
+<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<meta name="MSSmartTagsPreventParsing" content="TRUE">
+		<meta http-equiv="X-UA-Compatible" content=",,,,IE=edge,chrome=1">
+		<meta name="viewport" content=",,,,width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+		<meta name="AS.path.labels" content="/jscms/locale/">
+		<meta name="AS.labels.dontLabelize" content="true">
+		<title>Happy SEO</title>
+		<meta name="keywords" content="jscms, jbloud, google, seo">
+		<meta name="description" content="Building a static version of the page on page saving">
+		<link rel="apple-touch-icon" sizes="128×128" href="/style:default/img/icon128.png">
+		<link rel="apple-touch-icon" sizes="114×114" href="/style:default/img/icon114.png">
+		<link rel="apple-touch-icon" sizes="64×64" href="/style:default/img/icon64.png">
+		<link rel="apple-touch-icon" href="/style:default/img/icon32.png">
+		<link rel="apple-touch-icon-precomposed" sizes="128×128" href="/style:default/img/icon128.png">
+		<link rel="apple-touch-icon-precomposed" sizes="114×114" href="/style:default/img/icon114.png">
+		<link rel="apple-touch-icon-precomposed" sizes="64×64" href="/style:default/img/icon64.png">
+		<link rel="apple-touch-icon-precomposed" href="/style:default/img/icon32.png">
+		<link rel="shortcut icon" href="/style:default/img/icon64.png">
+		<link rel="alternate" type="application/rss+xml" title="Last updates" href="/jscms/data/struct/site-last100.rss">
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+		<script type="text/javascript" src="https://cdn.altersoftware.org/js-as-core/as-core.js" charset="UTF-8"></script>
+		<script type="text/javascript" src="https://cdn.altersoftware.org/js-as-labels/as-labels.js" charset="UTF-8"></script><script type="text/javascript" language="javascript" charset="utf-8" src="/jscms/locale/en.js" id="AS-autoloadjs-labels-en"></script><script type="text/javascript" language="javascript" charset="utf-8" src="/jscms/locale/icons.js" id="AS-autoloadjs-labels-icons"></script><script type="text/javascript" language="javascript" charset="utf-8" src="/jscms/locale/en.js" id="AS-autoloadjs-labels-en"></script><script type="text/javascript" language="javascript" charset="utf-8" src="/jscms/locale/icons.js" id="AS-autoloadjs-labels-icons"></script><script type="text/javascript" language="javascript" charset="utf-8" src="/jscms/locale/it.js" id="AS-autoloadjs-labels-it"></script><script type="text/javascript" language="javascript" charset="utf-8" src="/jscms/locale/en.js" id="AS-autoloadjs-labels-en"></script><script type="text/javascript" language="javascript" charset="utf-8" src="/jscms/locale/icons.js" id="AS-autoloadjs-labels-icons"></script><script type="text/javascript" language="javascript" charset="utf-8" src="/jscms/locale/it.js" id="AS-autoloadjs-labels-it"></script><script type="text/javascript" language="javascript" charset="utf-8" src="/jscms/locale/en.js" id="AS-autoloadjs-labels-en"></script><script type="text/javascript" language="javascript" charset="utf-8" src="/jscms/locale/icons.js" id="AS-autoloadjs-labels-icons"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+		<script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="/style:default/css/site.css">
+		<script type="text/javascript" src="/jscms/js/jc-load.js"></script></head>
+	<body style="overflow: auto;" class="">
+		<div id="topBarContainer">
+			<div id="aboveTopBar"></div>
+			<div id="topBar"><div class="topBarImage" onclick="jc.page.open('index')"></div>
+<div class="topBarText">Recipes from real Chefs</div>
+<div style="text-align:center;position:absolute;left:30px;right:30px;bottom:40px;z-index:10;">
+	<input type="checkbox" id="demoModeSwitch">
+	<label for="demoModeSwitch">Demo</label>
+</div>
+<script type="text/javascript">
+	window.setTimeout(()=>{
+		const dummy = () => {
+			let $s = $('input#demoModeSwitch');
+			let u = jc.prop.authUser||AS.getCookie('jcAuthUser');
+			if ( u && (u != 'Dummy') ) {
+				$s.closest('div').remove();
+				return;
+			}
+			jc.prop.authUser = $s.is(':checked') ? 'Dummy' : undefined;
+			$('.jcMenu').removeClass('jcMenuParsed');
+			jc.page.checkJcMenu();
+			if ($s.is(':checked')) Swal.fire("Demo mode","With a “Dummy” user you’ll be able to edit content, but changes won’t be saved.","info");
+		};
+		$('input#demoModeSwitch').on('click',dummy);
+		dummy();
+	},10);
+</script></div>
+			<div id="belowTopBar"></div>
+		</div>
+		<div id="jcToplevelContainer"><div id="topContainer">
+	<div id="topNavbar"></div>
+	<div id="mainContainer"><div class="jcDate date">Thursday, May 27, 2021</div><h3>Happy SEO</h3><h6 class="jcAbstract">Building a static version of the page on page saving</h6><div class="jcMixedBlocks"><h4>Sharing tool parametric</h4>
+<p>It wasn’t a big deal, it’s in place.</p>
+<p>There are parameters to decide if you want to place sharing in menu bar, in the body or both, and the option to hide specific sharing channels.<br>The decision was to have a <em>hide</em> parameter (instead of <em>show</em>) because in this case by adding new sharing channels they’ll be automatically added and shown.</p>
+<h4>About our friendly neighbourhood web crawlers</h4>
+<p>The entire jscms backing JBLOUD was designed to be fast, effective, parametric and therefore completely javascript-driven.</p>
+<p>I was confident that google and other search engines, used to crawl react and angular sites, would have been able to scan also this site… but apparently their code execution at crawl time is well defined, scoped, strictly limited to <em>some</em> code. <em>“Trust no one”</em>, the young Hank Moody was right 😛</p>
+<p>On the other hand at page save time JBLOUD is saving so many static JSON files for relationships (last updated, page types and such), so what about saving also a static copy of the page?</p>
+<p>Of course &nbsp;a static copy that would be loaded (if existing) instead of the template, then always<em>[*]</em> updated because <em>normal</em> page load will load data and render everything. But the page loaded could be good for crawlers.</p>
+<p>It was necessary to remove:</p>
+<ul>
+<li><code>&lt;body&gt;</code> classes</li>
+<li>all <code>&lt;head&gt;</code> elements (<code>&lt;link&gt;</code>, <code>&lt;script&gt;</code> and <code>&lt;style&gt;</code>) define after jscms loader script</li>
+<li>all the <code>&lt;nav&gt;</code>&nbsp;</li>
+<li>all the <code>&lt;svg&gt;</code>&nbsp;(ok, this wasn’t actually “necessary”, but useful)</li>
+</ul>
+<p>… and it’s there. Achieved!</p>
+<p style="padding-left: 40px;"><span style="font-size: 0.9em;"><em>«Questa dal punto di vista seo è roba seria»<br>[Daddy]</em></span></p>
+<p><span style="font-size: 0.9em;"><em>Note [*]: </em>Not really “always updated”, actually it’s updated only unless loaded in a frame.<br>Updating from another domain would break SOP, in addition without updating Google translate does its work.</span></p></div></div>
+</div>
+</div>
+		<div id="topFooter"></div>
+
+
+
+
+
+</body>
+</html>
