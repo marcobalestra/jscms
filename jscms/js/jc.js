@@ -1725,8 +1725,7 @@ jc.render = {
 						$li.append('➤ ');
 						$a = $(`<span class="title"></span>`).html(i.title);
 					} else {
-						$a = $(`<a class="title"></a>`).html(i.title);
-						$a.on('click',()=>{ jc.page.open( p, i.id ) }); 
+						$a = $(`<a class="title" onclick="jc.page.open('${p}'${ i.id ? ','+i.id : '' })"></a>`).html(i.title);
 					}
 					$li.append( $a );
 					if ( d.showdate ) {
