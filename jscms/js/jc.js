@@ -1253,8 +1253,8 @@ jc.page = {
 		jc.page.data( data );
 		let finalize = ()=>{
 			$(document.body).off('jc_render_end',finalize);
-			window.scrollTo(0,0);
-			$(document.body).trigger('jc_page_open_completed',{page:page,id:id,uriparams:data});
+			if ( ! jc.page.prop.editMode ) window.scrollTo(0,0);
+			$( ()=>{ $(document.body).trigger('jc_page_open_completed',{page:page,id:id,uriparams:data}); } );
 		}
 		$(document.body).on('jc_render_end',finalize);
 		jc.page.step.info( page, id, data, infokey );
