@@ -37,7 +37,6 @@
 				if ( ! p[1] ) p[1] = p[0];
 				data.language = p[0].toLowerCase() + '_' + p[1].toUpperCase();
 			}
-			data.language = 'it_IT';
 			if ( ! AS.test.num(data.numposts) ) data.numposts = 10;
 			if ( ! (window.FB && window.FB.XFBML)) $out.append(`<div id="fb-root"></div><script async defer crossorigin="anonymous" src="https://connect.facebook.net/${data.language}/sdk.js#xfbml=1&version=v10.0" nonce="tRDE8OwY"></script>`);
 			if ( data.like ) {
