@@ -40,7 +40,7 @@
 			if ( ! AS.test.num(data.numposts) ) data.numposts = 10;
 			if ( ! (window.FB && window.FB.XFBML)) $out.append(`<div id="fb-root"></div><script async defer crossorigin="anonymous" src="https://connect.facebook.net/${data.language}/sdk.js#xfbml=1&version=v10.0" nonce="dxZcBcFz"></script>`);
 			if ( data.like ) {
-				$out.append(`<div class="fb-like" data-width="" data-layout="button" data-action="like" data-size="small" data-share="true"></div>`);
+				$out.append(`<div class="fb-like" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>`);
 			}
 			if ( ! nocomment ) {
 				$out.append(`<div class="fb-comments" data-width="" data-numposts="${data.numposts}"></div>`);
