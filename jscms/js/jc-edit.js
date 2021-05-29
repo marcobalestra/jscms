@@ -586,6 +586,7 @@ jc.page.save = ( params ) => {
 			.replace(/[ \t]*<script [^>]+facebook\.(com|net)[^>]+>[^<]*<\/script>[\r\n]*/g,'')
 			.replace(/<!--type:part=fbcomments[\s\S]*?<!--\/type:part-->/,'')
 			.replace(/\n*<div id="fb-root" [\s\S]+?<\/div>\n+/,'')
+			.replace(/(<meta[^>]+content="),+([^>]+>)/g,"$1$2")
 			.replace(/<nav [\s\S]+?<\/nav>/g,"")
 			.replace(/<svg [\s\S]+?<\/svg>/g,"")
 			;
