@@ -28,6 +28,8 @@ AS.labels.load('it',[{
 	'ForceAlsoHidden' : 'Anche se è nascosta',
 	'GotoPage' : 'Vai alla pagina',
 	'headerTag' : 'I cuochi scrivono, tutti possono leggere',
+	'Hide' : 'Nascondi',
+	'HideComments' : 'Disabilita i commenti',
 	'IncludedParts' : 'Frammenti inclusi',
 	'IncludePage' : 'Includi una pagina esistente',
 	'IncludePagePart' : 'Includi un frammento esterno',

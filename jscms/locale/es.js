@@ -28,6 +28,8 @@ AS.labels.load('es',[{
 	'ForceAlsoHidden' : 'Aunque sea escondida',
 	'GotoPage' : 'Ve a la página',
 	'headerTag' : 'Los cocineros escriben, todos pueden leer',
+	'Hide' : 'Esconder',
+	'HideComments' : 'Desactivar comentarios',
 	'IncludedParts' : 'Fragmentos excluidos',
 	'IncludePage' : 'Incluir una página ya existente',
 	'IncludePagePart' : 'Incluir un fragmento externo',

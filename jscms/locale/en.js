@@ -20,6 +20,7 @@ AS.labels.load('en',[{
 	'ForceAlsoHidden' : 'Even if page is hidden',
 	'GotoPage' : 'Go to page',
 	'headerTag' : 'Recipes from real Chefs',
+	'HideComments' : 'Disable comments',
 	'IncludedParts' : 'Included parts',
 	'IncludePage' : 'Include another page content',
 	'IncludePagePart' : 'Include external part',
