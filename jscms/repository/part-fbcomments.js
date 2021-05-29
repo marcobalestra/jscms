@@ -16,6 +16,7 @@
 			return fo;
 		},
 		render : ( data ) => {
+			$('.jcFbcomments').remove();
 			const $out = $('<div class="jcFbcomments"></div>');
 			if ( (! data.active) || data['hide-'+jc.page.current()] || (jc.page.data().pageContent.metadata && jc.page.data().pageContent.metadata.hideComments) ) {
 				$out.data('inactive',true);
