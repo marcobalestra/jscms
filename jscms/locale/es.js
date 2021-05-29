@@ -23,6 +23,8 @@ AS.labels.load('es',[{
 	'editYetItOk' : 'Continúa',
 	'editYetItTitle' : 'La página ya era en modifica.',
 	'Error' : 'Error',
+	'FacebookID' : 'Facebook ID',
+	'FacebookIdHelp' : '<a href="https://www.facebook.com/help/1397933243846983" target="_blank">How to find your Facebook ID</a>\nThis value is required to activate comments: the user with such ID will be able to moderate comments.\nGeek? Get value from <code>c_user</code> FB cookie.',
 	'FileName' : 'Nombre',
 	'FileSize' : 'Tamaño',
 	'ForceAlsoHidden' : 'Aunque sea escondida',
@@ -81,6 +83,8 @@ AS.labels.load('es',[{
 	'TextOrHtml' : 'Texto o HTML',
 	'ThisPage' : 'Esta misma página',
 	'UnsupportedMedia' : 'El navegador no puede reproducir éste articulo <tt>{{type}}</tt><br />En alternativa puede <a href="{{uri}}" download="{{name}}"><b>descargar</b></a> el fichero.',
+	'UseFbLike' : 'Use Facebook “Like”',
+	'UseFbComments' : 'Use Facebook comments',
 	'Warning' : 'Cuidado',
 	'WholeSite' : 'Toda la web',
 }]);

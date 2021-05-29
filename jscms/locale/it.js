@@ -23,6 +23,8 @@ AS.labels.load('it',[{
 	'editYetItOk' : 'Continua',
 	'editYetItTitle' : 'La pagina era già in modifica.',
 	'Error' : 'Errore',
+	'FacebookID' : 'ID Facebook',
+	'FacebookIdHelp' : '<a href="https://www.facebook.com/help/1397933243846983" target="_blank">Come conoscere il proprio Facebook ID</a>\nÈ necessario per attivare i commenti, identifica l’utente che potrà moderarli.\nSei un geek? Leggi il cookie <code>c_user</code> di FB.',
 	'FileName' : 'Nome',
 	'FileSize' : 'Peso',
 	'ForceAlsoHidden' : 'Anche se è nascosta',
@@ -81,6 +83,8 @@ AS.labels.load('it',[{
 	'TextOrHtml' : 'Testo o HTML',
 	'ThisPage' : 'Questa pagina',
 	'UnsupportedMedia' : 'Il browser non riesce a riprodurre questo elemento <tt>{{type|unknown}}</tt><br />In alternativa è possibile <a href="{{uri}}" download="{{name}}"><b>scaricare</b></a> il file.',
+	'UseFbLike' : 'Usa i “Like” di Facebook',
+	'UseFbComments' : 'Usa i commenti Facebook',
 	'Warning' : 'Attenzione',
 	'WholeSite' : 'Tutto il sito',
 }]);
