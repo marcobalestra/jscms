@@ -582,6 +582,8 @@ jc.page.save = ( params ) => {
 		document.body.className = cn;
 		html = html
 			.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)[\s\S]*?>\s*(<\/head>)/,"$1$2")
+			.replace(/[ \t]*<script [^>]+AS-autoload[^>]+>[^<]*<\/script>[\r\n]*/g,'')
+			.replace(/[ \t]*<script [^>]+facebook\.(com|net)[^>]+>[^<]*<\/script>[\r\n]*/g,'')
 			.replace(/<nav [\s\S]+?<\/nav>/g,"")
 			.replace(/<svg [\s\S]+?<\/svg>/g,"")
 			;
