@@ -1490,7 +1490,7 @@ jc.render = {
 						if ( AS.test.udef(c.editable) ) c.editable = e.editable;
 						if ( c.rendered ) {
 							if ( jc.page.prop.editMode ) jc.render.editable(c);
-							$('#'+c.id,$tgt).after( c.rendered ).remove();
+							$('#'+c.id,$tgt).after( '<!--type:'+c.type+((c.type=='part')?'='+c.content:'')+'-->', c.rendered, '<!--/type:'+c.type+'-->' ).remove();
 							delete c.rendered;
 							delete c.internalRecursion;
 							delete c.id;
