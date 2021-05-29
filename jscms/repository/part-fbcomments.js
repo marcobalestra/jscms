@@ -40,10 +40,10 @@
 			if ( ! AS.test.num(data.numposts) ) data.numposts = 10;
 			if ( ! (window.FB && window.FB.XFBML)) $out.append(`<div id="fb-root"></div><script async defer crossorigin="anonymous" src="https://connect.facebook.net/${data.language}/sdk.js#xfbml=1&version=v10.0" nonce="tRDE8OwY"></script>`);
 			if ( data.like ) {
-				$out.append(`<div class="fb-like" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>`);
+				$out.append(`<div class="fb-like" data-width="" data-href="${location.href}" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>`);
 			}
 			if ( ! nocomment ) {
-				$out.append(`<div class="fb-comments" data-width="" data-numposts="${data.numposts}"></div>`);
+				$out.append(`<div class="fb-comments" data-width="" data-href="${location.href}" data-width="" data-numposts="${data.numposts}"></div>`);
 				const head = document.documentElement.querySelector('head');
 				$('meta[property="fb:admins"]',head).remove();
 				$(head).append(`<meta property="fb:admins" content="${ data.fbid }"/>`);
@@ -52,6 +52,7 @@
 				$(document.body).on('jc_render_end',()=>{
 					if ( ! (window.FB && window.FB.XFBML) ) return;
 					if ( $out.data('inactive') ) return;
+					$('[data-href]',$out).attr('href',location.href);
 					$( ()=> { FB.XFBML.parse(); } );
 				}).data('jcFbcommentsEvent',true);
 			}
