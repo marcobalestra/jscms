@@ -259,7 +259,7 @@ jc.page.create = ( options ) => {
 	if ( AS.test.udef(options.page) ) {
 		let l = jc.edit.prop.pageTypes.clone().sort();
 		let opts = {};
-		l.list.forEach( (k) => { opts[k] = k; } );
+		l.forEach( (k) => { opts[k] = k; } );
 		Swal.fire({
 			title: AS.label('SelectPageType'),
 			text: AS.label('SelectPageTypeDesc'),
