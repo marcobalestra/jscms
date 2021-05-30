@@ -1,3 +1,7 @@
+#Header always set X-Frame-Options "SAMEORIGIN"
+#Header always unset X-Frame-Options
+Header set X-Frame-Options "ALLOW-FROM https://www.facebook.com/"
+
 # File types
 	AddType 'text/html; charset=UTF-8' .html .xhtml
 	AddType 'text/css; charset=UTF-8' .css

@@ -590,7 +590,7 @@ jc.page.save = ( params ) => {
 			.replace(/<nav [\s\S]+?<\/nav>/g,"")
 			.replace(/<svg [\s\S]+?<\/svg>/g,"")
 			;
-		html = '<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE html>\n<html>\n'+html+'\n</html>'
+		html = '<!DOCTYPE html>\n<html>\n'+html+'\n</html>';
 		jc.dav.put( uri, html, ()=>{
 			$(document.body).trigger('jc_saved_static',params);
 			$(document.body).trigger('jc_saved_page_full',params);

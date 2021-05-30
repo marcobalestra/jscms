@@ -6,9 +6,15 @@
 <generator>jBloud CMS - jscms</generator>
 <item>
 	<link>https://ricette.lan.crossbow.it/blog2/</link>
-	<pubDate>Sat, 29 May 2021 10:30:38 GMT</pubDate>
+	<pubDate>Sun, 30 May 2021 09:14:06 GMT</pubDate>
 	<title>Happy SEO</title>
 	<description><![CDATA[Building a static version of the page on page saving]]></description>
+</item>
+<item>
+	<link>https://ricette.lan.crossbow.it/index2/</link>
+	<pubDate>Sun, 30 May 2021 09:13:23 GMT</pubDate>
+	<title>Overview</title>
+	<description><![CDATA[A quick overview on the CMS]]></description>
 </item>
 <item>
 	<link>https://ricette.lan.crossbow.it/navigatedate1/</link>
@@ -33,12 +39,6 @@
 	<pubDate>Fri, 28 May 2021 07:15:08 GMT</pubDate>
 	<title>Once upon a time…</title>
 	<description><![CDATA[From the beginning to JSCMS, then to JBLOUD - Thanks to some god for IE is dead]]></description>
-</item>
-<item>
-	<link>https://ricette.lan.crossbow.it/index2/</link>
-	<pubDate>Fri, 28 May 2021 07:12:24 GMT</pubDate>
-	<title>Overview</title>
-	<description><![CDATA[A quick overview on the CMS]]></description>
 </item>
 </channel>
 </rss>

@@ -18,7 +18,7 @@
 					{ type:"mixed",prop:"blocks" },
 				]
 			},
-			{ type:"part", content: "fbcomments.json" },
+// 			{ type:"part", content: "fbcomments.json" },
 			{ type:"part", content: "sharethis.json" },
 		]},
 	];
