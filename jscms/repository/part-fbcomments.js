@@ -38,7 +38,7 @@
 				data.language = p[0].toLowerCase() + '_' + p[1].toUpperCase();
 			}
 			if ( ! AS.test.num(data.numposts) ) data.numposts = 10;
-			if ( ! (window.FB && window.FB.XFBML)) $out.append(`<div id="fb-root"></div><script async defer crossorigin="anonymous" src="https://connect.facebook.net/${data.language}/sdk.js#xfbml=1&version=v10.0" nonce="tRDE8OwY"></script>`);
+			if ( ! (window.FB && window.FB.XFBML)) $out.append(`<div id="fb-root"></div><script async defer crossorigin="anonymous" src="https://connect.facebook.net/${data.language}/sdk.js#xfbml=1&version=v10.0" nonce="cB9CGF9M"></script>`);
 			if ( data.like ) {
 				$out.append(`<div class="fb-like" data-width="" data-href="${location.href}" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>`);
 			}
