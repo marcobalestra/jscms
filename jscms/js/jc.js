@@ -1630,7 +1630,25 @@ jc.render = {
 		},
 		date : (b,d) => {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
-			return '<div class="jcDate date">'+(new Date()).fromsql(d[b.prop]).toLocaleDateString(navigator.language,{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'</div>';
+			let $out = $(b.wrap||'<div></div>');
+			$out.addClass('jcDate');
+			$out.append('<span class="date">'+(new Date()).fromsql(d[b.prop]).toLocaleDateString(navigator.language,{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'</span>');
+			if ( (b.prop == 'blogdate') && d.metadata && d.metadata.type ) jc.lists.list.get(d.metadata.type,( ld )=>{
+				let sl = [];
+				Object.keys(ld).forEach( k => { sl.push(ld[k])} );
+				sl.sort( (a,b) => (a.gdate < b.date ? 1 : -1 ) );
+				let prev,next,max=(sl.length -1);
+				for ( let i = 0; i <= max; i++ ) {
+					if ( sl[i].id == d.metadata.id ) {
+						if ( i > 0 ) prev = sl[ i -1].id;
+						if ( i < max ) next = sl[i+1].id;
+						break;
+					}
+				}
+				if ( prev ) $out.prepend(`<a class="btn btn-sm mr-2 mb-1" onclick="jc.page.open('${d.metadata.type}',${prev})">◁</a>`);
+				if ( next) $out.append(`<a class="btn btn-sm ml-2 mb-1" onclick="jc.page.open('${d.metadata.type}',${next})">▷</a>`);
+			});
+			return $out;
 		},
 		mixed : (b,d) => {
 			if ( ! d[b.prop] ) return '';

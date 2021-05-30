@@ -7,7 +7,7 @@ body { background-color: #ddd; margin: 0; overflow: auto; padding: 0; }
 #topContainer { background-color: #fff; border: solid 1px #ccc; border-radius: 4px; margin: 48px auto; max-width: 1280px; padding: 10px; position: relative; }
 #topNavbar { margin: -10px -10px 10px -10px; }
 #topNavbar a[onclick] { cursor: pointer; }
-#mainContainer div.date { color: #999; font-size: bigger; font-style: italic; text-align: right; }
+#mainContainer div.jcDate { color: #999; font-size: bigger; font-style: italic; text-align: right; }
 
 /* Mobile only */
 @media (max-width: 600px) {

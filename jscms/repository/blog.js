@@ -4,4 +4,4 @@
 		}
 	};
 	jc.template.repo.set('blog',data);
-})(window);
+})();
