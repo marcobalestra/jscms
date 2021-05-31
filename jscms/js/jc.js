@@ -220,6 +220,9 @@ Date.prototype.jcparser = function(d) {
 if (!Date.prototype.fromita) Date.prototype.fromita = function(s) {
 	return this.fromsql( jc.date2sql(s) );
 };
+if (!Date.prototype.toblogdate) Date.prototype.toblogdate = function() {
+	return this.toLocaleDateString(navigator.language,{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+};
 
 jc.getError = (jqXHR,status,e) => { jc.console(jqXHR,status,e); };
 
@@ -1632,7 +1635,7 @@ jc.render = {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
 			let $out = $(b.wrap||'<div></div>');
 			$out.addClass('jcDate');
-			$out.append('<span class="date">'+(new Date()).fromsql(d[b.prop]).toLocaleDateString(navigator.language,{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'</span>');
+			$out.append('<span class="date">'+jc.sql2date(d[b.prop]).toblogdate()+'</span>');
 			if ( (b.prop == 'blogdate') && d.metadata && d.metadata.type ) jc.lists.list.get(d.metadata.type,( ld )=>{
 				let sl = [];
 				Object.keys(ld).forEach( k => { sl.push(ld[k])} );
@@ -1640,13 +1643,13 @@ jc.render = {
 				let prev,next,max=(sl.length -1);
 				for ( let i = 0; i <= max; i++ ) {
 					if ( sl[i].id == d.metadata.id ) {
-						if ( i > 0 ) prev = sl[ i -1].id;
-						if ( i < max ) next = sl[i+1].id;
+						if ( i > 0 ) prev = sl[ i -1];
+						if ( i < max ) next = sl[i+1];
 						break;
 					}
 				}
-				prev = prev ? `onclick="jc.page.open('${d.metadata.type}',${prev})"` : 'disabled="disabled"';
-				next = next ? `onclick="jc.page.open('${d.metadata.type}',${next})"` : 'disabled="disabled"';
+				prev = prev ? `onclick="jc.page.open('${d.metadata.type}',${prev.id})" title="${ jc.sql2date(prev.date).toblogdate() }"` : 'disabled="disabled"';
+				next = next ? `onclick="jc.page.open('${d.metadata.type}',${next.id})" title="${ jc.sql2date(next.date).toblogdate() }"` : 'disabled="disabled"';
 				$out.append( $('<span class="btn-group ml-2 mb-1"></span>')
 					.append(`<button class="btn btn-secondary btn-sm" ${prev}>${AS.icon('arrow-left')}</button>`)
 					.append(`<button class="btn btn-secondary btn-sm" ${next}>${AS.icon('arrow-right')}</button>`)
