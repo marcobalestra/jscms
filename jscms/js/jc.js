@@ -1645,7 +1645,7 @@ jc.render = {
 						break;
 					}
 				}
-				if ( prev ) $out.prepend(`<a class="btn btn-sm mr-2 mb-1" onclick="jc.page.open('${d.metadata.type}',${prev})">◁</a>`);
+				if ( prev ) $out.append(`<a class="btn btn-sm ml-2 mb-1" onclick="jc.page.open('${d.metadata.type}',${prev})">◁</a>`);
 				if ( next) $out.append(`<a class="btn btn-sm ml-2 mb-1" onclick="jc.page.open('${d.metadata.type}',${next})">▷</a>`);
 			});
 			return $out;
