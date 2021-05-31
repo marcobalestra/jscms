@@ -119,6 +119,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
     min-height : 320px;
 }
 
+.jcCarousel { display: block; width: 100%; margin: 1em 0; }
 .jcCarousel .carousel-inner { background-color: #999; border: 1px solid #666; background-image : linear-gradient(to top,#666,#999,#ccc,#666); overflow: hidden; }
 .jcCarousel .carousel-item { height: 340px; text-align: center; }
 .jcCarousel .carousel-item img { display: block; left: 50%; margin: 0; max-height: 340px; position: absolute; top: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 3px #000; }
