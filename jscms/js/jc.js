@@ -1645,8 +1645,10 @@ jc.render = {
 						break;
 					}
 				}
-				if ( prev ) $out.append(`<a class="btn btn-sm ml-1 mb-1" onclick="jc.page.open('${d.metadata.type}',${prev})">◀</a>`);
-				if ( next) $out.append(`<a class="btn btn-sm ml-1 mb-1" onclick="jc.page.open('${d.metadata.type}',${next})">►</a>`);
+				let $s = $('<span class="btn-group ml-2"></span>');
+				if ( prev ) $s.append(`<button class="btn btn-secondary btn-sm" onclick="jc.page.open('${d.metadata.type}',${prev})">${AS.icon('arrow-left')}</button>`);
+				if ( next) $s.append(`<button class="btn btn-secondary btn-sm" onclick="jc.page.open('${d.metadata.type}',${next})">${AS.icon('arrow-right')}</button>`);
+				$out.append($s);
 			});
 			return $out;
 		},
