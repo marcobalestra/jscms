@@ -221,7 +221,11 @@ if (!Date.prototype.fromita) Date.prototype.fromita = function(s) {
 	return this.fromsql( jc.date2sql(s) );
 };
 if (!Date.prototype.toblogdate) Date.prototype.toblogdate = function() {
-	return this.toLocaleDateString(navigator.language,{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+	return this
+		.toLocaleDateString(navigator.language,{weekday:'long',year:'numeric',month:'long',day:'numeric'})
+		.replace(/^([a-z])/,x=>x.toUpperCase())
+		.replace(/([^a-z])([a-z])/gi,(a,x,y)=>(x+y.toUpperCase()))
+	;
 };
 
 jc.getError = (jqXHR,status,e) => { jc.console(jqXHR,status,e); };
