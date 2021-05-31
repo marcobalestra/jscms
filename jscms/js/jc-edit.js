@@ -2025,11 +2025,35 @@ jc.edit.uploads = {
 			jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{ } });
 		};
 		if ( params.gallery ) {
-			let $s = $('<select><option>S</option><option value="">M</option><option>L</option><option>XL</option></select>');
-			$('.jcUploadsAdders .btn-group',$out).append($('<span class="ml-3 mt-1"></span>').append($s));
-			$s.val( params.gallery.size||'' );
-			$s.on('change',()=>{
-				if ( $s.val().length) params.gallery.size = $s.val();
+			let $st = $('<select class="mr-1 mt-1"><option value="T">Thumbnails</option><option value="C">Carousel</option></select>');
+			let $sf = $('<select class="mr-1 mt-1"><option value="">Plain</option><option value="c">With captions</option><option value="x">With controls</option><option value="i">With indicators</option><option value="ci">With captions + indicators</option><option value="xi">With controls + indicators</option><option value="cxi">With captions + controls + indicators</option></select>');
+			let $ss = $('<select class="mr-1 mt-1"><option>S</option><option value="">M</option><option>L</option><option>XL</option></select>');
+			$st.val( params.gallery.aspect||'T' );
+			$st.on('change',()=>{
+				params.gallery.aspect = $st.val();
+				if ( params.gallery.aspect == 'C' ) delete params.gallery.size;
+				else delete params.gallery.flags;
+				$ss.toggle( params.gallery.aspect != 'C' );
+				$sf.toggle( params.gallery.aspect == 'C' );
+				jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{
+					jc.edit.noModal();
+					$(document.body).on('jc_page_data_loaded',refresh);
+					jc.page.reload();
+				}});
+			});
+			$sf.val( params.gallery.flags||'' ).toggle( params.gallery.aspect == 'C' );
+			$sf.on('change',()=>{
+				if ( $sf.val().length) params.gallery.flags = $sf.val();
+				else delete params.gallery.flags;
+				jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{
+					jc.edit.noModal();
+					$(document.body).on('jc_page_data_loaded',refresh);
+					jc.page.reload();
+				}});
+			});
+			$ss.val( params.gallery.size||'' ).toggle( params.gallery.aspect != 'C' );
+			$ss.on('change',()=>{
+				if ( $ss.val().length) params.gallery.size = $ss.val();
 				else delete params.gallery.size;
 				jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{
 					jc.edit.noModal();
@@ -2037,7 +2061,8 @@ jc.edit.uploads = {
 					jc.page.reload();
 				}});
 			});
-			$s.select2({minimumResultsForSearch: Infinity});
+			$('.jcUploadsAdders .btn-group',$out).append($('<span class="ml-3"></span>').append($st,$sf,$ss));
+			$('.jcUploadsAdders .btn-group select',$out).css({'max-width':'100px'});
 		}
 		$('.jcImageUpload',$out).on('click',()=>{ $('input[type="file"]',$out).trigger('click'); });
 		$('input[type="file"]',$out).on('change',(e)=>{ doupload() });

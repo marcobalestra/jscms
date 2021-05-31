@@ -1698,41 +1698,70 @@ jc.render = {
 		gallery : (b,d,pdata) => {
 			if ( ! (AS.test.arr(d[b.prop]) && d[b.prop].length ) ) return '';
 			let gid = AS.generateId('jcGallery');
-			let $div = $('<div class="jcGallery"></div>');
+			let $div = $('<div></div>');
 			if ( d.size && d.size.length ) $div.addClass( 'size'+d.size);
-			d[b.prop].forEach( uu => {
-				let u = pdata.uploads.find( x => ( x.uri == uu.uri ));
-				if ( ! u ) return;
-				let $a = $(`<a href="${u.uri}"></a>`);
-				if ( u.fb ) {
-					$a.attr('data-fancybox',gid);
-					$a.attr('data-caption',u.caption);
+			if ( d.aspect == 'C' ) {
+				$div.addClass('jcCarousel carousel slide');
+				$div.attr({'id':gid,'data-interval':20000});
+				let imgs = [];
+				d[b.prop].forEach( uu => {
+					let u = pdata.uploads.find( x => ( x.uri == uu.uri ));
+					if ( u && u.img) imgs.push(u);
+				});
+				if ( d.flags && d.flags.includes('i') ) {
+					let $ol = $('<ol class="carousel-indicators"></ol>');
+					imgs.forEach( (i,idx) => { $ol.append(`<li data-target="#${gid}" data-slide-to="${idx}" class="${idx?'':'active'}"></li>`) } );
+					$div.append($ol);
 				}
-				$a.attr('title',u.caption);
-				if ( u.img ) {
-					$a.append(`<img src="${ u.uri }" alt="${ u.caption }" />`);
-				}  else {
-					if (u.fb) {
-						if ( u.au || u.vid ) {
-							$a.append( AS.icon(u.au ? 'audio' : 'video') );
-							$a.attr('data-type','iframe');
-							$a.attr('data-src', u.uri );
-							$a.attr('data-download', u.name );
-							$a.attr('href', 'javascript:;');
+				let $in = $('<div class="carousel-inner"></div>');
+				imgs.forEach( (i,idx) => {
+					let $it = $('<div class="carousel-item"></div>');
+					if ( ! idx ) $it.addClass('active');
+					$it.append(` <img src="${i.uri}" alt="${ i.caption }" />`);
+					if ( d.flags && d.flags.includes('c') ) $it.append( $('<div class="carousel-caption d-none d-md-block"></div>').append('<h5></h5>').html( i.caption ) );
+					$in.append($it);
+				} );
+				$div.append($in);
+				if ( d.flags && d.flags.includes('x') ) $div.append(
+					$(`<a class="carousel-control-prev" href="#${gid}" role="button" data-slide="prev"></a>`).append('<span class="carousel-control-prev-icon" aria-hidden="true"></span>','<span class="sr-only">Previous</span>'),
+					$(`<a class="carousel-control-next" href="#${gid}" role="button" data-slide="next"></a>`).append('<span class="carousel-control-next-icon" aria-hidden="true"></span>','<span class="sr-only">Next</span>')
+				);
+			} else {
+				$div.addClass('jcGallery');
+				d[b.prop].forEach( uu => {
+					let u = pdata.uploads.find( x => ( x.uri == uu.uri ));
+					if ( ! u ) return;
+					let $a = $(`<a href="${u.uri}"></a>`);
+					if ( u.fb ) {
+						$a.attr('data-fancybox',gid);
+						$a.attr('data-caption',u.caption);
+					}
+					$a.attr('title',u.caption);
+					if ( u.img ) {
+						$a.append(`<img src="${ u.uri }" alt="${ u.caption }" />`);
+					}  else {
+						if (u.fb) {
+							if ( u.au || u.vid ) {
+								$a.append( AS.icon(u.au ? 'audio' : 'video') );
+								$a.attr('data-type','iframe');
+								$a.attr('data-src', u.uri );
+								$a.attr('data-download', u.name );
+								$a.attr('href', 'javascript:;');
+							} else {
+								$a.append( AS.icon('file') );
+							}
 						} else {
-							$a.append( AS.icon('file') );
+							$a.attr('download',u.name);
+							$a.append( AS.icon('downloadPublic') );
 						}
-					} else {
-						$a.attr('download',u.name);
-						$a.append( AS.icon('downloadPublic') );
+						if (u.ext && u.ext.length) {
+							$a.attr('title',u.caption+' ('+u.ext.toUpperCase()+')');
+							$a.append('<span>.'+u.ext.shorten(5)+'</span>');
+						}
 					}
-					if (u.ext && u.ext.length) {
-						$a.attr('title',u.caption+' ('+u.ext.toUpperCase()+')');
-						$a.append('<span>.'+u.ext.shorten(5)+'</span>');
-					}
-				}
-				$div.append($a);
-			} );
+					$div.append($a);
+				} );
+			}
 			return $div;
 		},
 		lasts : (b,d) => {

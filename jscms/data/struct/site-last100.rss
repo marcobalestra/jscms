@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-<title>Once upon a time…</title>
+<title>Overview</title>
 <link>https://ricette.lan.crossbow.it/</link>
 <generator>jBloud CMS - jscms</generator>
+<item>
+	<link>https://ricette.lan.crossbow.it/index2/</link>
+	<pubDate>Mon, 31 May 2021 09:33:08 GMT</pubDate>
+	<title>Overview</title>
+	<description><![CDATA[A quick overview on the CMS]]></description>
+</item>
 <item>
 	<link>https://ricette.lan.crossbow.it/blog1/</link>
 	<pubDate>Sun, 30 May 2021 19:12:46 GMT</pubDate>
@@ -15,12 +21,6 @@
 	<pubDate>Sun, 30 May 2021 18:50:40 GMT</pubDate>
 	<title>Happy SEO</title>
 	<description><![CDATA[Building a static version of the page on page saving]]></description>
-</item>
-<item>
-	<link>https://ricette.lan.crossbow.it/index2/</link>
-	<pubDate>Sun, 30 May 2021 09:13:23 GMT</pubDate>
-	<title>Overview</title>
-	<description><![CDATA[A quick overview on the CMS]]></description>
 </item>
 <item>
 	<link>https://ricette.lan.crossbow.it/navigatedate1/</link>
