@@ -1655,8 +1655,8 @@ jc.render = {
 				prev = prev ? `onclick="jc.page.open('${d.metadata.type}',${prev.id})" title="${ jc.sql2date(prev.date).toblogdate() }"` : 'disabled="disabled"';
 				next = next ? `onclick="jc.page.open('${d.metadata.type}',${next.id})" title="${ jc.sql2date(next.date).toblogdate() }"` : 'disabled="disabled"';
 				$out.append( $('<span class="btn-group ml-2 mb-1"></span>')
-					.append(`<button class="btn btn-secondary btn-sm" ${prev}>${AS.icon('arrow-left')}</button>`)
-					.append(`<button class="btn btn-secondary btn-sm" ${next}>${AS.icon('arrow-right')}</button>`)
+					.append(`<button class="btn btn-secondary btn-sm" ${prev}>${AS.icon('arrow-up')}</button>`)
+					.append(`<button class="btn btn-secondary btn-sm" ${next}>${AS.icon('arrow-down')}</button>`)
 				);
 			});
 			return $out;
