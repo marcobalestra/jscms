@@ -119,12 +119,14 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
     min-height : 320px;
 }
 
-.jcCarousel .carousel-inner { background-color : #999; border: 1px solid #666; }
-.jcCarousel .carousel-item { height: 320px; text-align: center; }
-.jcCarousel .carousel-item img { display: inline; max-height: 320px; vertical-align: middle; }
-.jcCarousel span[class*="carousel-control-"] { background-color : rgba(0,0,0,.1); outline: 8px solid rgba(0,0,0,.1); }
-.jcCarousel .carousel-caption { text-shadow: 1px 1px 3px #333; }
-.jcCarousel .carousel-indicators li { box-shadow: 1px 1px 3px #333; border: none; margin-bottom: 10px; }
+.jcCarousel .carousel-inner { background-color: #999; border: 1px solid #666; }
+.jcCarousel .carousel-item { height: 340px; text-align: center; }
+.jcCarousel .carousel-item img { display: block; left: 50%; margin: 0; max-height: 340px; position: absolute; top: 50%; transform: translate(-50%, -50%); }
+.jcCarousel a[class*="carousel-control-"] { width: 10%; }
+.jcCarousel a[class*="carousel-control-"] span[class*="carousel-control-"] { background-color: rgba(0,0,0,.1); outline: 8px solid rgba(0,0,0,.1); }
+.jcCarousel .carousel-caption { color: #ff0; text-shadow: -1px 0 2px #666,0 1px 2px #666, 1px 0 2px #666,0 -1px 2px #666; }
+.jcCarousel .carousel-indicators li { border: none; box-shadow: -1px 0 2px #666,0 1px 2px #666, 1px 0 2px #666,0 -1px 2px #666; margin-bottom: 10px; opacity: .5; }
+.jcCarousel .carousel-indicators li.active { background-color: #ff0; opacity: 1; }
 
 .jcAbstract { font-weight: normal; font-style: italic;  font-size: 110%; display: block; margin: 1em 0;  line-height: 1em; color: #9ac; }
 .jcAbstract::before { content: '“'; font-size: 400%; color: #cde; vertical-align: -.4em; font-family: serif; }
