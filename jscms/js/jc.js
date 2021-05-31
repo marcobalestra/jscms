@@ -1717,7 +1717,7 @@ jc.render = {
 				imgs.forEach( (i,idx) => {
 					let $it = $('<div class="carousel-item"></div>');
 					if ( ! idx ) $it.addClass('active');
-					$it.append(` <img src="${i.uri}" alt="${ i.caption }" />`);
+					$it.append(` <img src="${i.uri}" alt="${ i.caption }" oncontextmenu="event.stopPropagation();" />`);
 					if ( d.flags && d.flags.includes('c') ) $it.append( $('<div class="carousel-caption d-none d-md-block"></div>').append('<h5></h5>').html( i.caption ) );
 					$in.append($it);
 				} );
