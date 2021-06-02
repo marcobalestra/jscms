@@ -11,6 +11,7 @@ AS.labels.load('en',[{
 	'ChooseAudio' : 'Choose an audio',
 	'ChooseVideo' : 'Choose a video',
 	'DeleteThisPage' : 'Delete this page',
+	'DeletingPage' : 'Deleting page',
 	'editYetItBody' : 'Resume previous edit or restart?',
 	'editYetItCancel' : 'Restart',
 	'editYetItOk' : 'Resume',

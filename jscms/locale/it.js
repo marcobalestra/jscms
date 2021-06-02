@@ -16,6 +16,7 @@ AS.labels.load('it',[{
 	'ChooseVideo' : 'Scegli un video',
 	'Delete' : 'Rimuovi',
 	'DeleteThisPage' : 'Cancella questa pagina',
+	'DeletingPage' : 'Cancellazione pagina',
 	'Done' : 'Fatto',
 	'Edit' : 'Modifica',
 	'editYetItBody' : 'Continui la modifica precedente o riparti ricaricando il contenuto?',
