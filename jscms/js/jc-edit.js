@@ -497,7 +497,7 @@ jc.page.save = ( params ) => {
 		if (( ! params.data.metadata.description ) && AS.test.str( params.data.abstract)) params.data.metadata.description = params.data.abstract.dehtml().shorten(256);
 		if (( ! params.data.metadata.title ) && AS.test.str( params.data.title)) params.data.metadata.title = params.data.title.dehtml().shorten(48);
 		if ( ! params.data.metadata.title ) params.data.metadata.title = params.page + ( params.id ? ' '+params.id : '');
-		if ( params.data.blogdate ) params.metadata.date = params.data.blogdate;
+		if ( params.data.blogdate ) params.data.metadata.date = params.data.blogdate;
 		params.data.metadata.upd = (new Date()).getTime();
 		params.metadataChecked = true;
 	}
