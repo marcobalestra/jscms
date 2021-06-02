@@ -1,44 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-<title>Overview</title>
+<title>Blog entries</title>
 <link>https://ricette.lan.crossbow.it/</link>
 <generator>jBloud CMS - jscms</generator>
 <item>
-	<link>https://ricette.lan.crossbow.it/index2/</link>
-	<pubDate>Mon, 31 May 2021 16:25:51 GMT</pubDate>
-	<title>Overview</title>
-	<description><![CDATA[A quick overview on the CMS]]></description>
-</item>
-<item>
-	<link>https://ricette.lan.crossbow.it/blog1/</link>
-	<pubDate>Sun, 30 May 2021 19:12:46 GMT</pubDate>
-	<title>Once upon a time…</title>
-	<description><![CDATA[From the beginning to JSCMS, then to JBLOUD - Thanks to some god for IE is dead]]></description>
-</item>
-<item>
-	<link>https://ricette.lan.crossbow.it/blog2/</link>
-	<pubDate>Sun, 30 May 2021 18:50:40 GMT</pubDate>
-	<title>Happy SEO</title>
-	<description><![CDATA[Building a static version of the page on page saving]]></description>
-</item>
-<item>
-	<link>https://ricette.lan.crossbow.it/navigatedate1/</link>
-	<pubDate>Fri, 28 May 2021 23:18:25 GMT</pubDate>
-	<title>Blog entries</title>
-	<description><![CDATA[JSCMS blog entries]]></description>
-</item>
-<item>
 	<link>https://ricette.lan.crossbow.it/index/</link>
-	<pubDate>Fri, 28 May 2021 15:14:17 GMT</pubDate>
+	<pubDate>Invalid Date</pubDate>
 	<title>JSCMS is here!</title>
-	<description><![CDATA[JSCMS home page (preview, still under development): the CMS without DB and without server-side languages.]]></description>
 </item>
 <item>
 	<link>https://ricette.lan.crossbow.it/index1/</link>
-	<pubDate>Fri, 28 May 2021 09:04:04 GMT</pubDate>
+	<pubDate>Invalid Date</pubDate>
 	<title>JSCMS tech info</title>
-	<description><![CDATA[A few tech details on the jscms backing JBLOUD]]></description>
+</item>
+<item>
+	<link>https://ricette.lan.crossbow.it/index2/</link>
+	<pubDate>Invalid Date</pubDate>
+	<title>Overview</title>
+</item>
+<item>
+	<link>https://ricette.lan.crossbow.it/blog1/</link>
+	<pubDate>Invalid Date</pubDate>
+	<title>Once upon a time…</title>
+</item>
+<item>
+	<link>https://ricette.lan.crossbow.it/blog2/</link>
+	<pubDate>Invalid Date</pubDate>
+	<title>Happy SEO</title>
+</item>
+<item>
+	<link>https://ricette.lan.crossbow.it/navigatedate1/</link>
+	<pubDate>Invalid Date</pubDate>
+	<title>Blog entries</title>
 </item>
 </channel>
 </rss>

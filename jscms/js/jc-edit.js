@@ -62,8 +62,8 @@ $.extend( jc.dav, {
 		});
 	},
 	rm : ( url, success, fail ) => {
-		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;
-		success = jc.evalFunc(success)||(()=>{});
+		fail = fail||success||jc.getError;
+		success = success||(()=>{});
 		if ( ! url.match(jc.prop.absUriMatcher) ) url = AS.path('jsdataroot') + url;
 		jc.console('jc.dav.rm',url);
 		$.ajax( url, {
@@ -401,9 +401,11 @@ jc.page.rm = ( params ) => {
 		return;
 	}
 	if ( ! params.removed ) {
-		jc.dav.rm( params.page + ( params.id || '') + '.json', ()=>{
-			params.removed = true;
-			jc.page.rm( params );
+		jc.dav.rm( AS.path('jsdatapages') + params.page + ( params.id || '') + '.json', ()=>{
+			jc.dav.rm( AS.path('jsdatapagestatics') + params.page + ( params.id || '') + '.html',()=>{
+				params.removed = true;
+				jc.page.rm( params );
+			});
 		});
 		return;
 	}
@@ -419,7 +421,7 @@ jc.page.rm = ( params ) => {
 		return;
 	}
 	if ( ! params.lastsPurged ) {
-		jc.page.makeLasts( param.fulllist, ()=>{
+		jc.page.makeLasts( params.fulllist, ()=>{
 			jc.page.makeTypeLasts( params.page, params.typelist, ()=>{
 				jc.page.makeTypeDates(params.page, params.typelist, ()=>{
 					params.lastsPurged = true;
@@ -571,28 +573,8 @@ jc.page.save = ( params ) => {
 		},100);
 	}
 	let makeStatic = () => {
-		if ( $('.jcEditable').length ) return;
-		if ( $('.swal2-container').length ) return setTimeout( makeStatic, 200 );
-		$(document.body).off('jc_render_end', makeStatic );
-		$(document.body).trigger('jc_saving_static',params);
-		const uri = AS.path('jsdatapagestatics')+jc.page.current()+(jc.page.data().pageContent.id||'')+'.html';
-		let cn = document.body.className;
-		document.body.className = '';
-		let html = $(document.documentElement).html();
-		document.body.className = cn;
-		html = html
-			.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)[\s\S]*?>\s*(<\/head>)/,"$1$2")
-			.replace(/[ \t]*<script [^>]+AS-autoload[^>]+>[^<]*<\/script>[\r\n]*/g,'')
-			.replace(/[ \t]*<script [^>]+facebook\.(com|net)[^>]+>[^<]*<\/script>[\r\n]*/g,'')
-			.replace(/<!--type:part=fbcomments[\s\S]*?<!--\/type:part-->/,'')
-			.replace(/\n*<div id="fb-root" [\s\S]+?<\/div>\n+/,'')
-			.replace(/(<meta[^>]+content="),+([^>]+>)/g,"$1$2")
-			.replace(/<nav [\s\S]+?<\/nav>/g,"")
-			.replace(/<svg [\s\S]+?<\/svg>/g,"")
-			;
-		html = '<!DOCTYPE html>\n<html>\n'+html+'\n</html>';
-		jc.dav.put( uri, html, ()=>{
-			$(document.body).trigger('jc_saved_static',params);
+		jc.page.makeStatic( ( done )=> {
+			if ( done ) $(document.body).off('jc_render_end', makeStatic );
 			$(document.body).trigger('jc_saved_page_full',params);
 		});
 	};
@@ -607,6 +589,38 @@ jc.page.save = ( params ) => {
 	jc.page.open( params.page, params.id );
 };
 
+jc.page.makeStatic = ( cb ) => {
+	if ( $('.jcEditable').length ) {
+		if ( AS.test.func(cb) ) cb.call(window,false);
+		return;
+	}
+	//if ( $('.swal2-container').length ) return setTimeout( makeStatic, 200 );
+	$(document.body).trigger('jc_saving_static');
+	const uri = AS.path('jsdatapagestatics')+jc.page.current()+(jc.page.data().pageContent.id||'')+'.html';
+	let cn = document.body.className;
+	document.body.className = '';
+	let html = $(document.documentElement).html();
+	document.body.className = cn;
+	html = html
+		.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)[\s\S]*?>\s*(<\/head>)/,"$1$2")
+		.replace(/[ \t]*<script [^>]+AS-autoload[^>]+>[^<]*<\/script>[\r\n]*/g,'')
+		.replace(/[ \t]*<script [^>]+facebook\.(com|net)[^>]+>[^<]*<\/script>[\r\n]*/g,'')
+		.replace(/<!--type:part=fbcomments[\s\S]*?<!--\/type:part-->/,'')
+		.replace(/\n*<div id="fb-root" [\s\S]+?<\/div>\n+/,'')
+		.replace(/\n*<div [^>]+swal2-container[\s\S]+?<div [^>]+swal2-timer-progress-bar[^>]+>([\s\S]*?<\/div>\n*){4}/,'')
+		.replace(/\n*<div [^>]*class="[^"]*modal[ "][\s\S]+?<div [^>]*class="[^"]*modal-backdrop[^>]+>[^<]*<\/div>\n*/,'')
+		.replace(/\n*<div [^>]*class="[^"]*modal[ "][\s\S]+<\/div>\n*<\/body>/,'</body>')
+		.replace(/(<meta[^>]+content="),+([^>]+>)/g,"$1$2")
+		.replace(/<nav [\s\S]+?<\/nav>/g,"")
+		.replace(/<svg [\s\S]+?<\/svg>/g,"")
+		;
+	html = '<!DOCTYPE html>\n<html>\n'+html+'\n</html>';
+	jc.dav.put( uri, html, ()=>{
+		$(document.body).trigger('jc_saved_static');
+		if ( AS.test.func(cb) ) cb.call(window,true);
+	});
+};
+
 jc.page.makeLasts = ( list, callback ) => {
 	if ( ! AS.test.obj(list) ) {
 		jc.lists.list.get((l)=>{ jc.page.makeLasts( l||{}, callback ); });
@@ -619,6 +633,7 @@ jc.page.makeLasts = ( list, callback ) => {
 			if ( typelist[k].hidden ) return;
 			let pm = Object.assign(typelist[k]);
 			pm.page = t;
+			if ( k != '0') pm.id = parseInt(k);
 			lasts.push( pm );
 		});
 	} );
@@ -659,6 +674,7 @@ jc.page.makeTypeLasts = ( pagetype, typelist, callback ) => {
 		if ( typelist[k].hidden ) return;
 		let pm = Object.assign(typelist[k]);
 		delete pm.page;
+		if ( k != '0') pm.id = parseInt(k);
 		lasts.push( pm );
 	});
 	lasts.sort( (a,b) =>(b.upd - a.upd));
@@ -967,16 +983,6 @@ jc.edit = {
 	getRepository : ( pagetype, callback ) => {
 		if ( AS.test.udef(pagetype)) pagetype = jc.page.current();
 		jc.template.repo.get( pagetype, callback );
-// 		if ( ! jc.edit.prop.repo[pagetype]) {
-// 			jc.springLoad( AS.path('jsreporoot')+'/'+pagetype+'.js' );
-// 			jc.edit.prop.repo[pagetype] = '_loading_';
-// 		}
-// 		if ( jc.edit.prop.repo[pagetype] == '_loading_' ) {
-// 			setTimeout( ()=>{jc.edit.getRepository(pagetype,callback);},100);
-// 			return;
-// 		}
-// 		if ( AS.test.func(callback) ) callback.call( window,jc.edit.prop.repo[pagetype]);
-// 		else return jc.edit.prop.repo[pagetype];
 	},
 	setRepository : jc.template.repo.set,
 	loadPageTypes : ( force )=>{
@@ -991,7 +997,29 @@ jc.edit = {
 			jc.jdav.get(AS.path('jsauth') + 'auth/lsparts', r => { jc.edit.prop.pageParts = r.list; });
 		}
 	},
+	maintenance : ( confirmed ) => {
+		if ( ! confirmed ) {
+			Swal.fire({
+				title: AS.label('MaintenanceConfirmTitle'),
+				html: AS.label('MaintenanceConfirmBody'),
+				icon: "question",
+				showDenyButton: false,
+				showCancelButton: true,
+				cancelButtonText: AS.label('Cancel'),
+				confirmButtonText: AS.label('OK'),
+			}).then( result => {
+				if ( result.isConfirmed ) jc.edit.maintenance( true );
+			});
+			return;
+		}
+		if ( ! jc.maint ) {
+			jc.springLoad('module:maintenance');
+			return window.setTimeout( ()=>{ jc.edit.maintenance( confirmed ) }, 300 );
+		}
+		jc.maint.start();
+	},
 	start : () => {
+		jc.edit.getRepository();
 		document.querySelectorAll('.jcEditable:not(.jcEditableParsed)').forEach( (d) => {
 			let $d = $(d);
 			let data = $d.data('editable');
@@ -2027,12 +2055,11 @@ jc.edit.uploads = {
 		if ( params.gallery ) {
 			let $st = $('<select class="mr-1 mt-1"><option value="T">Thumbnails</option><option value="C">Carousel</option></select>');
 			let $sf = $('<select class="mr-1 mt-1"><option value="">Plain</option><option value="c">With captions</option><option value="x">With controls</option><option value="i">With indicators</option><option value="ci">With captions + indicators</option><option value="xi">With controls + indicators</option><option value="cxi">With captions + controls + indicators</option></select>');
-			let $ss = $('<select class="mr-1 mt-1"><option>S</option><option value="">M</option><option>L</option><option>XL</option></select>');
+			let $ss = $('<select class="mr-1 mt-1"><option>XS</option><option>S</option><option value="">M</option><option>L</option><option>XL</option><option>XXL</option></select>');
 			$st.val( params.gallery.aspect||'T' );
 			$st.on('change',()=>{
 				params.gallery.aspect = $st.val();
-				if ( params.gallery.aspect == 'C' ) delete params.gallery.size;
-				else delete params.gallery.flags;
+				if ( params.gallery.aspect != 'C' ) delete params.gallery.flags;
 				$ss.toggle( params.gallery.aspect != 'C' );
 				$sf.toggle( params.gallery.aspect == 'C' );
 				jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{
@@ -2051,7 +2078,7 @@ jc.edit.uploads = {
 					jc.page.reload();
 				}});
 			});
-			$ss.val( params.gallery.size||'' ).toggle( params.gallery.aspect != 'C' );
+			$ss.val( params.gallery.size||'' );
 			$ss.on('change',()=>{
 				if ( $ss.val().length) params.gallery.size = $ss.val();
 				else delete params.gallery.size;
@@ -2061,7 +2088,7 @@ jc.edit.uploads = {
 					jc.page.reload();
 				}});
 			});
-			$('.jcUploadsAdders .btn-group',$out).append($('<span class="ml-3"></span>').append($st,$sf,$ss));
+			$('.jcUploadsAdders .btn-group',$out).append($('<span class="ml-3"></span>').append($st,$ss,$sf));
 			$('.jcUploadsAdders .btn-group select',$out).css({'max-width':'100px'});
 		}
 		$('.jcImageUpload',$out).on('click',()=>{ $('input[type="file"]',$out).trigger('click'); });

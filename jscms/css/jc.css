@@ -83,12 +83,14 @@ a[href^="mailto:"]::after { content: ' ✉'; }
 .jcEditMenu span svg { display: block; height: 18px; margin: 4px; padding: 0; width: 18px; }
 #jcHiddenPageIndicator { background-color: rgba(255,0,32,.5); border-radius: 0 0 20px 0; left: 0; margin: 0; padding: 0; position: fixed; top: 0; z-index: 10; }
 #jcHiddenPageIndicator span { color: #fff; font-weight: bold; padding: 10px 20px; }
-#jcProgressIndicator .jcicon.progressIcon svg { animation: keeprotating 2s linear 0s infinite; width: 32px; height: 32px; fill: #999; margin: 0 1em 0 0; }
+#jcHiddenPageIndicator .jcicon.progressIcon svg { animation: keeprotating 2s linear 0s infinite; width: 32px; height: 32px; fill: #999; margin: 0 1em 0 0; }
 @keyframes keeprotating {
 	0% { transform: rotate(0deg); }
 	50% { transform: rotate(-180deg); }
 	0% { transform: rotate(-360deg); }
 }
+.jcProgressbar { width: 280px; height: 8px; background-color : #eee; border: 1px solid #ccc; overflow: hidden; }
+.jcProgressbar div { height: 8px; float: left; background-color : #ccc; }
 
 #jcPageUploads>div { max-height: 600px; overflow-y: auto; }
 table.jcUploads { min-width: 60%; margin: 0 auto; }
@@ -102,6 +104,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcDate { text-transform: capitalize; }
 
 .jcGallery a { background-color: #fff; box-shadow: -1px 0 #aaa, 1px 0 #aaa, 0 -1px #aaa, 0 1px #aaa, 4px 4px 2px #ddd; display: inline-block; height: 96px; margin: 8px; position: relative; text-align: center; transform: skew(-10deg); vertical-align: middle; width: 96px; }
+.jcGallery.sizeXS a { height: 48px; width: 48px; }
 .jcGallery.sizeS a { height: 64px; width: 64px; }
 .jcGallery.sizeL a { height: 128px; width: 128px; }
 .jcGallery.sizeXL a { height: 160px; width: 160px; }
@@ -121,13 +124,23 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 
 .jcCarousel { display: block; width: 100%; margin: 1em 0; box-shadow: -1px 0 2px #666,0 1px 2px #666, 1px 0 2px #666,0 -1px 2px #666; }
 .jcCarousel .carousel-inner { background-color: #999; background-image : linear-gradient(to top,#666,#999,#ccc,#666); overflow: hidden; }
-.jcCarousel .carousel-item { height: 340px; text-align: center; }
-.jcCarousel .carousel-item img { display: block; left: 50%; margin: 0; max-height: 340px; position: absolute; top: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 3px #000; }
+.jcCarousel .carousel-item { height: 280px; text-align: center; }
+.jcCarousel .carousel-item img { display: block; left: 50%; margin: 0; max-height: 280px; position: absolute; top: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 3px #000; }
 .jcCarousel a[class*="carousel-control-"] { width: 10%; }
 .jcCarousel a[class*="carousel-control-"] span[class*="carousel-control-"] { background-color: rgba(0,0,0,.1); outline: 8px solid rgba(0,0,0,.1); }
 .jcCarousel .carousel-caption { color: #ff0; text-shadow: -1px 0 2px #666,0 1px 2px #666, 1px 0 2px #666,0 -1px 2px #666; }
 .jcCarousel .carousel-indicators li { border: none; box-shadow: -1px 0 2px #666,0 1px 2px #666, 1px 0 2px #666,0 -1px 2px #666; margin-bottom: 10px; opacity: .5; }
 .jcCarousel .carousel-indicators li.active { background-color: #ff0; opacity: 1; }
+.jcCarousel.sizeXS .carousel-item { height: 160px; }
+.jcCarousel.sizeXS .carousel-item img { max-height: 160px; }
+.jcCarousel.sizeS .carousel-item { height: 220px; }
+.jcCarousel.sizeS .carousel-item img { max-height: 220px; }
+.jcCarousel.sizeL .carousel-item { height: 340px; }
+.jcCarousel.sizeL .carousel-item img { max-height: 340px; }
+.jcCarousel.sizeXL .carousel-item { height: 420px; }
+.jcCarousel.sizeXL .carousel-item img { max-height: 420px; }
+.jcCarousel.sizeXXL .carousel-item { height: 640px; }
+.jcCarousel.sizeXXL .carousel-item img { max-height: 640px; }
 
 .jcAbstract { font-weight: normal; font-style: italic;  font-size: 110%; display: block; margin: 1em 0;  line-height: 1em; color: #9ac; }
 .jcAbstract::before { content: '“'; font-size: 400%; color: #cde; vertical-align: -.4em; font-family: serif; }

@@ -64,6 +64,10 @@ jc.prop.loadModules = {
 		'https://cdn.altersoftware.org/js-as-form/as-form.js',
 		'wait:()=>( jc.edit && AS.form )',
 	],
+	'maintenance' : [
+		AS.path('jscdn') + 'js/jc-maintenance'+(jc.prop.isDeveloper?'':'.min')+'.js',
+		'wait:()=>( jc.maint )',
+	],
 	'datatables': [
 		'https://cdn.datatables.net/v/dt/dt-1.10.24/date-1.0.3/sp-1.2.2/datatables.min.css',
 		'https://cdn.datatables.net/v/dt/dt-1.10.24/date-1.0.3/sp-1.2.2/datatables.min.js',
@@ -1365,9 +1369,14 @@ jc.page = {
 		});
 	},
 	edit : ( status, savePolicy ) => {
-		if ( status == 'page' ) {
+		if ( ! jc.edit ) {
 			jc.springLoad('module:edit');
-			if ( ! jc.edit ) return window.setTimeout( ()=>{ jc.page.edit(status,savePolicy) }, 100 );
+			return window.setTimeout( ()=>{ jc.page.edit(status,savePolicy) }, 300 );
+		}
+		if ( status == 'maintenance' ) {
+			jc.edit.maintenance();
+			return;
+		} else if ( status == 'page' ) {
 			jc.page.prop.editMode = status;
 			let oe = jc.edit.data()||false;
 			if ( oe ) {
@@ -1397,8 +1406,6 @@ jc.page = {
 			jc.page.reload();
 			return;
 		} else if ( status == 'parts' ) {
-			jc.springLoad('module:edit');
-			if ( ! jc.edit ) return window.setTimeout( ()=>{ jc.page.edit(status,savePolicy) }, 100 );
 			jc.page.prop.editMode = status;
 			jc.page.reload();
 			return;
@@ -1895,9 +1902,11 @@ jc.actionsMenu = (e) => {
 // 		tm.content.push( {icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('parts');} } );
 		ws.content.push(
 			{icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.create();} },
-			{icon:'jcicon',iconKey:'pageParts',label:AS.label('IncludedParts'),action:()=>{jc.page.edit('parts');} }
+			{icon:'jcicon',iconKey:'pageParts',label:AS.label('IncludedParts'),action:()=>{jc.page.edit('parts');} },
+			'-',
+			{icon:'jcicon',iconKey:'maintenance',label:AS.label('Maintenance'),action:()=>{jc.page.edit('maintenance');} },
 		);
-		acts.push(AS.label('menuActionsTitle'),tp,ws);
+		acts.push(AS.label('menuActionsTitle'),tp,'-',ws);
 	}
 	jc.menu(e, { content: acts, highlight: false });
 };

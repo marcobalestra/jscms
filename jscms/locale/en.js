@@ -30,6 +30,8 @@ AS.labels.load('en',[{
 	'LoginDoneBody':'Login done with user “{{user}}”.\nTo logout quit the browser.',
 	'LoginDoneTitle':'Authenticated',
 	'Mains' : 'Main',
+	'MaintenanceConfirmTitle': 'Start maintenance?',
+	'MaintenanceConfirmBody': 'Full site maintenance process lists, loads and analyzes every single page, then saves brand new aggregated lists.<br />This process crawls the whole site, and shouldn’t be interrupted.',
 	'menuActionsTitle' : 'Available actions',
 	'menuEditOver' : 'Exit editor',
 	'menuEditOverDiscard' : 'Discard changes',

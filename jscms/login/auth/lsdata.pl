@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 my $arg = $ENV{QUERY_STRING};
 my $match = $arg =~ m/^.*match=([a-zA-Z0-9._-]+).*/ ? "$1" : '';
-my $ext = $arg =~ m/^.*ext=([a-zA-Z0-9._-]+).*/ ? "$1" : '';
+my $ext = $arg =~ m/^.*ext=([a-zA-Z0-9._-]+).*/ ? "$1" : 'json';
 my $relpath = $arg =~ m,^.*dir=([a-zA-Z0-9/._-]+).*, ? "$1" : '';
 $match =~ s/\./\\./g;
 $ext =~ s/\./\\./g;
