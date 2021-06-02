@@ -134,7 +134,6 @@ $(window).on('popstate',() => {
 		jc.page.open(sp.page,sp.id,sp.data);
 	}
 });
-
 if (!Date.prototype.clone) Date.prototype.clone = function() { let d = new Date(); d.setTime( this.getTime()); return d; };
 if (!Date.prototype.tosqldate) Date.prototype.tosqldate = function() {
 	let a = this.getFullYear() +'-';
@@ -230,6 +229,16 @@ if (!Date.prototype.toblogdate) Date.prototype.toblogdate = function() {
 		.replace(/^([a-z])/,x=>x.toUpperCase())
 		.replace(/([^a-z])([a-z])/gi,(a,x,y)=>(x+y.toUpperCase()))
 	;
+};
+
+jc.objFind = ( o, p, v )=>{
+	if ( AS.test.arr(o) ) return o.find( x => jc.objFind(x,p,v));
+	if ( AS.test.obj(o)) {
+		if ( o[p] ) return (o[p]==v ? o : undefined);
+		let f = Object.keys(o).find( x => jc.objFind(o[x],p,v) );
+		if (f) return jc.objFind(o[f],p,v);
+	}
+	return undefined;
 };
 
 jc.getError = (jqXHR,status,e) => { jc.console(jqXHR,status,e); };
@@ -1877,7 +1886,7 @@ jc.actionsMenu = (e) => {
 	if ( jc.page.prop.editMode == 'page' ) {
 		acts.push(
 			AS.label('ThisPage')+':',
-			{icon:'jcicon',iconKey:'metadata',label:AS.label('Properties'),action:()=>{jc.edit.meta.edit();} },
+			{icon:'jcicon',iconKey:'metadata',label:AS.label('Metadata'),action:()=>{jc.edit.meta.edit();} },
 			{icon:'jcicon',iconKey:'pageEditOff',label:AS.label('menuEditOver')+':',action:()=>{jc.page.edit(false);},content:[
 				{icon:'jcicon',iconKey:'done',label:AS.label('menuEditOverSave'),action:()=>{jc.page.edit(false,true);} },
 				{icon:'jcicon',iconKey:'editRemove',label:AS.label('menuEditOverDiscard'),action:()=>{jc.page.edit(false,false);} }

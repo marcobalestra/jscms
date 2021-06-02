@@ -467,6 +467,7 @@ jc.page.save = ( params ) => {
 			if ( AS.test.udef(params.mute) ) params.mute = true;
 			if ( AS.test.udef(params.noDialog) ) params.noDialog = true;
 			if ( AS.test.udef(params.noLists) ) params.noLists = true;
+			if ( AS.test.udef(params.noStatic) ) params.noStatic = true;
 		}
 		if ( params.noLists ) params.noFullList = params.noTypeList = params.noLasts = true;
 		if ( params.noFullList && AS.test.udef(params.noTypeList) ) params.noTypeList = true;
@@ -482,7 +483,14 @@ jc.page.save = ( params ) => {
 		return;
 	}
 	if (params.id=='new') {
-		params.isNew = true;
+		if ( ! params.isNew ) {
+			params.isNew = true;
+			jc.template.info.get(params.page,(i)=>{
+				if ( jc.objFind(i,'prop','blogdate') ) params.data.blogdate = (new Date()).tosqldate();
+				jc.page.save( params );
+			});
+			return;
+		}
 		if ( Object.keys(params.typelist).length ) {
 			let max = 0;
 			Object.keys(params.typelist).forEach( k => {
@@ -572,13 +580,21 @@ jc.page.save = ( params ) => {
 			});
 		},100);
 	}
-	let makeStatic = () => {
-		jc.page.makeStatic( ( done )=> {
-			if ( done ) $(document.body).off('jc_render_end', makeStatic );
-			$(document.body).trigger('jc_saved_page_full',params);
-		});
-	};
-	$(document.body).on('jc_render_end', makeStatic );
+	if ( ! params.staticSet ) {
+		let makeStatic = () => {
+			let afterStatic = ( done ) => {
+				if ( done ) $(document.body).off('jc_render_end', makeStatic );
+				$(document.body).trigger('jc_saved_page_full',params);
+			};
+			if ( params.noStatic || params.isNew  ) {
+				afterStatic();
+			} else {
+				jc.page.makeStatic( afterStatic );
+			}
+		};
+		$(document.body).on('jc_render_end', makeStatic );
+		params.staticSet = true;
+	}
 	$(document.body).trigger('jc_saved_page',params);
 	if ( AS.test.func(params.callback) ) {
 		params.callback.call(window,params.page,params.id,params.data);
@@ -1492,7 +1508,7 @@ jc.edit.meta = {
 			<div class="modal-header bg-info text-white">
 				<p class="modal-title">
 					<span class="jcicon">${ AS.icon('metadata') }</span> 
-					<b>${ AS.label('Properties') }</b>
+					<b>${ AS.label('Metadata') }</b>
 				</p>
 				<button type="button" class="close" onclick="jc.edit.noModal()" aria-label="Close">
 					<span aria-hidden="true" class="jcicon modalCloser">${ AS.icon('circleClose') }</span>

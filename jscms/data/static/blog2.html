@@ -32,7 +32,10 @@
 			<div id="aboveTopBar"></div>
 			<div id="topBar"><!--type:part=header.html--><div class="topBarImage" onclick="jc.page.open('index')"></div>
 <div class="topBarText">Recipes from real Chefs</div>
-
+<div style="text-align:center;position:absolute;left:30px;right:30px;bottom:40px;z-index:10;">
+	<input type="checkbox" id="demoModeSwitch">
+	<label for="demoModeSwitch">Demo</label>
+</div>
 <script type="text/javascript">
 	window.setTimeout(()=>{
 		const dummy = () => {
@@ -55,7 +58,7 @@
 		</div>
 		<div id="jcToplevelContainer" aria-hidden="true"><div id="topContainer">
 	<div id="topNavbar"><!--type:part=navbar.json--><!--/type:part--></div>
-	<div id="mainContainer"><!--type:blocks--><div class="jcDate"><span class="date">Thursday, May 27, 2021</span><span class="btn-group ml-2 mb-1"><button class="btn btn-secondary btn-sm" disabled="disabled"></button><button class="btn btn-secondary btn-sm" disabled="disabled"></button></span></div><h3>Happy SEO</h3><h6 class="jcAbstract">Building a static version of the page on page saving</h6><div class="jcMixedBlocks"><h4>Sharing tool parametric</h4>
+	<div id="mainContainer"><!--type:blocks--><div class="jcDate"><span class="date">Thursday, May 27, 2021</span><span class="btn-group ml-2 mb-1"><button class="btn btn-secondary btn-sm" disabled="disabled"></button><button class="btn btn-secondary btn-sm" onclick="jc.page.open('blog',1)" title="Wednesday, May 26, 2021"></button></span></div><h3>Happy SEO</h3><h6 class="jcAbstract">Building a static version of the page on page saving</h6><div class="jcMixedBlocks"><h4>Sharing tool parametric</h4>
 <p>It wasn’t a big deal, it’s in place.</p>
 <p>There are parameters to decide if you want to place sharing in menu bar, in the body or both, and the option to hide specific sharing channels.<br>The decision was to have a <em>hide</em> parameter (instead of <em>show</em>) because in this case by adding new sharing channels they’ll be automatically added and shown.</p>
 <h4>About our friendly neighbourhood web crawlers</h4>
