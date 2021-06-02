@@ -484,7 +484,7 @@ jc.page.save = ( params ) => {
 			params.id = 1;
 		}
 	}
-	if ( ! params.tpd ) {
+	if ( ! params.metadataChecked ) {
 		if ( AS.test.udef(params.data.metadata) ) params.data.metadata = {};
 		Object.keys(params.data).forEach( k => {
 			if ( AS.test.arr(params.data[k])) params.data[k].forEach( i => {
@@ -493,23 +493,13 @@ jc.page.save = ( params ) => {
 				}
 			} );
 		} );
-		if ( params.id ) {
-			params.data.id = params.id;
-			params.data.metadata.id = params.id;
-		}
+		if ( params.id ) params.data.id = params.data.metadata.id = parseInt(params.id);
 		if (( ! params.data.metadata.description ) && AS.test.str( params.data.abstract)) params.data.metadata.description = params.data.abstract.dehtml().shorten(256);
 		if (( ! params.data.metadata.title ) && AS.test.str( params.data.title)) params.data.metadata.title = params.data.title.dehtml().shorten(48);
-		params.tpd = {
-			title: params.data.metadata.title||'',
-			desc: params.data.metadata.description || '',
-			upd: (new Date()).getTime(),
-			user: jc.prop.authUser
-		};
-		if ( params.data.metadata.hidden ) params.tpd.hidden = true;
-		if ( params.data.blogdate ) params.tpd.date = params.data.blogdate;
-		if ( params.id ) params.tpd.id = parseInt(params.id);
-		if (( ! params.tpd.title.length) && AS.test.str( params.data.title)) params.tpd.title = params.data.title.dehtml().shorten(48);
-		if ( ! params.tpd.title.length ) params.tpd.title = params.page + ( params.id ? ' '+params.id : '');
+		if ( ! params.data.metadata.title ) params.data.metadata.title = params.page + ( params.id ? ' '+params.id : '');
+		if ( params.data.blogdate ) params.metadata.date = params.data.blogdate;
+		params.data.metadata.upd = (new Date()).getTime();
+		params.metadataChecked = true;
 	}
 	if ( ! params.saved ) {
 		jc.jdav.put( AS.path('jsdatapages') + params.page + ( params.id || '') + '.json', params.data, ()=>{
@@ -521,7 +511,7 @@ jc.page.save = ( params ) => {
 	}
 	if ( (! params.noFullList) && (! params.savedFullList) ) {
 		if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
-		params.fulllist[params.page][String(params.id?params.id:0)] = params.tpd;
+		params.fulllist[params.page][String(params.id?params.id:0)] = Object.assign(params.data.metadata);
 		if ( ! params.mute ) jc.progress(AS.label('SavingArticleList'));
 		jc.lists.list.set(params.fulllist,()=>{
 			$(document.body).trigger('jc_saved_page_fulllist',params);
@@ -531,7 +521,7 @@ jc.page.save = ( params ) => {
 		return;
 	}
 	if ( (! params.noFullList) && (! params.savedTypeList) ) {
-		params.typelist[String(params.id?params.id:0)] = params.tpd;
+		params.typelist[String(params.id?params.id:0)] = Object.assign(params.data.metadata);
 		jc.lists.list.set(params.page,params.typelist,()=>{
 			$(document.body).trigger('jc_saved_page_typelist',params);
 			params.savedTypeList = true;
@@ -631,10 +621,7 @@ jc.page.makeLasts = ( list, callback ) => {
 		let typelist = list[t];
 		Object.keys(typelist).forEach( k => {
 			if ( typelist[k].hidden ) return;
-			let pm = Object.assign(typelist[k]);
-			pm.page = t;
-			if ( k != '0') pm.id = parseInt(k);
-			lasts.push( pm );
+			lasts.push( Object.assign(typelist[k]) );
 		});
 	} );
 	lasts.sort( (a,b) =>(b.upd - a.upd));
@@ -672,10 +659,7 @@ jc.page.makeTypeLasts = ( pagetype, typelist, callback ) => {
 	let lasts = [];
 	Object.keys(typelist).forEach( k => {
 		if ( typelist[k].hidden ) return;
-		let pm = Object.assign(typelist[k]);
-		delete pm.page;
-		if ( k != '0') pm.id = parseInt(k);
-		lasts.push( pm );
+		lasts.push( Object.assign(typelist[k]) );
 	});
 	lasts.sort( (a,b) =>(b.upd - a.upd));
 	qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) );

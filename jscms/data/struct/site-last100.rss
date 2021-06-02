@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-<title>Blog entries</title>
+<title>JSCMS is here!</title>
 <link>https://ricette.lan.crossbow.it/</link>
 <generator>jBloud CMS - jscms</generator>
 <item>
-	<link>https://ricette.lan.crossbow.it/index/</link>
-	<pubDate>Invalid Date</pubDate>
+	<link>https://ricette.lan.crossbow.it/site/</link>
+	<pubDate>Wed, 02 Jun 2021 11:30:45 GMT</pubDate>
 	<title>JSCMS is here!</title>
 </item>
 <item>
-	<link>https://ricette.lan.crossbow.it/index1/</link>
+	<link>https://ricette.lan.crossbow.it/site1/</link>
 	<pubDate>Invalid Date</pubDate>
 	<title>JSCMS tech info</title>
 </item>
 <item>
-	<link>https://ricette.lan.crossbow.it/index2/</link>
-	<pubDate>Invalid Date</pubDate>
+	<link>https://ricette.lan.crossbow.it/site2/</link>
+	<pubDate>Wed, 02 Jun 2021 11:21:26 GMT</pubDate>
 	<title>Overview</title>
 </item>
 <item>
-	<link>https://ricette.lan.crossbow.it/blog1/</link>
+	<link>https://ricette.lan.crossbow.it/site1/</link>
 	<pubDate>Invalid Date</pubDate>
 	<title>Once upon a time…</title>
 </item>
 <item>
-	<link>https://ricette.lan.crossbow.it/blog2/</link>
+	<link>https://ricette.lan.crossbow.it/site2/</link>
 	<pubDate>Invalid Date</pubDate>
 	<title>Happy SEO</title>
 </item>
 <item>
-	<link>https://ricette.lan.crossbow.it/navigatedate1/</link>
+	<link>https://ricette.lan.crossbow.it/site1/</link>
 	<pubDate>Invalid Date</pubDate>
 	<title>Blog entries</title>
 </item>

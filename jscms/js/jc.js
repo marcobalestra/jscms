@@ -1785,7 +1785,7 @@ jc.render = {
 				let cp = jc.page.current();
 				let cid = jc.page.data().id;
 				list.forEach( i => {
-					let p = i.page||d.ptype;
+					let p = i.type;
 					let $li = $('<'+nodes[1]+' class="jcLastsEntry"></'+nodes[1]+'>');
 					let $a;
 					if ( (cp==p ) && (i.id == cid ) ) {
@@ -1800,7 +1800,7 @@ jc.render = {
 						$li.append(' ',$('<span class="date"></span>').html( dt.toLocaleDateString() ));
 						if ( d.showtime ) $li.append( $('<span class="time"></span>').html( dt.toLocaleTimeString() ) );
 					}
-					if ( d.showdesc && i.desc && i.desc.length) $li.append('<br />', $('<small class="desc"></small>').html(i.desc));
+					if ( d.showdesc && i.description && i.description.length) $li.append('<br />', $('<small class="desc"></small>').html(i.description));
 					$ol.append($li);
 				});
 				div.append($ol);

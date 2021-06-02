@@ -47,7 +47,7 @@
 						let $li = $('<li></li>');
 						$li.append(`<a class="" onclick="jc.page.open('${e.page||ntype}'${e.id?','+e.id:''})"><strong>${e.title}</strong></a>`);
 						$li.append(`<small class="jcDate date ml-2"> ${ (new Date()).fromsql(e.date).toLocaleDateString(navigator.language,{weekday:'long',day:'numeric'}) } </small>`);
-						if ( e.desc && e.desc.length ) $li.append('<br /><span class="jcDesc">'+e.desc+'</span>');
+						if ( e.description && e.description.length ) $li.append('<br /><span class="jcDesc">'+e.description+'</span>');
 						$ul.append($li);
 					} );
 					$tgt.append($ul);
