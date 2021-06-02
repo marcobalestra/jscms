@@ -659,7 +659,9 @@ jc.page.makeTypeLasts = ( pagetype, typelist, callback ) => {
 	let lasts = [];
 	Object.keys(typelist).forEach( k => {
 		if ( typelist[k].hidden ) return;
-		lasts.push( Object.assign(typelist[k]) );
+		let pm = Object.assign(typelist[k]);
+		delete pm.type;
+		lasts.push( pm );
 	});
 	lasts.sort( (a,b) =>(b.upd - a.upd));
 	qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) );
