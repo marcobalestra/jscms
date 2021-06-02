@@ -152,7 +152,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcLastsEntry .time::before { content: ', '; }
 
 .jcAudio audio { width: 80%; height: 64px; margin: 10px 10%; }
-.jcVideo video { max-width: 90%; margin: 10px auto; display: block; }
+.jcVideo video { max-width: 100%; margin: 1em auto; display: block; box-shadow: 0 0 2px #999, 2px 2px 3px #ccc;}
 
 #jcSharingPanel { align-items: start; border-top: 1px solid #ddd; display: flex; flex-wrap: wrap; justify-content: center; margin: 24px 0; padding: 8px; }
 #jcToplevelContainer #jcSharingPanel a[href]::after { content: ''; }
