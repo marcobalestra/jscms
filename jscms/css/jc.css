@@ -83,7 +83,7 @@ a[href^="mailto:"]::after { content: ' ✉'; }
 .jcEditMenu span svg { display: block; height: 18px; margin: 4px; padding: 0; width: 18px; }
 #jcHiddenPageIndicator { background-color: rgba(255,0,32,.5); border-radius: 0 0 20px 0; left: 0; margin: 0; padding: 0; position: fixed; top: 0; z-index: 10; }
 #jcHiddenPageIndicator span { color: #fff; font-weight: bold; padding: 10px 20px; }
-#jcHiddenPageIndicator .jcicon.progressIcon svg { animation: keeprotating 2s linear 0s infinite; width: 32px; height: 32px; fill: #999; margin: 0 1em 0 0; }
+#jcProgressIndicator .jcicon.progressIcon svg { animation: keeprotating 2s linear 0s infinite; width: 32px; height: 32px; fill: #999; margin: 0 1em 0 0; }
 @keyframes keeprotating {
 	0% { transform: rotate(0deg); }
 	50% { transform: rotate(-180deg); }
