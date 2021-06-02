@@ -1650,7 +1650,7 @@ jc.render = {
 			if ( (b.prop == 'blogdate') && d.metadata && d.metadata.type ) jc.lists.list.get(d.metadata.type,( ld )=>{
 				let sl = [];
 				Object.keys(ld).forEach( k => { sl.push(ld[k])} );
-				sl.sort( (a,b) => (a.gdate < b.date ? 1 : -1 ) );
+				sl.sort( (a,b) => (a.date < b.date ? 1 : -1 ) );
 				let prev,next,max=(sl.length -1);
 				for ( let i = 0; i <= max; i++ ) {
 					if ( sl[i].id == d.metadata.id ) {

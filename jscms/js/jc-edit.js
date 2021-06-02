@@ -457,17 +457,27 @@ jc.page.rm = ( params ) => {
 };
 
 jc.page.save = ( params ) => {
-	if ( ! params.mute ) jc.progress(AS.label('SavingPage'));
 	if ( AS.test.udef(params)) params = {};
 	else if ( AS.test.func(params)) params = { callback: params };
-	if ( AS.test.udef(params.data)) params.data = jc.edit.data() || jc.page.data().pageContent;
-	if ( AS.test.udef(params.page)) params.page = jc.page.current();
-	if ( AS.test.udef(params.id) ) params.id = params.data.id;
-	if ( AS.test.udef(params.typelist)) {
+	if ( ! params.paramsChecked ) {
+		if ( AS.test.udef(params.data)) params.data = jc.edit.data() || jc.page.data().pageContent;
+		if ( AS.test.udef(params.page)) params.page = jc.page.current();
+		if ( AS.test.udef(params.id) ) params.id = params.data.id;
+		if ( params.maintenance ) {
+			if ( AS.test.udef(params.mute) ) params.mute = true;
+			if ( AS.test.udef(params.noDialog) ) params.noDialog = true;
+			if ( AS.test.udef(params.noLists) ) params.noLists = true;
+		}
+		if ( params.noLists ) params.noFullList = params.noTypeList = params.noLasts = true;
+		if ( params.noFullList && AS.test.udef(params.noTypeList) ) params.noTypeList = true;
+		params.paramsChecked = true;
+	}
+	if ( ! params.mute ) jc.progress(AS.label('SavingPage'));
+	if ( AS.test.udef(params.typelist) ) {
 		jc.lists.list.get(params.page,(l)=>{ params.typelist = l||{}; jc.page.save( params ); })
 		return;
 	}
-	if ( AS.test.udef(params.fulllist)) {
+	if ( AS.test.udef(params.fulllist) ) {
 		jc.lists.list.get((l)=>{ params.fulllist = l||{}; jc.page.save( params ); })
 		return;
 	}
@@ -498,7 +508,7 @@ jc.page.save = ( params ) => {
 		if (( ! params.data.metadata.title ) && AS.test.str( params.data.title)) params.data.metadata.title = params.data.title.dehtml().shorten(48);
 		if ( ! params.data.metadata.title ) params.data.metadata.title = params.page + ( params.id ? ' '+params.id : '');
 		if ( params.data.blogdate ) params.data.metadata.date = params.data.blogdate;
-		params.data.metadata.upd = (new Date()).getTime();
+		if (! ( params.maintenance || params.data.metadata.upd )) params.data.metadata.upd = (new Date()).getTime();
 		params.metadataChecked = true;
 	}
 	if ( ! params.saved ) {
@@ -509,7 +519,7 @@ jc.page.save = ( params ) => {
 		});
 		return;
 	}
-	if ( (! params.noFullList) && (! params.savedFullList) ) {
+	if ( ! ( params.noFullList || params.savedFullList ) ) {
 		if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
 		params.fulllist[params.page][String(params.id?params.id:0)] = Object.assign(params.data.metadata);
 		if ( ! params.mute ) jc.progress(AS.label('SavingArticleList'));
@@ -520,7 +530,7 @@ jc.page.save = ( params ) => {
 		});
 		return;
 	}
-	if ( (! params.noFullList) && (! params.savedTypeList) ) {
+	if ( ! ( params.noTypeList || params.savedTypeList) ) {
 		params.typelist[String(params.id?params.id:0)] = Object.assign(params.data.metadata);
 		jc.lists.list.set(params.page,params.typelist,()=>{
 			$(document.body).trigger('jc_saved_page_typelist',params);
@@ -2022,7 +2032,7 @@ jc.edit.uploads = {
 				};
 				if ( params.gallery ) {
 					newitems.forEach( (i) => { params.gallery.gallery.push({ uri: i.uri }); } );
-					jc.page.save({ noDialog: true, noLasts: true, callback: finalize });
+					jc.page.save({ maintenance: true, mute: false, callback: finalize });
 				} else {
 					finalize();
 				}
@@ -2036,7 +2046,7 @@ jc.edit.uploads = {
 				$i.val(capts[ data.uri ] = String($i.val()||'').replace(/[\\"]/g,'').trim() );
 			} );
 			params.uploads.forEach( u=>{ u.caption = capts[ u.uri ] } );
-			jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{ } });
+			jc.page.save({ maintenance: true, mute: false, callback: ()=>{ } });
 		};
 		if ( params.gallery ) {
 			let $st = $('<select class="mr-1 mt-1"><option value="T">Thumbnails</option><option value="C">Carousel</option></select>');
@@ -2048,7 +2058,7 @@ jc.edit.uploads = {
 				if ( params.gallery.aspect != 'C' ) delete params.gallery.flags;
 				$ss.toggle( params.gallery.aspect != 'C' );
 				$sf.toggle( params.gallery.aspect == 'C' );
-				jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{
+				jc.page.save({ maintenance: true, mute: false, callback: ()=>{
 					jc.edit.noModal();
 					$(document.body).on('jc_page_data_loaded',refresh);
 					jc.page.reload();
@@ -2058,7 +2068,7 @@ jc.edit.uploads = {
 			$sf.on('change',()=>{
 				if ( $sf.val().length) params.gallery.flags = $sf.val();
 				else delete params.gallery.flags;
-				jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{
+				jc.page.save({ maintenance: true, mute: false, callback: ()=>{
 					jc.edit.noModal();
 					$(document.body).on('jc_page_data_loaded',refresh);
 					jc.page.reload();
@@ -2068,7 +2078,7 @@ jc.edit.uploads = {
 			$ss.on('change',()=>{
 				if ( $ss.val().length) params.gallery.size = $ss.val();
 				else delete params.gallery.size;
-				jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{
+				jc.page.save({ maintenance: true, mute: false, callback: ()=>{
 					jc.edit.noModal();
 					$(document.body).on('jc_page_data_loaded',refresh);
 					jc.page.reload();
@@ -2097,7 +2107,7 @@ jc.edit.uploads = {
 				if ( AS.test.func(params.onchange) ) {
 					params.onchange.call(params.gallery.gallery.clone());
 				} else {
-					jc.page.save({ noDialog: true, noLasts: true, callback: ()=>{
+					jc.page.save({ maintenance: true, mute: false, callback: ()=>{
 						jc.edit.noModal();
 						$(document.body).on('jc_page_data_loaded',refresh);
 						jc.page.reload();
