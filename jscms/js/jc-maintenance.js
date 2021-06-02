@@ -131,8 +131,6 @@ jc.maint = {
 		let page = jc.page.current();
 		jc.maint.prog({ text:'Scan: '+pd.metadata.title });
 		let nm = Object.assign(pd.metadata);
-		delete nm.type;
-		delete nm.id;
 		if ( pd.blogdate ) nm.date = pd.blogdate;
 		if ( ! jc.maint.prop.full[page] ) jc.maint.prop.full[page] = {};
 		jc.maint.prop.full[page][String((pd.id||0))] = nm;
