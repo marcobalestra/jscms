@@ -1674,10 +1674,20 @@ jc.render = {
 				}
 				prev = prev ? `onclick="jc.page.open('${d.metadata.type}',${prev.id})" title="${ jc.sql2date(prev.date).toblogdate() }"` : 'disabled="disabled"';
 				next = next ? `onclick="jc.page.open('${d.metadata.type}',${next.id})" title="${ jc.sql2date(next.date).toblogdate() }"` : 'disabled="disabled"';
+				let idxpage = $(`<button class="btn btn-secondary btn-sm d-none">${AS.icon('menu')}</button>`);
 				$out.append( $('<span class="btn-group ml-2 mb-1"></span>')
 					.append(`<button class="btn btn-secondary btn-sm" ${prev}>${AS.icon('arrow-up')}</button>`)
+					.append(idxpage)
 					.append(`<button class="btn btn-secondary btn-sm" ${next}>${AS.icon('arrow-down')}</button>`)
 				);
+				let finalize = ()=>{
+					$(document.body).off('jc_render_end',finalize);
+					if ( $('.jcNavbar .nav-item.active').data() && $('.jcNavbar .nav-item.active').data().page ) {
+						let pd = $('.jcNavbar .nav-item.active').data();
+						$(idxpage).removeClass('d-none').on('click',()=>{ jc.page.open(pd.page,pd.id) });
+					}
+				}
+				$(document.body).on('jc_render_end',finalize);
 			});
 			return $out;
 		},

@@ -24,6 +24,7 @@ AS.labels.load('en',[{
 	'GotoPage' : 'Go to page',
 	'headerTag' : 'Recipes from real Chefs',
 	'HideComments' : 'Disable comments',
+	'HighlightForType' : 'Also active for type',
 	'IncludedParts' : 'Included parts',
 	'IncludePage' : 'Include another page content',
 	'IncludePagePart' : 'Include external part',

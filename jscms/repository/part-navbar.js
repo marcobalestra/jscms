@@ -1,6 +1,8 @@
 (()=>{
 	let data = {
 		form : () => {
+			let ptypes = jc.edit.prop.pageTypes.clone().sort();
+			ptypes.unshift({value:'',label:'['+AS.label('None')+']'});
 			return {
 				requires : ['basic','pikaday','tinymce','iro','slider'],
 				options : {
@@ -28,7 +30,8 @@
 									['type','select',{asLabel:'Type',options:[{label:'Page',value:'item'},{label:'Menu',value:'menu'}]}],
 									{subpart:'label'},
 									{subpart:'page'},
-									['menu','subform',{asLabel:'Content',subform:'itemd',depends:'type=menu'}]
+									['menu','subform',{asLabel:'Content',subform:'itemd',depends:'type=menu'}],
+									["hitype","select",{asLabel:'HighlightForType',options:ptypes}],
 								]
 							},
 					],
@@ -52,6 +55,8 @@
 				if ( item.type == "item" ) {
 					$li.append(`<a class="nav-link" onclick="jc.page.open('${item.item.page}'${ item.item.id ? ','+item.item.id : ''})">${ item.label.escape() }</a>`)
 					if ( (jc.page.current() == item.item.page) && ( item.item.id == jc.page.data().id) ) $li.addClass('active');
+					else if ( item.hitype && item.hitype.length && (item.hitype == jc.page.current())) $li.addClass('active');
+					$li.data(item.item);
 				} else if ( item.type == "menu" ) {
 					$li.addClass('dropdown');
 					let id = AS.generateId('jcMenu');
