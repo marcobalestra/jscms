@@ -1879,7 +1879,6 @@ jc.render = {
 			return $d;
 		},
 		youtube : (b,d) => {
-			console.log(b,d);
 			const makeId = (url) => {
 				let ID;
 				url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
