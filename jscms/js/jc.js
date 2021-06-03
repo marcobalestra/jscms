@@ -1660,35 +1660,37 @@ jc.render = {
 			let $out = $(b.wrap||'<div></div>');
 			$out.addClass('jcDate');
 			$out.append('<span class="date">'+jc.sql2date(d[b.prop]).toblogdate()+'</span>');
-			if ( (b.prop == 'blogdate') && d.metadata && d.metadata.type ) jc.lists.list.get(d.metadata.type,( ld )=>{
-				let sl = [];
-				Object.keys(ld).forEach( k => { sl.push(ld[k])} );
-				sl.sort( (a,b) => (a.date < b.date ? 1 : -1 ) );
-				let prev,next,max=(sl.length -1);
-				for ( let i = 0; i <= max; i++ ) {
-					if ( sl[i].id == d.metadata.id ) {
-						if ( i > 0 ) prev = sl[ i -1];
-						if ( i < max ) next = sl[i+1];
-						break;
+			if ( (b.prop == 'blogdate') && d.metadata && d.metadata.type ) {
+				jc.render.queue(1);
+				jc.lists.list.get(d.metadata.type,( ld )=>{
+					let sl = [];
+					Object.keys(ld).forEach( k => { sl.push(ld[k])} );
+					sl.sort( (a,b) => (a.date < b.date ? 1 : -1 ) );
+					let prev,next,max=(sl.length -1);
+					for ( let i = 0; i <= max; i++ ) {
+						if ( sl[i].id == d.metadata.id ) {
+							if ( i > 0 ) prev = sl[ i -1];
+							if ( i < max ) next = sl[i+1];
+							break;
+						}
 					}
-				}
-				prev = prev ? `onclick="jc.page.open('${d.metadata.type}',${prev.id})" title="${ jc.sql2date(prev.date).toblogdate() }"` : 'disabled="disabled"';
-				next = next ? `onclick="jc.page.open('${d.metadata.type}',${next.id})" title="${ jc.sql2date(next.date).toblogdate() }"` : 'disabled="disabled"';
-				let idxpage = $(`<button class="btn btn-secondary btn-sm d-none">${AS.icon('menu')}</button>`);
-				$out.append( $('<span class="btn-group ml-2 mb-1"></span>')
-					.append(`<button class="btn btn-secondary btn-sm" ${prev}>${AS.icon('arrow-up')}</button>`)
-					.append(idxpage)
-					.append(`<button class="btn btn-secondary btn-sm" ${next}>${AS.icon('arrow-down')}</button>`)
-				);
-				let finalize = ()=>{
-					$(document.body).off('jc_render_end',finalize);
-					if ( $('.jcNavbar .nav-item.active').data() && $('.jcNavbar .nav-item.active').data().page ) {
+					prev = prev ? `onclick="jc.page.open('${d.metadata.type}',${prev.id})" title="${ jc.sql2date(prev.date).toblogdate() }"` : 'disabled="disabled"';
+					next = next ? `onclick="jc.page.open('${d.metadata.type}',${next.id})" title="${ jc.sql2date(next.date).toblogdate() }"` : 'disabled="disabled"';
+					let idxpage = $(`<button class="btn btn-secondary btn-sm d-none">${AS.icon('menu')}</button>`);
+					$out.append( $('<span class="btn-group ml-2 mb-1"></span>')
+						.append(`<button class="btn btn-secondary btn-sm" ${prev}>${AS.icon('arrow-up')}</button>`)
+						.append(idxpage)
+						.append(`<button class="btn btn-secondary btn-sm" ${next}>${AS.icon('arrow-down')}</button>`)
+					);
+					let finalize = ()=>{
+						$(document.body).off('jc_render_end',finalize);
 						let pd = $('.jcNavbar .nav-item.active').data();
-						$(idxpage).removeClass('d-none').on('click',()=>{ jc.page.open(pd.page,pd.id) });
+						if ( pd && pd.page ) $(idxpage).removeClass('d-none').on('click',()=>{ jc.page.open(pd.page,pd.id) });
 					}
-				}
-				$(document.body).on('jc_render_end',finalize);
-			});
+					$(document.body).on('jc_render_end',finalize);
+					jc.render.queue(-1);
+				});
+			}
 			return $out;
 		},
 		mixed : (b,d) => {
