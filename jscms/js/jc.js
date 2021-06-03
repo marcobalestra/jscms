@@ -1878,6 +1878,25 @@ jc.render = {
 			$d.append($v);
 			return $d;
 		},
+		youtube : (b,d) => {
+			console.log(b,d);
+			const makeId = (url) => {
+				let ID;
+				url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+				if(url[2] !== undefined) {
+					ID = url[2].split(/[^0-9a-z_\-]/i);
+					ID = ID[0];
+				} else {
+					ID = url;
+				}
+				return ID;
+			};
+			let id = makeId(d[b.prop]);
+			if ( ! id ) return '';
+			let $d = $('<div class="jcYoutube embed-responsive embed-responsive-16by9"></div>');
+			$d.append(`<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/${id}?rel=0" allowfullscreen></iframe>`);
+			return $d;
+		},
 	},
 };
 

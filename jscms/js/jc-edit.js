@@ -964,6 +964,7 @@ jc.edit = {
 		blockTypes : [
 			{type:'text',label:'TextOrHtml',menu:true},
 			{type:'gallery',label:'Gallery',menu:true},
+			{type:'youtube',label:'YouTube Video'},
 			{type:'audio',label:'Audio'},
 			{type:'video',label:'Video'},
 			{type:'lasts',label:'LastChangedPages'},
@@ -1303,6 +1304,14 @@ jc.edit = {
 				["subpage","jcpage",{nolabel:true,skypempty:true,mandatory:true}],
 				["force",'bool',{asLabel:'ForceAlsoHidden',depends:'subpage'}],
 				['footer','freehtml',{value:'<br />'}],
+			);
+			return o;
+		},
+		youtube : (b,d) => {
+			let o = jc.edit.form._base(b,d);
+			o.fields.push(
+				['type','hidden',{value:'youtube'}],
+				['youtube','text',{asLabel:'URL',focus:true,normalize:true,skipempty:true,mandatory:true}],
 			);
 			return o;
 		},
