@@ -1879,8 +1879,12 @@ jc.render = {
 			return $d;
 		},
 		youtube : (b,d) => {
-			const makeId = (url) => {
+			const makeUri = (url) => {
 				let ID;
+				if ( url.includes('vimeo') && url.match(/^.*\/([0-9]{8,}).*$/)) {
+					ID = url.replace(/^.*\/([0-9]{8,}).*$/,"$1");
+					return 'https://player.vimeo.com/video/' + ID;
+				}
 				url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
 				if(url[2] !== undefined) {
 					ID = url[2].split(/[^0-9a-z_\-]/i);
@@ -1888,12 +1892,11 @@ jc.render = {
 				} else {
 					ID = url;
 				}
-				return ID;
+				return ID.includes('://') ? ID : `https://www.youtube.com/embed/${ID}?rel=0`;
 			};
-			let id = makeId(d[b.prop]);
-			if ( ! id ) return '';
+			let uri = makeUri(d[b.prop]);
 			let $d = $('<div class="jcYoutube embed-responsive embed-responsive-16by9"></div>');
-			$d.append(`<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/${id}?rel=0" allowfullscreen></iframe>`);
+			$d.append(`<iframe class="embed-responsive-item" src="${uri}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`);
 			return $d;
 		},
 	},
