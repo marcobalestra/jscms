@@ -402,7 +402,7 @@ jc.page.rm = ( params ) => {
 	}
 	if ( ! params.removed ) {
 		jc.dav.rm( AS.path('jsdatapages') + params.page + ( params.id || '') + '.json', ()=>{
-			jc.dav.rm( AS.path('jsdatapagestatics') + params.page + ( params.id || '') + '.html',()=>{
+			jc.dav.rm( AS.path('jsdatastatics') + params.page + ( params.id || '') + '.html',()=>{
 				params.removed = true;
 				jc.page.rm( params );
 			});
@@ -612,7 +612,7 @@ jc.page.makeStatic = ( cb ) => {
 	}
 	//if ( $('.swal2-container').length ) return setTimeout( makeStatic, 200 );
 	$(document.body).trigger('jc_saving_static');
-	const uri = AS.path('jsdatapagestatics')+jc.page.current()+(jc.page.data().pageContent.id||'')+'.html';
+	const uri = AS.path('jsdatastatics')+jc.page.current()+(jc.page.data().id||jc.page.data().pageContent.id||'')+'.html';
 	let cn = document.body.className;
 	document.body.className = '';
 	let html = $(document.documentElement).html();

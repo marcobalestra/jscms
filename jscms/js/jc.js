@@ -43,7 +43,8 @@ if ( AS.test.udef(jc.prop.prefs.prefsVersion)) jc.prop.prefs.prefsVersion = 1;
 	if ( AS.test.udef(AS.path('jsextensions'))) AS.path({jsextensions:AS.path('jstemplates')+'extensions/'});
 	if ( AS.test.udef(AS.path('jsdataroot'))) AS.path({jsdataroot:lp+'data/'});
 	if ( AS.test.udef(AS.path('jsdatapages'))) AS.path({jsdatapages:AS.path('jsdataroot')+'pages/'});
-	if ( AS.test.udef(AS.path('jsdatapagestatics'))) AS.path({jsdatapagestatics:AS.path('jsdataroot')+'static/'});
+	if ( AS.test.udef(AS.path('jsdatasite'))) AS.path({jsdatasite:AS.path('jsdataroot')+'site/'});
+	if ( AS.test.udef(AS.path('jsdatastatics'))) AS.path({jsdatastatics:AS.path('jsdataroot')+'static/'});
 	if ( AS.test.udef(AS.path('jsauth'))) AS.path({jsauth:lp+'login/'});
 	if ( AS.test.udef(AS.path('jsreporoot'))) AS.path({jsreporoot:bp+'repository/'});
 })()
@@ -1793,7 +1794,7 @@ jc.render = {
 				if ( ! (AS.test.arr(list) && list.length ) ) return;
 				if ( d.title ) div.append( $('<h4></h4>').append(d.title) );
 				let $ol = $('<'+nodes[0]+' class="jcLastsEntries"></'+nodes[0]+'>');
-				list.splice( d.max -1 );
+				list.splice( d.max );
 				let cp = jc.page.current();
 				let cid = jc.page.data().id;
 				list.forEach( i => {
