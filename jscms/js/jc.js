@@ -743,27 +743,30 @@ jc.URI = {
 		return pars;
 	},
 	encode : (o,title)=>{
-		if ( ! AS.test.str(o.page) ) return '/';
 		let uri = '';
-		if ( AS.test.obj(o.data) ) {
+		if ( AS.test.obj(o)) {
+			if ( ! AS.test.str(o.page) ) return '/';
 			uri += encodeURIComponent(o.page);
 			if ( o.id ) {
 				uri += o.id;
-			} else if ( o.data && o.data.id ) {
-				uri += o.data.id;
-			} else {
-				let parts = [];
-				for (const [key, value] of Object.entries(o.data)) {
-					let v = false;
-					if ( AS.test.str(value) && (! isNaN(parseInt(value))) ) {
-						o.data[key] = parseInt(value);
-						parts.push(key);
-					} else if ( AS.test.num(value) && (parseInt(value)==value) ) {
-						parts.push(key);
+			}
+			if ( AS.test.obj(o.data) ) {
+				if ( (! o.id) && o.data && o.data.id ) {
+					uri += o.data.id;
+				} else {
+					let parts = [];
+					for (const [key, value] of Object.entries(o.data)) {
+						let v = false;
+						if ( AS.test.str(value) && (! isNaN(parseInt(value))) ) {
+							o.data[key] = parseInt(value);
+							parts.push(key);
+						} else if ( AS.test.num(value) && (parseInt(value)==value) ) {
+							parts.push(key);
+						}
 					}
-				}
-				if ( parts.length ) {
-					uri += ',' + parts.sort().map( p => ( p + ':' + o.data[p]) ).join(',');
+					if ( parts.length ) {
+						uri += ',' + parts.sort().map( p => ( p + ':' + o.data[p]) ).join(',');
+					}
 				}
 			}
 		} else if ( AS.test.str(o) ) {
@@ -1794,14 +1797,17 @@ jc.render = {
 				let cp = jc.page.current();
 				let cid = jc.page.data().id;
 				list.forEach( i => {
-					let p = i.type;
+					let p = i.type||d.ptype;
 					let $li = $('<'+nodes[1]+' class="jcLastsEntry"></'+nodes[1]+'>');
 					let $a;
 					if ( (cp==p ) && (i.id == cid ) ) {
 						$li.append('➤ ');
 						$a = $(`<span class="title"></span>`).html(i.title);
 					} else {
-						$a = $(`<a class="title" onclick="jc.page.open('${p}'${ i.id ? ','+i.id : '' })"></a>`).html(i.title);
+						$a = $(`<a class="title" href="${ jc.URI.encode({page:p,id:i.id},i.url) }"></a>`).on('click',(e)=>{
+							e.preventDefault();
+							jc.page.open(p,i.id);
+						}).html(i.title);
 					}
 					$li.append( $a );
 					if ( d.showdate ) {
