@@ -88,4 +88,5 @@ AS.labels.load('it',[{
 	'UseFbComments' : 'Usa i commenti Facebook',
 	'Warning' : 'Attenzione',
 	'WholeSite' : 'Tutto il sito',
+	'YtVimeoVideo' : 'Vodeo Youtube / Vimeo',
 }]);

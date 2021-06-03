@@ -964,7 +964,7 @@ jc.edit = {
 		blockTypes : [
 			{type:'text',label:'TextOrHtml',menu:true},
 			{type:'gallery',label:'Gallery',menu:true},
-			{type:'youtube',label:'YouTube or Vimeo video'},
+			{type:'youtube',label:'YtVimeoVideo'},
 			{type:'audio',label:'Audio'},
 			{type:'video',label:'Video'},
 			{type:'lasts',label:'LastChangedPages'},
