@@ -963,8 +963,8 @@ jc.edit = {
 	prop : {
 		blockTypes : [
 			{type:'text',label:'TextOrHtml',menu:true},
+			{type:'youtube',label:'YtVimeo',menu:true},
 			{type:'gallery',label:'Gallery',menu:true},
-			{type:'youtube',label:'YtVimeoVideo'},
 			{type:'audio',label:'Audio'},
 			{type:'video',label:'Video'},
 			{type:'lasts',label:'LastChangedPages'},

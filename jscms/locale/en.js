@@ -78,5 +78,5 @@ AS.labels.load('en',[{
 	'UseFbLike' : 'Use Facebook “Like”',
 	'UseFbComments' : 'Use Facebook comments',
 	'WholeSite' : 'The whole site',
-	'YtVimeoVideo' : 'Youtube / Vimeo video',
+	'YtVimeo' : 'Youtube / Vimeo',
 }]);
