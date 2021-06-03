@@ -516,7 +516,7 @@ jc.page.save = ( params ) => {
 		if (( ! params.data.metadata.title ) && AS.test.str( params.data.title)) params.data.metadata.title = params.data.title.dehtml().shorten(48);
 		if ( ! params.data.metadata.title ) params.data.metadata.title = params.page + ( params.id ? ' '+params.id : '');
 		if ( params.data.blogdate ) params.data.metadata.date = params.data.blogdate;
-		if (! ( params.maintenance || params.data.metadata.upd )) params.data.metadata.upd = (new Date()).getTime();
+		if (! ( params.maintenance && params.data.metadata.upd )) params.data.metadata.upd = (new Date()).getTime();
 		params.metadataChecked = true;
 	}
 	if ( ! params.saved ) {
@@ -650,14 +650,13 @@ jc.page.makeLasts = ( list, callback ) => {
 			lasts.push( Object.assign(typelist[k]) );
 		});
 	} );
-	lasts.sort( (a,b) =>(b.upd - a.upd));
-	qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) );
-	qts.sort( (a,b)=>( b - a ) );
+	lasts.sort( (a,b) =>(b.upd - a.upd) );
+	let qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) ).sort( (a,b)=>( b - a ) );
 	let makeRss = true;
 	let proc = () => {
 		if ( qts.length ) {
 			const qt = qts.shift();
-			lasts.splice(qt -1);
+			lasts.splice(qt);
 			if ( makeRss) {
 				makeRss = false;
 				qts.unshift(qt);
@@ -690,12 +689,11 @@ jc.page.makeTypeLasts = ( pagetype, typelist, callback ) => {
 		lasts.push( pm );
 	});
 	lasts.sort( (a,b) =>(b.upd - a.upd));
-	qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) );
-	qts.sort( (a,b)=>( b - a ) );
+	let qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) ).sort( (a,b)=>( b - a ) );
 	let proc = () => {
 		if ( qts.length ) {
 			const qt = qts.shift();
-			lasts.splice(qt -1);
+			lasts.splice(qt);
 			jc.lists.last.set(pagetype,qt,lasts,proc);
 			return;
 		} else {
