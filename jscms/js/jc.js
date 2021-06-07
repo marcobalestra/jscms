@@ -111,6 +111,13 @@ $(() => {
 // 			}
 			/* 1st page */
 			if ( window.self == window.top) {
+				if ( ! jc.prop.site ) {
+					jc.jdav.get( AS.path('jsdataroot')+'site.json',(l)=>{
+						jc.prop.site = l||{};
+						foo();
+					});
+					return;
+				}
 				let sp = jc.URI.decode();
 				if ( AS.test.str(sp.page) ) jc.page.open(sp.page,sp.id,sp.data);
 				else jc.page.open('index');
@@ -1350,16 +1357,16 @@ jc.page = {
 			jc.springLoad('module:edit');
 			$(document.body).addClass('jcUserAuth');
 			if ( $menu.hasClass('jcMenuText') ) {
-				$menu.append(`<span class="jcicon">${ AS.icon('user') }</span><span class="jcUser">${ user }</span>`);
+				$menu.append(`<span class="jcicon">${ AS.icon('user') }</span>`);
 			} else {
-				$menu.append(`<div class="jcicon jcAuth">${ AS.icon('user') }</div><div class="jcUser">${ user }</div>`);
+				$menu.append(`<div class="jcicon jcAuth">${ AS.icon('menu') }</div>`);
 			}
 			$menu.on('click contextmenu',jc.actionsMenu);
 			$(document.body).on('contextmenu',jc.actionsMenu);
 		} else {
 			$(document.body).removeClass('jcUserAuth');
 			if ( $menu.hasClass('jcMenuText') ) {
-				$menu.append(`<span class="jcicon jcUnauth">${ AS.icon('lock') }</span><span class="jcUnauth">${ AS.label('Login') }</span>`);
+				$menu.append(`<span class="jcicon jcUnauth">${ AS.icon('lock') }</span>`);
 			} else {
 				$menu.append(`<span class="jcicon jcUnauth">${ AS.icon('lock') }</span>`);
 			}
@@ -1676,7 +1683,7 @@ jc.render = {
 					}
 					prev = prev ? `onclick="jc.page.open('${d.metadata.type}',${prev.id})" title="${ jc.sql2date(prev.date).toblogdate() }"` : 'disabled="disabled"';
 					next = next ? `onclick="jc.page.open('${d.metadata.type}',${next.id})" title="${ jc.sql2date(next.date).toblogdate() }"` : 'disabled="disabled"';
-					let idxpage = $(`<button class="btn btn-secondary btn-sm d-none">${AS.icon('menu')}</button>`);
+					let idxpage = $(`<button class="btn btn-secondary btn-sm d-none">${AS.icon('list')}</button>`);
 					$out.append( $('<span class="btn-group ml-2 mb-1"></span>')
 						.append(`<button class="btn btn-secondary btn-sm" ${prev}>${AS.icon('arrow-up')}</button>`)
 						.append(idxpage)

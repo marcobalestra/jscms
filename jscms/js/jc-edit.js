@@ -1383,7 +1383,8 @@ jc.edit = {
 			jc.page.reload();
 		};
 		fopt.callback = (f) => {
-			if ( AS.test.def(t)) f.setValue('type',t);
+			if ( AS.test.def(t) && b._ && t == 'text') f.setValue('type','html');
+			else if ( AS.test.def(t)) f.setValue('type',t);
 			else if ( (b._) || AS.test.udef(b._.qt)) f.setValue('type','html');
 			else f.setValue('type',d[b.prop][b._.idx].type);
 		};
