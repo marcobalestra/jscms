@@ -1339,6 +1339,7 @@ jc.page = {
 					if ( md.keywords ) $('meta[name="keywords"]',h).attr('content',md.keywords);
 					if ( md.description ) $('meta[name="description"]',h).attr('content',md.description);
 					if ( md.hidden ) $(document.body).append(`<div id="jcHiddenPageIndicator"><span>${ AS.label('PageHidden')}</span></div>`);
+					$(document.body).attr('style','');
 				}
 				$(document.body).trigger('jc_page_data_loaded',j);
 				if (jc.page.prop.editMode == 'page') jc.edit.data( j );
