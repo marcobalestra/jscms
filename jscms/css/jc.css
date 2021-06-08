@@ -160,7 +160,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcLastsEntry .time::before { content: ', '; }
 
 .jcAudio audio { width: 80%; height: 64px; margin: 10px 10%; }
-.jcVideo { margin: 1em -1px; width: 100%; padding: 0; overflow-x: visible;overflow-y: auto;}
+.jcVideo { margin: 1em -1px; width: 100%; padding: 0; overflow: visible; }
 .jcVideo video { max-width: 100%; margin: 0 auto; display: block; box-shadow: 0 0 2px #999, 3px 3px 3px #ccc; }
 .jcYoutube { max-width: 100%; margin: 1em auto; display: block; }
 
