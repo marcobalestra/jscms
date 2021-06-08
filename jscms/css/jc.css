@@ -160,8 +160,8 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcLastsEntry .time::before { content: ', '; }
 
 .jcAudio audio { width: 80%; height: 64px; margin: 10px 10%; }
-.jcVideo { margin: 0; width: 100%; padding: 0; overflow-x: visible;overflow-y: auto;}
-.jcVideo video { max-width: 100%; margin: 1em -1px; display: block; box-shadow: 0 0 2px #999, 3px 3px 3px #ccc; }
+.jcVideo { margin: 1em -1px; width: 100%; padding: 0; overflow-x: visible;overflow-y: auto;}
+.jcVideo video { max-width: 100%; margin: 0 auto; display: block; box-shadow: 0 0 2px #999, 3px 3px 3px #ccc; }
 .jcYoutube { max-width: 100%; margin: 1em auto; display: block; }
 
 #jcSharingPanel { align-items: start; border-top: 1px solid #ddd; display: flex; flex-wrap: wrap; justify-content: center; margin: 24px 0; padding: 8px 32px; }
