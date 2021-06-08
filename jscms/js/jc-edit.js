@@ -1323,7 +1323,14 @@ jc.edit = {
 				name: 'item',
 				subtype: 'array',
 				preview: ['label'],
-				values: [['item','jcpage',{nolabel:true,includecurrent:false}]]
+				values: [
+					['label','text',{asLabel:'Label',normalize:true,mandatory:true}],
+					['item','jcpage',{nolabel:true,includecurrent:false,jconchange:(f,s)=>{
+						let v = AS.test.obj(f.prop.value) ? (f.prop.value.page + (f.prop.value.id||'')) : '';
+						let t = $('option[value="'+v+'"]',s).attr('title')||'';
+						f.getForm().setValue( 'label', t, true );
+					} }]
+				]
 			});
 			o.fields.push(
 				['type','hidden',{value:'relateds'}],
