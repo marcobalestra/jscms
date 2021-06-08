@@ -6,9 +6,10 @@ body { background-color: #ddd; margin: 0; overflow: auto; padding: 0; }
 /* 
 #topBarContainer .jcMenu { position: absolute; right: 16px; top: 24px; }
  */
-#topContainer { background-color: #fff; border: solid 1px #ccc; border-radius: 4px; margin: 48px auto; max-width: 1300px; padding: 10px; position: relative; }
-#topNavbar { margin: -10px -10px 10px -10px; }
+#topContainer { background-color: #fff; border: solid 1px #ccc; border-radius: 4px; margin: 48px auto; max-width: 1300px; padding: 0; position: relative; }
+#topNavbar { margin: 0 0 10px 0; }
 #topNavbar a[onclick] { cursor: pointer; }
+#mainContainer { margin: 10px; overflow-y: auto; overflow-x: visible;}
 #mainContainer div.jcDate { color: #999; font-size: bigger; font-style: italic; text-align: right; }
 
 /* Mobile only */
