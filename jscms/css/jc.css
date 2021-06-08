@@ -164,7 +164,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcVideo video { max-width: 100%; margin: 0 auto; display: block; box-shadow: 0 0 2px #999, 3px 3px 3px #ccc; }
 .jcYoutube { max-width: 100%; margin: 1em auto; display: block; }
 
-#jcSharingPanel { align-items: start; border-top: 1px solid #ddd; display: flex; flex-wrap: wrap; justify-content: center; margin: 24px 0; padding: 8px 32px; }
+#jcSharingPanel { align-items: start; border-top: 1px solid #ddd; display: flex; flex-wrap: wrap; justify-content: center; margin: 24px 0; padding: 8px 24px; }
 #jcToplevelContainer #jcSharingPanel a[href]::after { content: ''; }
 #jcSharingPanel > div { border: none; display: inline-block; height: 56px; overflow: hidden; width: 56px; }
 #jcSharingPanel a { border: none; border-radius: 20px; display: block; fill: #fff; height: 40px; margin: 8px; stroke: none; text-decoration: none; transition: all .15s ease-out; width: 40px; }
