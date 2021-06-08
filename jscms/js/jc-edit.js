@@ -614,9 +614,12 @@ jc.page.makeStatic = ( cb ) => {
 	$(document.body).trigger('jc_saving_static');
 	const uri = AS.path('jsdatastatics')+jc.page.current()+(jc.page.data().id||jc.page.data().pageContent.id||'')+'.html';
 	let cn = document.body.className;
+	let cs = document.body.getAttribute('style');
 	document.body.className = '';
+	document.body.style='';
 	let html = $(document.documentElement).html();
 	document.body.className = cn;
+	document.body.style = cs;
 	html = html
 		.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)[\s\S]*?>\s*(<\/head>)/,"$1$2")
 		.replace(/[ \t]*<script [^>]+AS-autoload[^>]+>[^<]*<\/script>[\r\n]*/g,'')
@@ -963,6 +966,7 @@ jc.edit = {
 			{type:'text',label:'TextOrHtml',menu:true},
 			{type:'youtube',label:'YtVimeo',menu:true},
 			{type:'gallery',label:'Gallery',menu:true},
+			{type:'relateds',label:'RelatedPages'},
 			{type:'audio',label:'Audio'},
 			{type:'video',label:'Video'},
 			{type:'lasts',label:'LastChangedPages'},
@@ -1310,6 +1314,30 @@ jc.edit = {
 			o.fields.push(
 				['type','hidden',{value:'youtube'}],
 				['youtube','text',{asLabel:'URL',focus:true,normalize:true,skipempty:true,mandatory:true}],
+			);
+			return o;
+		},
+		relateds : (b,d) => {
+			let o = jc.edit.form._base(b,d);
+			o.options.subforms.push({
+				name: 'item',
+				subtype: 'array',
+				preview: ['label'],
+				values: [
+					['label','text',{asLabel:'Label',normalize:true,mandatory:true}],
+					['item','jcpage',{nolabel:true,includecurrent:false,jconchange:(f,s)=>{
+						let v = AS.test.obj(f.prop.value) ? (f.prop.value.page + (f.prop.value.id||'')) : '';
+						let t = $('option[value="'+v+'"]',s).attr('title')||'';
+						f.getForm().setValue( 'label', t, true );
+					} }]
+				]
+			});
+			o.fields.push(
+				['type','hidden',{value:'relateds'}],
+				['title','text',{asLabel:'Title',normalize:true,skipempty:true}],
+				['view','select',{asLabel:'View',options:[{label:AS.label('Bullet list'),value:'ul,li'},{label:AS.label('Numbered list'),value:'ol,li'},{label:AS.label('Plain list'),value:'div,div'}]}],
+				['position','select',{asLabel:'Position',options:[{label:AS.label('Block'),value:''},{label:AS.label('FloatRight'),value:'jcBoxRight'}]}],
+				['relateds','subform',{asLabel:'Content',subform:'item',mandatory:true}],
 			);
 			return o;
 		},

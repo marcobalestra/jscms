@@ -1843,6 +1843,30 @@ jc.render = {
 			});
 			return div;
 		},
+		relateds : (b,d) => {
+			let id = AS.generateId('relateds');
+			let nodes = (d.view||'ol,li').split(',');
+			let $div = $('<div class="jcRelateds"></div>');
+			$div.attr('id',id);
+			if ( d.position ) $div.addClass( d.position );
+			if ( d.title ) $div.append( $('<h4></h4>').append(d.title) );
+			jc.lists.list.get( data => {
+				let $ol = $('<'+nodes[0]+' class="jcRelatedEntries"></'+nodes[0]+'>');
+				d.relateds.forEach( i => {
+					let rn = data[i.item.page] ? data[i.item.page][String(i.item.id||0)] : false;
+					if ( ! rn ) return;
+					let $li = $('<'+nodes[1]+' class="jcLastsEntry"></'+nodes[1]+'>');
+					let $a = $(`<a class="title" href="${ jc.URI.encode(i.item,rn.url) }"></a>`).on('click',(e)=>{
+						e.preventDefault();
+						jc.page.open(i.item.page,i.item.id);
+					}).html(rn.title);
+					$li.append( $a );
+					$ol.append($li);
+				});
+				$div.append($ol);
+			});
+			return $div;
+		},
 		subpage : (b,d) => {
 			let id = AS.generateId('blockSubpage');
 			let div = $('<div></div>');
@@ -1959,7 +1983,7 @@ jc.actionsMenu = (e) => {
 // 		tm.content.push( {icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('parts');} } );
 		ws.content.push(
 			{icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.create();} },
-			{icon:'jcicon',iconKey:'pageParts',label:AS.label('IncludedParts'),action:()=>{jc.page.edit('parts');} },
+			{icon:'jcicon',iconKey:'pageParts',label:AS.label('IncludedParts'),action:()=>{jc.page.edit('parts');jc.page.open('index');} },
 			'-',
 			{icon:'jcicon',iconKey:'maintenance',label:AS.label('Maintenance'),action:()=>{jc.page.edit('maintenance');} },
 		);

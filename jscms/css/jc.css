@@ -59,7 +59,7 @@ a[href^="http://"]:hover::after, #jcToplevelContainer a[href^="https://"]:hover:
 a[href^="mailto:"]::after { content: ' ✉'; }
 
 .jcMenu { cursor: pointer; width: 32px; height: 32px; }
-.jcMenu:not(.jcMenuText) { position: fixed; top: 32px; right: 32px; z-index: 2; }
+.jcMenu:not(.jcMenuText) { position: absolute; top: 32px; right: 32px; z-index: 2; }
 @media (max-width: 600px) {
 	.jcMenu:not(.jcMenuText) { top: 8px; right: 8px; }
 }
@@ -79,7 +79,7 @@ a[href^="mailto:"]::after { content: ' ✉'; }
 .jcMenu:not(.jcMenuText):hover .jcUser { color: #090; }
 .jcEditable, .jcEditable * { box-sizing: border-box; }
 .jcPlaceHolder { font-weight: bold; font-style: italic; color: #ccc; }
-.jcEditable { border: #ccc dashed 1px; margin: 2px 0; min-height: 30px; min-width: 30px; overflow: auto; overflow: visible; padding: 0 32px 0 0; position: relative; }
+.jcEditable { border: #ccc dashed 1px; margin: 2px 0; min-height: 30px; min-width: 30px; overflow-y: auto; overflow-x: visible; padding: 0 32px 0 0; position: relative; }
 .jcEditableBlock { border-left: #99c dotted 3px; margin: 2px 0; min-height: 30px; min-width: 30px; overflow: auto; overflow: visible; position: relative; padding: 0 0 0 2px; }
 .jcEditMenu { background: #fff; border: #ccc solid 1px; line-height: 8px; padding: 0; position: absolute; right: -1px; top: -1px; z-index:90; }
 .appContextHighlight .jcEditMenu { display: none; }
@@ -188,6 +188,10 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcMediaRecordArea audio[src=""] { opacity: .5; }
 .jcMediaRecordArea video { max-width: 100%; display: block; }
 .jcMediaRecordArea.recording video, .jcMediaRecordArea.recording audio { opacity: .3; background-color : #c00; }
+
+.jcBoxRight { display: block; float: right; margin: 0 0 0 1em; max-width: 480px; }
+
+.jcMixedBlocks { overflow-y: auto; }
 
 button[data-ismonth] { text-transform: capitalize; }
 

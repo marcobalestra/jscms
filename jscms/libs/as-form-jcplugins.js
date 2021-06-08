@@ -12,29 +12,6 @@ AS.form.fields.jcpage = class extends AS.form.field {
 		to.field.setAttribute('placeholder', to.prop.placeholder );
 		to.field.setAttribute('style', 'width:100%;' );
 		to.field.asField = ()=>{ return to; };
-		jc.jdav.get('struct/_all-list.json',(data)=>{
-			let $f = $(to.field);
-			$f.append(`<option></option>`);
-			let curpage = jc.page.current();
-			let curid = String(jc.page.data().id||'');
-			Object.keys( data ).forEach( page => {
-				let ptype = data[page];
-				Object.keys( ptype ).forEach( id => {
-					let p = ptype[id];
-					id = parseInt(id) ? id : '';
-					if ((! to.prop.includecurrent) && (page == curpage) && ( id == curid)) return;
-					let v = page + id;
-					$f.append(`<option value="${ v }">[${page}${id}] ${p.title.escape()} — ${(p.desc||'').escape()}</option>`);
-				} );
-			} );
-			if ( cv ) $f.val( cv );
-			if ( to.prop._s2v ) $f.val( to.prop._s2v );
-			$f.select2({
-				dropdownParent : $(to.getForm().fakeForm()).closest('.modal'),
-				placeholder: AS.label('Select'),
-			});
-			$f.on('change',()=>{ to.setValue(to.getJsValue()); AS.form.field.onchange(to); });
-		});
 		return AS.form.field.prototype.renderField.call( to );
 	};
 	getJsValue() {
@@ -50,16 +27,54 @@ AS.form.fields.jcpage = class extends AS.form.field {
 		let av = v[this.prop.name];
 		if ( av ) {
 			let avs = av.page + ( av.id ? av.id : '');
-			this.setValue(av);
 			this.prop._s2v = avs;
-			$( this.fakeField() ).val(avs).trigger('change');
+			let $s = $( this.fakeField() );
+			const sv = () => {
+				if ( ! $s.hasClass('jcParsed') ) return setTimeout( sv, 100 );
+				this.setValue(av);
+				$s.val(avs).trigger('change');
+			}
+			sv();
 		}
 		this.hideWarning();
 	};
 	renderField() { return AS.form.fields.jcpage.renderField.call(window,this); };
 	postRender() {
-		let $d = $( this.field ).closest('div');
+		const to = this;
+		const $d = $( to.field ).closest('div');
 		$d.css({'padding':'.5em 1em 1em 1em'});
-		return AS.form.field.postRender.call(window,this);
+		const cv = AS.test.obj(to.prop.value) ? (to.prop.value.page + (to.prop.value.id ? to.prop.value.id : '')) : false;
+		let args = [];
+		if ( AS.test.str(to.prop.pageType) ) args.push( to.prop.pageType );
+		args.push( (data)=>{
+			let $f = $(to.field);
+			$f.append(`<option></option>`);
+			let curpage = jc.page.current();
+			let curid = String(jc.page.data().id||'');
+			Object.keys( data ).forEach( page => {
+				let ptype = data[page];
+				Object.keys( ptype ).forEach( id => {
+					let p = ptype[id];
+					id = parseInt(id) ? id : '';
+					if ((! to.prop.includecurrent) && (page == curpage) && ( id == curid)) return;
+					let v = page + id;
+					$f.append(`<option value="${ v }" title="${p.title.escape()}">[${page}${id}] ${p.title.escape()} — ${(p.desc||'').escape()}</option>`);
+				} );
+			} );
+			if ( cv ) $f.val( cv );
+			if ( to.prop._s2v ) $f.val( to.prop._s2v );
+			$f.select2({
+				dropdownParent : $(to.getForm().fakeForm()).closest('.modal'),
+				placeholder: AS.label('Select'),
+			});
+			$f.on('change',(e)=>{
+				to.setValue(to.getJsValue());
+				AS.form.field.onchange(to);
+				if ( AS.test.func(to.prop.jconchange) ) window.setTimeout( ()=>{ to.prop.jconchange.call( window, to, $f ); }, 10 );
+			});
+			$f.addClass('jcParsed');
+		});
+		jc.lists.list.get.apply(window,args);
+		return AS.form.field.postRender.call(window,to);
 	};
 };

@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-<title>JSCMS is here!</title>
+<title>Overview</title>
 <link>https://ricette.lan.crossbow.it/</link>
 <generator>jBloud CMS - jscms</generator>
+<item>
+	<link>https://ricette.lan.crossbow.it/site2/</link>
+	<pubDate>Tue, 08 Jun 2021 09:55:03 GMT</pubDate>
+	<title>Overview</title>
+</item>
 <item>
 	<link>https://ricette.lan.crossbow.it/site/</link>
 	<pubDate>Thu, 03 Jun 2021 14:55:15 GMT</pubDate>
@@ -28,11 +33,6 @@
 	<link>https://ricette.lan.crossbow.it/site1/</link>
 	<pubDate>Thu, 03 Jun 2021 12:02:20 GMT</pubDate>
 	<title>JSCMS tech info</title>
-</item>
-<item>
-	<link>https://ricette.lan.crossbow.it/site2/</link>
-	<pubDate>Wed, 02 Jun 2021 11:21:26 GMT</pubDate>
-	<title>Overview</title>
 </item>
 </channel>
 </rss>
