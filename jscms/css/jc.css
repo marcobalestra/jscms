@@ -133,7 +133,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcCarousel { display: block; width: 100%; margin: 1em 0; box-shadow: -1px 0 2px #666,0 1px 2px #666, 1px 0 2px #666,0 -1px 2px #666; }
 .jcCarousel .carousel-inner { background-color: #999; background-image : linear-gradient(to top,#666,#999,#ccc,#666); overflow: hidden; }
 .jcCarousel .carousel-item { height: 280px; text-align: center; }
-.jcCarousel .carousel-item img { display: block; left: 50%; margin: 0; max-height: 280px; position: absolute; top: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 3px #000; }
+.jcCarousel .carousel-item img { display: block; left: 50%; margin: 0; max-height: 280px; position: absolute; top: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 3px #000; max-width: 100%; }
 .jcCarousel a[class*="carousel-control-"] { width: 10%; }
 .jcCarousel a[class*="carousel-control-"] span[class*="carousel-control-"] { background-color: rgba(0,0,0,.1); outline: 8px solid rgba(0,0,0,.1); }
 .jcCarousel .carousel-caption { color: #ff0; text-shadow: -1px 0 2px #666,0 1px 2px #666, 1px 0 2px #666,0 -1px 2px #666; }
