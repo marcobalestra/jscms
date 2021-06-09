@@ -64,7 +64,7 @@ a[href^="mailto:"]::after { content: ' ✉'; }
 .jcBannerArea .jcCover { width: 100%; height: 128px; overflow: hidden; }
 .jcBannerArea .jcCover img { display: block; border: none; width: 100%; height: 100%; }
 .jcBannerArea.nop .jcCover { height: 64px; }
-.jcBannerArea .jcBannerText { color: #69c; font-size: 140%; font-weight: bold; position: absolute; text-overflow: ellipsis; text-shadow: 0 0 3px #000; transform: scaleY(1.5); white-space: nowrap; }
+.jcBannerArea .jcBannerText { color: #69c; font-size: 140%; font-weight: bold; position: absolute; text-overflow: ellipsis; overflow:hidden; text-shadow: 0 0 3px #000; transform: scaleY(1.5); white-space: nowrap; }
 .jcBannerArea.cfill .jcCover img { object-fit: cover; }
 .jcBannerArea.cstretch .jcCover img { object-fit: fill; }
 .jcBannerArea.ccenter .jcCover img { object-fit: none; margin: 0 auto; }
