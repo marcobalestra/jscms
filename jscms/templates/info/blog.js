@@ -6,7 +6,7 @@
 	};
 	ti.content = [
 		{ selector: "#aboveTopBar", content: false },
-		{ selector: "#topBar", part: "header.json", editable: false },
+		{ selector: "#topBar", part: "header.json" },
 		{ selector: "#belowTopBar", content: false },
 		{ selector: "#topNavbar", part: 'navbar.json' },
 		{ selector: "#mainContainer", content : [

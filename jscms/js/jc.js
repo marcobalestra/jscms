@@ -1972,11 +1972,9 @@ jc.actionsMenu = (e) => {
 		if ( (jc.page.current()!='index')||AS.test.def(jc.page.data().id)) {
 			tp.content.push('-',{icon:'jcicon danger',iconKey:'pageRm',label:AS.label('DeleteThisPage')+'…',action:()=>{jc.page.rm();} });
 		}
-// 		let tm = {label:AS.label('IncludedParts')+':',content:[]};
-// 		tm.content.push( {icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('parts');} } );
 		ws.content.push(
 			{icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.create();} },
-			{icon:'jcicon',iconKey:'pageParts',label:AS.label('IncludedParts'),action:()=>{jc.page.edit('parts');jc.page.open('index');} },
+			{icon:'jcicon',iconKey:'pageParts',label:AS.label('IncludedParts'),action:()=>{jc.page.edit('parts');} },
 			'-',
 			{icon:'jcicon',iconKey:'maintenance',label:AS.label('Maintenance'),action:()=>{jc.page.edit('maintenance');} },
 		);
