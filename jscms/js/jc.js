@@ -111,13 +111,6 @@ $(() => {
 // 			}
 			/* 1st page */
 			if ( window.self == window.top) {
-				if ( ! jc.prop.site ) {
-					jc.jdav.get( AS.path('jsdataroot')+'site.json',(l)=>{
-						jc.prop.site = l||{};
-						foo();
-					});
-					return;
-				}
 				let sp = jc.URI.decode();
 				if ( AS.test.str(sp.page) ) jc.page.open(sp.page,sp.id,sp.data);
 				else jc.page.open('index');

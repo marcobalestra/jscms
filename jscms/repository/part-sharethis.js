@@ -13,7 +13,7 @@
 	];
 	let data = {
 		shares : shares,
-		form : () => {
+		form : ( callback ) => {
 			let fo = {
 				requires : ['basic','pikaday','tinymce','iro','slider'],
 				options : {},
@@ -24,6 +24,7 @@
 				],
 			};
 			shares.forEach( s => { fo.fields.push(['hide-'+s.key,'bool',{label:s.label}]) } );
+			if ( AS.test.func(callback) ) callback.call(window,fo);
 			return fo;
 		},
 		render : ( blockdata ) => {

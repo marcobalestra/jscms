@@ -59,10 +59,33 @@ a[href^="http://"]:hover::after, #jcToplevelContainer a[href^="https://"]:hover:
 a[href^="mailto:"]::after { content: ' ✉'; }
 
 .jcMenu { cursor: pointer; width: 32px; height: 32px; }
-.jcMenu:not(.jcMenuText) { position: absolute; top: 32px; right: 32px; z-index: 2; }
+
+.jcBannerArea { position: relative; }
+.jcBannerArea .jcCover { width: 100%; height: 128px; overflow: hidden; }
+.jcBannerArea .jcCover img { display: block; border: none; width: 100%; height: 100%; }
+.jcBannerArea.nop .jcCover { height: 64px; }
+.jcBannerArea .jcBannerText { color: #69c; font-size: 140%; font-weight: bold; position: absolute; text-overflow: ellipsis; text-shadow: 0 0 3px #000; transform: scaleY(1.5); white-space: nowrap; }
+.jcBannerArea.cfill .jcCover img { object-fit: cover; }
+.jcBannerArea.cstretch .jcCover img { object-fit: fill; }
+.jcBannerArea.ccenter .jcCover img { object-fit: none; margin: 0 auto; }
+.jcBannerArea.ccontain .jcCover img { object-fit: contain; margin: 0 auto; }
+.jcBannerArea.nop .jcBannerText { left: 10px; bottom: 10px; right: 50px; }
+.jcBannerArea .jcMenu { position: absolute; top: 32px; right: 32px; z-index: 2; }
+.jcBannerArea.nop .jcMenu { top: 16px; right: 16px; }
+.jcBannerArea .jcProfile { position: absolute; width: 120px; height: 120px; background-size: cover; }
+.jcBannerArea.pcircle .jcProfile { border-radius: 50%; }
+.jcBannerArea.pbleft .jcProfile { top: 4px; left: 4%; border: 4px solid #fff; }
+.jcBannerArea.pbleft .jcBannerText { left: calc(5% + 130px); bottom: 10px; right: 50px; }
+.jcBannerArea.pleft .jcProfile { top: 0; left: 0; border: none; width: 128px; height: 128px; }
+.jcBannerArea.pleft .jcBannerText { left: calc(1% + 130px); bottom: 10px; right: 50px; }
+.jcBannerArea.pbcenter .jcProfile { top: 4px; left: calc(50% - 64px); border: 4px solid #fff; }
+.jcBannerArea.pbcenter .jcBannerText { left: 10px; top: 20px; height: 66%; width: calc(50% - 90px); white-space: normal; line-height: 1em; }
+
+
 @media (max-width: 600px) {
-	.jcMenu:not(.jcMenuText) { top: 8px; right: 8px; }
+	.jcBannerArea .jcMenu { top: 8px; right: 8px; }
 }
+
 
 .jcMenu:not(.jcMenuText) .jcicon { background-color: #933; text-align: center; width: 32px; height: 32px; border-radius: 16px; display: block;  border: 1px solid #fff; }
 .jcMenu:not(.jcMenuText) .jcicon.jcAuth { background-color: #393; }
@@ -195,6 +218,8 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcMixedBlocks { overflow-y: auto; }
 
 button[data-ismonth] { text-transform: capitalize; }
+
+label svg.bannerPreview { width: 220px; vertical-align: -20px; }
 
 /* Bootstrap enhancements */
 a[onclick] { cursor: pointer; }

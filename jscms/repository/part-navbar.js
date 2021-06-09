@@ -1,9 +1,9 @@
 (()=>{
 	let data = {
-		form : () => {
+		form : ( callback ) => {
 			let ptypes = jc.edit.prop.pageTypes.clone().sort();
 			ptypes.unshift({value:'',label:'['+AS.label('None')+']'});
-			return {
+			let fo = {
 				requires : ['basic','pikaday','tinymce','iro','slider'],
 				options : {
 					subparts: {
@@ -44,6 +44,8 @@
 					['menu','subform',{asLabel:'Content',subform:'item',mandatory:true}],
 				],
 			};
+			if ( AS.test.func(callback) ) callback.call(window,fo);
+			return fo;
 		},
 		render : ( data ) => {
 			let $navbar = $(`<nav class="jcNavbar navbar navbar-expand-lg ${data.theme}"></nav>`);

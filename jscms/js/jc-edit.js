@@ -230,17 +230,17 @@ $.extend( true, jc.lists, {
 			if ( ! list ) list = jc.lists.prop.lasts[type][String(qt)]||[];
 			let uri = jc.lists.last.uri(type,qt).replace(/\.json/,'.rss');
 			let feed = '<?xml version="1.0" encoding="UTF-8" ?>\n<rss version="2.0">\n<channel>\n';
-			feed += '<title>'+$('head title',document.documentElement).html().escape()+'</title>\n';
+			feed += '<title>'+jc.prop.site.sitename.escape()+'</title>\n';
 			let baseuri = window.location.protocol + '//' + window.location.hostname + '/';
 			feed += '<link>'+baseuri+'</link>\n';
 			feed += '<generator>jBloud CMS - jscms</generator>\n';
 			list.forEach( i => {
-				let pt = i.page||type;
+				let pt = i.page||i.type||type;
 				feed += '<item>\n';
-				feed += '\t<link>'+baseuri+pt+(i.id||'')+'/</link>\n';
+				feed += '\t<link>'+baseuri+pt+(i.id||'')+'/'+(i.url||'')+'</link>\n';
 				feed += '\t<pubDate>'+ (new Date(i.upd)).toUTCString() +'</pubDate>\n';
 				feed += '\t<title>'+i.title.escape()+'</title>\n';
-				if ( i.desc && i.desc.length ) feed += '\t<description><![CDATA['+i.desc+']]></description>\n';
+				if ( i.description && i.description.length ) feed += '\t<description><![CDATA['+i.description+']]></description>\n';
 				feed += '</item>\n';
 			} );
 			feed += '</channel>\n</rss>\n';
@@ -606,11 +606,14 @@ jc.page.save = ( params ) => {
 };
 
 jc.page.makeStatic = ( cb ) => {
+	if ( jc.prop.site && jc.prop.site.nostatic ) {
+		if ( AS.test.func(cb) ) cb.call(window,true);
+		return;
+	}
 	if ( $('.jcEditable').length ) {
 		if ( AS.test.func(cb) ) cb.call(window,false);
 		return;
 	}
-	//if ( $('.swal2-container').length ) return setTimeout( makeStatic, 200 );
 	$(document.body).trigger('jc_saving_static');
 	const uri = AS.path('jsdatastatics')+jc.page.current()+(jc.page.data().id||jc.page.data().pageContent.id||'')+'.html';
 	let cn = document.body.className;
@@ -1442,13 +1445,49 @@ jc.edit = {
 		b.type = AS.test.obj(b.raw) ? 'object' : 'html';
 		jc.edit.partEdit(b);
 	},
-	partEdit : ( data ) => {
+	partEdit : ( data, fo ) => {
 		if ( (data.type == 'object') && AS.test.udef(data.repo)) {
 			jc.template.part.get( data.src, { repo:true }, (repo) =>{
 				data.repo = repo;
-				jc.edit.partEdit(data);
+				jc.edit.partEdit(data,fo);
 			});
 			return;
+		}
+		if ( AS.test.udef(fo) ) {
+			if ( data.type == 'object') {
+				data.repo.form( rfo => {
+					fo = rfo;
+					fo.callback = (f) => { f.parse(data.raw); }
+					fo.options.jsaction = (fd,f) => {
+						f.destroy();
+						jc.edit.noModal();
+						jc.template.part.put(data.src,fd,()=>{
+							jc.page.reload();
+						});
+					};
+					jc.edit.partEdit(data,fo);
+				})
+				return;
+			} else {
+				fo = {
+					options : {
+						theme: 'transparent',
+						subforms: [],
+						jsaction: (fd,f) => {
+							f.destroy();
+							jc.edit.noModal();
+							jc.template.part.put(data.src,fd.html,()=>{
+								jc.page.reload();
+							});
+						}
+					},
+					fields : [ ["html","html",{nolabel:true,trim:true,asTitle:'onlyNonEmptyFields',value:""}] ],
+					callback : (f) => {
+						f.setValue('html',data.raw);
+					},
+				};
+			
+			}
 		}
 		let $mod = jc.edit.getModal(true);
 		$('.modal-dialog',$mod).append(`<div class="modal-content">
@@ -1463,37 +1502,6 @@ jc.edit = {
 				</div>
 				<div class="modal-body" id="jcPageEditor"></div>
 			</div>`);
-		let fo;
-		if ( data.type == 'object') {
-			fo = data.repo.form();
-			fo.callback = (f) => { f.parse(data.raw); }
-			fo.options.jsaction = (fd,f) => {
-				f.destroy();
-				jc.edit.noModal();
-				jc.template.part.put(data.src,fd,()=>{
-					jc.page.reload();
-				});
-			};
-		} else {
-			fo = {
-				options : {
-					theme: 'transparent',
-					subforms: [],
-					jsaction: (fd,f) => {
-						f.destroy();
-						jc.edit.noModal();
-						jc.template.part.put(data.src,fd.html,()=>{
-							jc.page.reload();
-						});
-					}
-				},
-				fields : [ ["html","html",{nolabel:true,trim:true,asTitle:'onlyNonEmptyFields',value:""}] ],
-				callback : (f) => {
-					f.setValue('html',data.raw);
-				},
-			};
-			
-		}
 		fo.target = 'jcPageEditor';
 		fo.options.effectduration = 0;
 		fo.fields.push(['hr','hr',{position:'bottom'}],['btns','buttons',{position:'bottom',list:[{label:AS.label('Cancel'),icon:AS.icon('circleClose'),onclick:jc.edit.noModal},{btype:'submit'}]}]),
