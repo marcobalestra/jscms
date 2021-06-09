@@ -93,10 +93,12 @@
 				if ( data.profile && data.profile.length ) {
 					let $p = $('<div class="jcProfile"></div>');
 					$p.css('background-image','url('+data.profile+')');
+					$p.on('click',()=>{ jc.page.open('index'); }).css('cursor','pointer');
 					$out.append($p);
 				}
 			}
 			let $h = $('<div class="jcBannerText"></div>').html(data.headertag||data.sitename||'');
+			if ( ! (data.profile && data.profile.length)) $h.on('click',()=>{ jc.page.open('index'); }).css('cursor','pointer');
 			if ( data.headercolor ) $h.css('color',data.headercolor);
 			if ( data.headerborder ) $h.css('text-shadow','0 0 3px '+data.headerborder);
 			$out.append( $h );
