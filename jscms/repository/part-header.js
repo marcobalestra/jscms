@@ -4,6 +4,7 @@
 		covercolor : '#ffffff',
 		headercolor : '#000000',
 		headerborder : '#ffffff',
+		tags : [{name:'site',label:'Topics'}],
 	};
 	let data = {
 		form : ( callback, uploads, raw ) => {
@@ -25,9 +26,7 @@
 				}
 				let adjusted = false;
 				if ( AS.test.udef(raw.bannerpos) || (! bannerpos.find( x => (x.value == raw.bannerpos) ))) adjusted = raw.bannerpos = bannerpos[0].value;
-				Object.keys( defaults ).forEach( k => {
-					if ( AS.test.udef(raw[k]) ) adjusted = raw[k] = defaults[k];
-				} );
+				Object.keys( defaults ).filter( k => AS.test.udef(raw[k]) ).forEach( k => { raw[k] = defaults[k]; adjusted = true; } );
 				if ( adjusted ) jc.template.part.set( 'header.json',raw);
 			}
 			let coversizes = [
@@ -46,12 +45,42 @@
 			let fo = {
 				requires : ['basic','pikaday','tinymce','iro','slider'],
 				options : {
-					tabs: [AS.label('Main'),AS.label('Banner'),AS.label('Privacy')],
+					title : AS.label('Site properties'),
+					tabs: [AS.label('Main'),AS.label('Banner'),AS.label('Privacy'),AS.label('Tags')],
 					effectduration : 0,
 					theme: 'light',
 					subparts: {
 					},
 					subforms : [
+						{
+							name : 'tagvals',
+							subtype: 'array',
+							preview : ['tag'],
+							values : [ ['tag','text',{asLabel:'Value',normalize:true,skipempty:true,mandatory:true}] ],
+						},
+						{
+							name : 'tagprops',
+							subtype: 'array',
+							preview : ['name','label'],
+							values : [
+								['name','text',{asLabel:'Name',normalize:true,skipempty:true,mandatory:true,transform:'x=>String(x).replace(/[^a-z]+/g,"").toLowerCase()',expr:(v,f)=>{
+									if ( (v == 'tag')||(v == 'name')||(!v.length) ) return false;
+									return true;
+								},help:'Javascript name of the property, lowercase characters; must be unique in the tag and different from “tag” and “name”.'}],
+								['label','text',{asLabel:'Label',normalize:true,skipempty:true,mandatory:true}]
+							],
+						},
+						{
+							name : 'tag',
+							subtype: 'array',
+							preview : ['name','label'],
+							values : [
+								['name','text',{asLabel:'Name',normalize:true,skipempty:true,mandatory:true,transform:'x=>String(x).toLowerCase()'}],
+								['label','text',{asLabel:'Label',normalize:true,skipempty:true}],
+								['props','subform',{asLabel:'More fields',subform:'tagprops',skipempty:true,help:'Additional properties that can be added to the tag.'}],
+								['strict','subform',{asLabel:'Restrict',subform:'tagvals',skipempty:true,help:'If the list isn’t empty only the listed values will be accepted.'}],
+							],
+						}
 					],
 				},
 				fields : [
@@ -66,10 +95,12 @@
 					['covercolor','color',{asLabel:'Cover color',tab:1,help:'Cover background color, visible when there’s no image or where the image doesn’t cover banner area.'}],
 					['coversize','select',{asLabel:'Cover size',options:coversizes,depends:'!covertype=c',tab:1}],
 					['profile','select',{asLabel:'Profile picture',options:profiles,depends:'!bannerpos=nop',tab:1,help:'It’s possible to choose among the images uploaded in site index page, see site index attachments.'}],
-					['privacynote','freehtml',{tab:2,value:'If you change these values then run «Maintenance» to reflect changes on existing static files.'}],
+					['privacynote','freehtml',{tab:2,value:'If you change these values then run «'+AS.label('Maintenance')+'» to reflect changes on existing static files.'}],
 					['noindex','bool',{asLabel:'Don’t index',tab:2,help:'Tell google and other robots to avoid indexing and following links on site pages.'}],
 					['norss','bool',{asLabel:'Don’t create RSS',tab:2,help:'Every time a page is saved an RSS with the latest 100 changes on site is created.'}],
 					['nostatic','bool',{asLabel:'Don’t create static',tab:2,help:'If a static version of the page isn’t created search engines won’t be able to scan page content.\nIncluded for those who prefer a more private blog.'}],
+					['tagsnote','freehtml',{tab:3,value:'If you change these values then run «'+AS.label('Maintenance')+'» to reflect changes on existing static files.'}],
+					['tags','subform',{asLabel:'Tags',subform:'tag',tab:3}],
 				],
 			};
 			if ( AS.test.func(callback) ) callback.call(window,fo);
