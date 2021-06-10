@@ -658,12 +658,12 @@ jc.page.makeLasts = ( list, callback ) => {
 	} );
 	lasts.sort( (a,b) =>(b.upd - a.upd) );
 	let qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) ).sort( (a,b)=>( b - a ) );
-	let makeRss = true;
+	let makeRss = (! (jc.prop.site && jc.prop.site.norss ));
 	let proc = () => {
 		if ( qts.length ) {
 			const qt = qts.shift();
 			lasts.splice(qt);
-			if ( makeRss) {
+			if ( makeRss ) {
 				makeRss = false;
 				qts.unshift(qt);
 				jc.lists.last.dorss('site',qt,lasts,proc);

@@ -69,6 +69,9 @@ jc.maint = {
 		if ( ! params.listsPurged ) {
 			jc.maint.prog({ text:'Deleting old lists…', prog: 0 });
 			if ( ! params.tbdLists ) {
+				jc.jdav.ls({dir:'struct',ext:'rss'},(x) => {
+					x.list.forEach( (k) => { jc.dav.rm('struct/'+k,()=>{ }); } );
+				});
 				jc.jdav.ls({dir:'struct'},(x) => {
 					params.tbdLists = x.list;
 					params.tbdCount = params.tbdLists.length;
@@ -134,6 +137,6 @@ jc.maint = {
 		if ( pd.blogdate ) nm.date = pd.blogdate;
 		if ( ! jc.maint.prop.full[page] ) jc.maint.prop.full[page] = {};
 		jc.maint.prop.full[page][String((pd.id||0))] = nm;
-		jc.dav.rm(AS.path('jsdatapagestatics')+page+(pd.id||'')+'.html',()=>{ jc.page.makeStatic( cb ) });
+		jc.dav.rm(AS.path('jsdatastatics')+page+(pd.id||'')+'.html',()=>{ jc.page.makeStatic( cb ) });
 	},
 };

@@ -1,4 +1,10 @@
 (()=>{
+	const defaults = {
+		bgcolor : '#eeeeee',
+		covercolor : '#ffffff',
+		headercolor : '#000000',
+		headerborder : '#ffffff',
+	};
 	let data = {
 		form : ( callback, uploads, raw ) => {
 			if ( AS.test.func(callback) && AS.test.udef(uploads) ) {
@@ -14,18 +20,14 @@
 			];
 			if ( AS.test.func(callback) ) {
 				if ( AS.test.udef(raw) ) {
-					jc.template.part.get( 'header.json',{raw:true}, j => {
-						console.log(j);
-						data.form( callback, uploads, j )
-					});
+					jc.template.part.get( 'header.json',{raw:true}, j => { data.form( callback, uploads, j ) });
 					return;
 				}
 				let adjusted = false;
 				if ( AS.test.udef(raw.bannerpos) || (! bannerpos.find( x => (x.value == raw.bannerpos) ))) adjusted = raw.bannerpos = bannerpos[0].value;
-				if ( AS.test.udef(raw.bgcolor) ) adjusted = raw.bgcolor = '#eeeeee';
-				if ( AS.test.udef(raw.covercolor) ) adjusted = raw.covercolor = '#ffffff';
-				if ( AS.test.udef(raw.headercolor) ) adjusted = raw.headercolor = '#000000';
-				if ( AS.test.udef(raw.headerborder) ) adjusted = raw.headerborder = '#ffffff';
+				Object.keys( defaults ).forEach( k => {
+					if ( AS.test.udef(raw[k]) ) adjusted = raw[k] = defaults[k];
+				} );
 				if ( adjusted ) jc.template.part.set( 'header.json',raw);
 			}
 			let coversizes = [
@@ -34,17 +36,17 @@
 				{value:'ccenter',label:AS.label('Centered (crop)')},
 				{value:'ccontain',label:AS.label('Centered')},
 			];
-			let covertypes = [{value:'c',label:AS.label('Color')}];
-			let profiles = [{value:'',label:AS.label('None')}];
-			uploads.forEach( u => {
-				if (! u.img) return;
-				covertypes.push({value:u.uri,label:u.name});
-				profiles.push({value:u.uri,label:u.name});
+			let covertypes = [{value:'c',label:'['+AS.label('Color')+']'}];
+			let profiles = [{value:'',label:'['+AS.label('None')+']'}];
+			uploads.filter( x => (x.img)).forEach( u => {
+				let l = '“'+(u.caption||u.name)+'”';
+				covertypes.push({value:u.uri,label:l});
+				profiles.push({value:u.uri,label:l});
 			});
 			let fo = {
 				requires : ['basic','pikaday','tinymce','iro','slider'],
 				options : {
-					tabs: [AS.label('Main'),AS.label('Banner')],
+					tabs: [AS.label('Main'),AS.label('Banner'),AS.label('Privacy')],
 					effectduration : 0,
 					theme: 'light',
 					subparts: {
@@ -55,16 +57,19 @@
 				fields : [
 					['type','hidden',{value:"header",tab:0}],
 					['sitename','text',{asLabel:'Site name',normalize:true,skipempty:true,mandatory:true,tab:0}],
-					['bgcolor','color',{asLabel:'Background color',value:'#eeeeee',skipempty:true,tab:0}],
-					['nostatic','bool',{asLabel:'Don’t create static',tab:0,help:'If a static version of the page isn’t created search engines won’t be able to scan page content.\nIncluded for those who prefer a more private blog.'}],
+					['bgcolor','color',{asLabel:'Background color',value:defaults.bgcolor,skipempty:true,tab:0}],
 					['bannerpos','checklist',{asLabel:'Banner',ctype:'r',list:bannerpos,tab:1}],
-					['headertag','text',{asLabel:'Header tag',normalize:true,skipempty:true,tab:1,help:'A few words on the cover page, defaults to site name'}],
-					['headercolor','color',{asLabel:'Header color',tab:1,help:'The color of the text of header tag or site name.'}],
-					['headerborder','color',{asLabel:'Header border',tab:1,help:'The color of the border of the text of header tag or site name.'}],
+					['headertag','text',{asLabel:'Header text',normalize:true,skipempty:true,tab:1,help:'A few words on the cover page, defaults to site name'}],
+					['headercolor','color',{asLabel:'Header color',value:defaults.headercolor,tab:1,help:'The color of the text of header tag or site name.'}],
+					['headerborder','color',{asLabel:'Header border',value:defaults.headerborder,tab:1,help:'The color of the border of the text of header tag or site name.'}],
 					['covertype','select',{asLabel:'Cover source',options:covertypes,tab:1,help:'It’s possible to choose among the images uploaded in site index page, see site index attachments.'}],
 					['covercolor','color',{asLabel:'Cover color',tab:1,help:'Cover background color, visible when there’s no image or where the image doesn’t cover banner area.'}],
 					['coversize','select',{asLabel:'Cover size',options:coversizes,depends:'!covertype=c',tab:1}],
 					['profile','select',{asLabel:'Profile picture',options:profiles,depends:'!bannerpos=nop',tab:1,help:'It’s possible to choose among the images uploaded in site index page, see site index attachments.'}],
+					['privacynote','freehtml',{tab:2,value:'If you change these values then run «Maintenance» to reflect changes on existing static files.'}],
+					['noindex','bool',{asLabel:'Don’t index',tab:2,help:'Tell google and other robots to avoid indexing and following links on site pages.'}],
+					['norss','bool',{asLabel:'Don’t create RSS',tab:2,help:'Every time a page is saved an RSS with the latest 100 changes on site is created.'}],
+					['nostatic','bool',{asLabel:'Don’t create static',tab:2,help:'If a static version of the page isn’t created search engines won’t be able to scan page content.\nIncluded for those who prefer a more private blog.'}],
 				],
 			};
 			if ( AS.test.func(callback) ) callback.call(window,fo);
@@ -78,15 +83,12 @@
 				$t.attr('site',data.sitename);
 				if ( $t.html().indexOf(data.sitename)!=0 ) $t.html( data.sitename+': '+$t.html());
 			}
+			if ( data.norss ) $('head>link[type="application/rss+xml"]',document.documentElement).remove();
+			$('head>meta[name="robots"]',document.documentElement).attr('content',(data.noindex?'noindex,nofollow,noarchive,nosnippet':'all'));
 			if ( data.bgcolor ) document.body.style.backgroundColor = data.bgcolor;
 			if ( data.coversize ) $out.addClass(data.coversize);
-			let $c = $('<div class="jcCover"></div>');
-			if ( data.covercolor ) {
-				$c.css('background-color',data.covercolor);
-			}
-			if ( data.covertype != 'c' ) {
-				$c.append(`<img src="${data.covertype}" alt="" />`);
-			}
+			let $c = $('<div class="jcCover"></div>').css({backgroundColor:(data.covercolor||defaults.covercolor)});
+			if ( data.covertype != 'c' ) $c.append(`<img src="${data.covertype}" alt="" />`);
 			$out.append($c);
 			if ( data.bannerpos && data.bannerpos.length ) {
 				$out.addClass(data.bannerpos);
@@ -97,10 +99,14 @@
 					$out.append($p);
 				}
 			}
-			let $h = $('<div class="jcBannerText"></div>').html(data.headertag||data.sitename||'');
+			let $h = $('<div class="jcBannerText"></div>')
+				.css({
+					color: (data.headercolor||defaults.headercolor),
+					textShadow : `-1px 0 1px ${data.headerborder||defaults.headerborder},0 -1px 1px ${data.headerborder||defaults.headerborder},0 1px 1px ${data.headerborder||defaults.headerborder},1px 1px 1px ${data.headerborder||defaults.headerborder}`,
+				})
+				.html(data.headertag||data.sitename||'')
+				;
 			if ( ! (data.profile && data.profile.length)) $h.on('click',()=>{ jc.page.open('index'); }).css('cursor','pointer');
-			if ( data.headercolor ) $h.css('color',data.headercolor);
-			if ( data.headerborder ) $h.css('text-shadow','0 0 3px '+data.headerborder);
 			$out.append( $h );
 			$out.append('<div class="jcMenu"></div>');
 			return $out;
