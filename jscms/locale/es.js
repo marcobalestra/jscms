@@ -77,6 +77,7 @@ AS.labels.load('es',[{
 	'SavingArticleList' : 'Guardando listado de todas las entradas…',
 	'SavingLasts' : 'Guardando últimas acutalizaciones…',
 	'SavingPage' : 'Guardando página…',
+	'SavingTags' : 'Guardando etiquetas…',
 	'SelectBlockType' : 'Escoge un tipo',
 	'SelectBlockTypeDesc' : 'Escoge el tipo de bloque che quieres añadir:',
 	'SelectPageType' : 'Escoge un tipo',

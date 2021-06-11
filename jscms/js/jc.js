@@ -242,6 +242,23 @@ jc.objFind = ( o, p, v )=>{
 	return undefined;
 };
 
+jc.objFindAll = ( mo, p, v )=>{
+	let out = [];
+	const s = o => {
+		if ( AS.test.arr(o) ) return o.filter( x => s(x) );
+		if ( AS.test.obj(o)) {
+			if ( AS.test.def(o[p]) ) {
+				if ( o[p]==v || AS.test.udef(v) ) out.push( o );
+				return;
+			}
+			Object.keys(o).forEach( x => s( o[x] ) );
+		}
+		return undefined;
+	}
+	s(mo);
+	return out;
+};
+
 jc.getError = (jqXHR,status,e) => { jc.console(jqXHR,status,e); };
 
 jc.sql2date = d => ( AS.test.date(d) ? d : (new Date()).fromsql(d) );
@@ -1153,7 +1170,7 @@ jc.template = {
 /* jc.lists */
 
 jc.lists = {
-	prop : { lists:{}, lasts:{} },
+	prop : { lists:{}, lasts:{}, tags:{} },
 	list : {
 		uri : ( type ) => ('struct/'+type+'-list.json'),
 		get : ( ...args ) => {
@@ -1210,6 +1227,32 @@ jc.lists = {
 			if ( ! jc.lists.prop.lasts[type] ) jc.lists.prop.lasts[type] = {};
 			delete jc.lists.prop.lasts[type][String(qt)];
 			jc.lists.last.get.apply(window,args);
+		},
+	},
+	tag : {
+		uri : ( type ) => ('struct/tag-'+type+'.json'),
+		get : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'site';
+			const callback = args.find(a=>AS.test.func(a));
+			if ( jc.lists.prop.tags[type] == '_loading_') {
+				window.setTimeout( ()=>{jc.lists.tag.get.apply(window,args);}, 100 );
+				return;
+			}
+			if ( ! jc.lists.prop.tags[type] ) {
+				jc.lists.prop.tags[type] = '_loading_';
+				jc.jdav.get( jc.lists.tag.uri(type), (l)=>{
+					if ( jc.lists.prop.tags[type] == '_loading_') jc.lists.prop.tags[type] = l||{};
+					jc.lists.tag.get.apply(window,args);
+				});
+				return;
+			}
+			if ( AS.test.func(callback)) callback.call(window,JSON.parse(JSON.stringify(jc.lists.prop.tags[type])));
+			else return JSON.parse(JSON.stringify(jc.lists.prop.tags[type]));
+		},
+		fetch : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'site';
+			delete jc.lists.prop.tags[type];
+			jc.lists.tags.get.apply(window,args);
 		},
 	},
 };
@@ -1707,6 +1750,7 @@ jc.render = {
 					let r = jc.render.block[sb.type].call(window,{prop:sb.type, editable:b.editable},sb,d) || '';
 					if ( b.editable && (jc.page.prop.editMode=='page') ) {
 						let editable = { prop: b.prop, type: 'block', subtype: sb.type, _ : { idx: idx, qt: qt } };
+						if ( AS.test.udef(r) || (AS.test.str(r) && (r.length==0)) ) r = '<span class="jcPlaceHolder">Block: '+sb.type+'</span>';
 						r = $('<div class="jcEditable"></div>').data('editable',editable).append( r );
 					}
 					out.append( r );
@@ -1800,19 +1844,19 @@ jc.render = {
 		lasts : (b,d) => {
 			let id = AS.generateId('lasts');
 			let nodes = (d.view||'ol,li').split(',');
-			let div = $('<div class="jcLasts"></div>');
+			let div = $('<div class="jcLasts jcEntriesArea"></div>');
 			div.attr('id',id);
 			let qt = jc.prop.lastChangedQuantities.clone().sort((a,b)=>(a-b)).find( x=>(d.max <= x ));
 			jc.lists.last.get(d.ptype,qt,(list)=>{
 				if ( ! (AS.test.arr(list) && list.length ) ) return;
-				if ( d.title ) div.append( $('<h4></h4>').append(d.title) );
-				let $ol = $('<'+nodes[0]+' class="jcLastsEntries"></'+nodes[0]+'>');
+				if ( d.title ) div.append( $('<h5></h5>').append(d.title) );
+				let $ol = $('<'+nodes[0]+' class="jcLastsEntries jcEntries"></'+nodes[0]+'>');
 				list.splice( d.max );
 				let cp = jc.page.current();
 				let cid = jc.page.data().id;
 				list.forEach( i => {
 					let p = i.type||d.ptype;
-					let $li = $('<'+nodes[1]+' class="jcLastsEntry"></'+nodes[1]+'>');
+					let $li = $('<'+nodes[1]+' class="jcLastsEntry jcEntry"></'+nodes[1]+'>');
 					let $a;
 					if ( (cp==p ) && (i.id == cid ) ) {
 						$li.append('➤ ');
@@ -1839,16 +1883,16 @@ jc.render = {
 		relateds : (b,d) => {
 			let id = AS.generateId('relateds');
 			let nodes = (d.view||'ol,li').split(',');
-			let $div = $('<div class="jcRelateds"></div>');
+			let $div = $('<div class="jcRelateds jcEntriesArea"></div>');
 			$div.attr('id',id);
 			if ( d.position ) $div.addClass( d.position );
-			if ( d.title ) $div.append( $('<h4></h4>').append(d.title) );
+			if ( d.title ) $div.append( $('<h5></h5>').append(d.title) );
 			jc.lists.list.get( data => {
-				let $ol = $('<'+nodes[0]+' class="jcRelatedEntries"></'+nodes[0]+'>');
+				let $ol = $('<'+nodes[0]+' class="jcRelatedEntries jcEntries"></'+nodes[0]+'>');
 				d.relateds.forEach( i => {
 					let rn = data[i.item.page] ? data[i.item.page][String(i.item.id||0)] : false;
 					if ( ! rn ) return;
-					let $li = $('<'+nodes[1]+' class="jcLastsEntry"></'+nodes[1]+'>');
+					let $li = $('<'+nodes[1]+' class="jcRelatedEntry jcEntry"></'+nodes[1]+'>');
 					let $a = $(`<a class="title" href="${ jc.URI.encode(i.item,rn.url) }"></a>`).on('click',(e)=>{
 						e.preventDefault();
 						jc.page.open(i.item.page,i.item.id);
@@ -1942,6 +1986,44 @@ jc.render = {
 			let $d = $('<div class="jcYoutube embed-responsive embed-responsive-16by9"></div>');
 			$d.append(`<iframe class="embed-responsive-item" src="${uri}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`);
 			return $d;
+		},
+		tags : (b,d) => {
+			if ( !( d.show && AS.test.arr(d.tags) && d.tags.length )) return '';
+			let id = AS.generateId('tags');
+			let nodes = (d.view||'ul,li').split(',');
+			let $div = $('<div class="jcTags jcEntriesArea"></div>');
+			$div.attr('id',id);
+			if ( d.position ) $div.addClass( d.position );
+			jc.render.queue(1);
+			const build = () => {
+				if ( ! jc.prop.site ) return setTimeout( build, 100 );
+				let tag = AS.def.arr(jc.prop.site.tags).find( x => ( AS.test.obj(x) && x.name && ( x.name == d.name )));
+				if (! tag) {
+					$div.remove();
+					jc.render.queue(-1);
+					return;
+				};
+				if ( d.showtitle ) $div.append( $('<h5></h5>').append(d.customtitle||tag.label||tag.name) );
+				let $ol = $('<'+nodes[0]+' class="jcTagEntries jcEntries"></'+nodes[0]+'>');
+				const useProps = !! (tag.props && tag.props.length);
+				d.tags.forEach( t => {
+					let $li = $('<'+nodes[1]+' class="jcTagEntry jcEntry"></'+nodes[1]+'>');
+					$li.append(`<span class="title">${ t.tag.escape() }</span>`);
+					if ( useProps ) {
+						let props = [];
+						tag.props.forEach( p => {
+							if ( ! t[p.name] ) return;
+							props.push( ((d.verbose && p.label ) ? p.label+': ' : '') + t[p.name] );
+						});
+						if ( props.length ) $li.append((d.verbose ? '<br />' : ' '),props.join((d.verbose ? '<br />' : ', ')));
+					}
+					$ol.append($li);
+				} );
+				$div.append($ol);
+				jc.render.queue(-1);
+			};
+			$( ()=>{ build() } );
+			return $div;
 		},
 	},
 };

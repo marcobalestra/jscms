@@ -180,7 +180,7 @@ $.extend( true, jc.lists, {
 				const type = args.find(a=>AS.test.str(a))||'_all';
 				const list = JSON.parse(JSON.stringify(args.find(a=>AS.test.obj(a))||{}));
 				const callback = args.find(a=>AS.test.func(a));
-				if ( AS.test.udef())
+				jc.lists.prop.lists[type] = list
 				if ( AS.test.func(callback)) callback.call(window);
 			}
 		},
@@ -245,6 +245,30 @@ $.extend( true, jc.lists, {
 			} );
 			feed += '</channel>\n</rss>\n';
 			jc.dav.put( uri, feed, (r)=>{
+				if ( AS.test.func(callback)) callback.call(window,r);
+			});
+		},
+	},
+	tag : {
+		set : ( ...args ) => {
+			let commit = args.find(a=>AS.test.bool(a));
+			if ( AS.test.udef(commit)) commit=true;
+			if ( commit ) {
+				jc.lists.tag.commit.apply(window,args);
+			} else {
+				const type = args.find(a=>AS.test.str(a))||'site';
+				const list = JSON.parse(JSON.stringify(args.find(a=>AS.test.arr(a))||{}));
+				const callback = args.find(a=>AS.test.func(a));
+				jc.lists.prop.tags[type] = list;
+				if ( AS.test.func(callback)) callback.call(window);
+			}
+		},
+		commit : ( ...args ) => {
+			const type = args.find(a=>AS.test.str(a))||'site';
+			const list = JSON.parse(JSON.stringify(args.find(a=>AS.test.obj(a))||jc.lists.prop.tags[type]||{}));
+			const callback = args.find(a=>AS.test.func(a));
+			jc.jdav.put( jc.lists.tag.uri(type), list, (r)=>{
+				jc.lists.prop.tags[type] = list;
 				if ( AS.test.func(callback)) callback.call(window,r);
 			});
 		},
@@ -468,9 +492,11 @@ jc.page.save = ( params ) => {
 			if ( AS.test.udef(params.noDialog) ) params.noDialog = true;
 			if ( AS.test.udef(params.noLists) ) params.noLists = true;
 			if ( AS.test.udef(params.noStatic) ) params.noStatic = true;
+			if ( AS.test.udef(params.noTags) ) params.noTags = true;
 		}
 		if ( params.noLists ) params.noFullList = params.noTypeList = params.noLasts = true;
 		if ( params.noFullList && AS.test.udef(params.noTypeList) ) params.noTypeList = true;
+		if ( params.noFullList && AS.test.udef(params.noTags) ) params.noTags = true;
 		params.paramsChecked = true;
 	}
 	if ( ! params.mute ) jc.progress(AS.label('SavingPage'));
@@ -512,6 +538,7 @@ jc.page.save = ( params ) => {
 			} );
 		} );
 		if ( params.id ) params.data.id = params.data.metadata.id = parseInt(params.id);
+		params.data.metadata.type = params.page;
 		if (( ! params.data.metadata.description ) && AS.test.str( params.data.abstract)) params.data.metadata.description = params.data.abstract.dehtml().shorten(256);
 		if (( ! params.data.metadata.title ) && AS.test.str( params.data.title)) params.data.metadata.title = params.data.title.dehtml().shorten(48);
 		if ( ! params.data.metadata.title ) params.data.metadata.title = params.page + ( params.id ? ' '+params.id : '');
@@ -529,7 +556,7 @@ jc.page.save = ( params ) => {
 	}
 	if ( ! ( params.noFullList || params.savedFullList ) ) {
 		if ( AS.test.udef(params.fulllist[params.page]) ) params.fulllist[params.page] = {};
-		params.fulllist[params.page][String(params.id?params.id:0)] = Object.assign(params.data.metadata);
+		params.fulllist[params.page][String(params.id?params.id:0)] = JSON.parse(JSON.stringify(params.data.metadata));
 		if ( ! params.mute ) jc.progress(AS.label('SavingArticleList'));
 		jc.lists.list.set(params.fulllist,()=>{
 			$(document.body).trigger('jc_saved_page_fulllist',params);
@@ -539,7 +566,7 @@ jc.page.save = ( params ) => {
 		return;
 	}
 	if ( ! ( params.noTypeList || params.savedTypeList) ) {
-		params.typelist[String(params.id?params.id:0)] = Object.assign(params.data.metadata);
+		params.typelist[String(params.id?params.id:0)] = JSON.parse(JSON.stringify(params.data.metadata));
 		jc.lists.list.set(params.page,params.typelist,()=>{
 			$(document.body).trigger('jc_saved_page_typelist',params);
 			params.savedTypeList = true;
@@ -562,6 +589,15 @@ jc.page.save = ( params ) => {
 		jc.page.makeTypeDates( params.page, params.typelist, ()=>{
 			$(document.body).trigger('jc_saved_page_dates',params);
 			params.savedDates = true;
+			jc.page.save( params );
+		});
+		return;
+	}
+	if ( ! ( params.noTags) && (! params.savedTags) ) {
+		if ( ! params.mute ) jc.progress(AS.label('SavingTags'));
+		jc.page.makeTagsAll( params.data, ()=>{
+			$(document.body).trigger('jc_saved_page_tags',params);
+			params.savedTags = true;
 			jc.page.save( params );
 		});
 		return;
@@ -653,7 +689,7 @@ jc.page.makeLasts = ( list, callback ) => {
 		let typelist = list[t];
 		Object.keys(typelist).forEach( k => {
 			if ( typelist[k].hidden ) return;
-			lasts.push( Object.assign(typelist[k]) );
+			lasts.push( JSON.parse(JSON.stringify(typelist[k])) );
 		});
 	} );
 	lasts.sort( (a,b) =>(b.upd - a.upd) );
@@ -690,9 +726,7 @@ jc.page.makeTypeLasts = ( pagetype, typelist, callback ) => {
 	let lasts = [];
 	Object.keys(typelist).forEach( k => {
 		if ( typelist[k].hidden ) return;
-		let pm = Object.assign(typelist[k]);
-		delete pm.type;
-		lasts.push( pm );
+		lasts.push( JSON.parse(JSON.stringify(typelist[k])) );
 	});
 	lasts.sort( (a,b) =>(b.upd - a.upd));
 	let qts = jc.prop.lastChangedQuantities.clone().map( i => parseInt(i) ).filter( i => ( ! isNaN(i) ) ).sort( (a,b)=>( b - a ) );
@@ -775,6 +809,41 @@ jc.page.makeTypeDates = ( pagetype, typelist, callback ) => {
 	}
 	proc();
 	return;
+};
+
+jc.page.makeTagsAll = (pd, callback, pdtags, tagslist ) => {
+	if ( AS.test.udef(pdtags) ) pdtags = jc.objFindAll( pd, 'type', 'tags' ).clone();
+	if ( AS.test.udef(tagslist) ) tagslist = AS.def.arr(jc.prop.site.tags).clone();
+	if ( ! tagslist.length ) {
+		if ( AS.test.func(callback) ) callback.call(window);
+		return;
+	}
+	let thistag = tagslist.shift();
+	jc.lists.tag.get( thistag.name, ( tdata )=> {
+		let ndata  = jc.page.parseTagsOne( pd, thistag.name, tdata, pdtags );
+		jc.lists.tag.set( thistag.name, ndata, ()=>{
+			jc.page.makeTagsAll(pd, callback, pdtags, tagslist );
+		});
+	});
+};
+
+jc.page.parseTagsOne = ( pd, tagname, tdata, pdtags ) => {
+	if (AS.test.udef(pdtags) ) pdtags = jc.objFindAll( pd, 'type', 'tags' );
+	let ttags = jc.objFindAll( pdtags, 'name', tagname );
+	let md = { type: String(pd.metadata.type) };
+	if ( pd.metadata.id ) md.id = parseInt(pd.metadata.id);
+	md.title = String(pd.metadata.title);
+	md.upd = parseInt( pd.metadata.upd);
+	Object.keys( tdata ).forEach( k => { tdata[k] = tdata[k].filter( x => ( (x.type != md.type) || (x.id != md.id )) ); } );
+	if ( ttags.length ) {
+		let atags = {};
+		ttags.forEach( (tc) => { tc.tags.forEach( (t) => { atags[ t.tag ] = true; } ); });
+		Object.keys( atags ).forEach( (k) => {
+			if ( AS.test.udef( tdata[k] ) ) tdata[k] = [];
+			tdata[k].unshift(md);
+		} );
+	}
+	return tdata;
 };
 
 jc.page.upload = (fld,...args) => {
@@ -969,6 +1038,7 @@ jc.edit = {
 			{type:'text',label:'TextOrHtml',menu:true},
 			{type:'youtube',label:'YtVimeo',menu:true},
 			{type:'gallery',label:'Gallery',menu:true},
+			{type:'tags',label:'Tags',menu:true},
 			{type:'relateds',label:'RelatedPages'},
 			{type:'audio',label:'Audio'},
 			{type:'video',label:'Video'},
@@ -996,7 +1066,11 @@ jc.edit = {
 		}
 		jc.edit.prop.formPlugins.forEach( p => { AS.form.plugin(p); });
 		// Plugins without locales and CSS
-		jc.springLoad( AS.path('jscdn')+'libs/as-form-jcplugins'+(jc.prop.isDeveloper?'':'.min')+'.js' );
+		const rawplugins = () => {
+			if ( ! (AS.form.fields && AS.form.fields.select) ) return window.setTimeout( rawplugins, 100 );
+			jc.springLoad( AS.path('jscdn')+'libs/as-form-jcplugins'+(jc.prop.isDeveloper?'':'.min')+'.js' );
+		}
+		rawplugins();
 	},
 	getRepository : ( pagetype, callback ) => {
 		if ( AS.test.udef(pagetype)) pagetype = jc.page.current();
@@ -1219,7 +1293,7 @@ jc.edit = {
 			let o = jc.edit.form._base(b,d);
 			let ptypes = jc.edit.prop.pageTypes.clone();
 			ptypes.unshift({label:AS.label('Choose'),value:''},{label:'* '+AS.label('All'),value:'_all'});
-			let vtypes = [{label:AS.label('Numbered list'),value:'ol,li'},{label:AS.label('Bullet list'),value:'ul,li'},{label:AS.label('Plain list'),value:'div,div'}]
+			let vtypes = [{label:AS.label('Numbered list'),value:'ol,li'},{label:AS.label('Bullet list'),value:'ul,li'},{label:AS.label('Plain list'),value:'div,div'}];
 			o.fields.push(
 				['type','hidden',{value:'lasts'}],
 				['ptype','select',{asLabel:'PageType',options:ptypes,skipempty:true,mandatory:true}],
@@ -2041,6 +2115,118 @@ jc.edit.custom = {
 			let $mod = jc.edit.custom.gallery.getModal(true);
 			let params = { target: $('#jcPageUploads',$mod), reloader: ()=>{ jc.edit.custom.gallery.edit(b,d) }, select: true, gallery: bd };
 			$mod.on('shown.bs.modal',()=>{ jc.edit.uploads.render( params); }).modal({show:true,keyboard:false});
+		},
+	},
+	tags : {
+		form : (b,d,to,tdata) => {
+			if ( ! to ) {
+				to = AS.def.arr(jc.prop.site && jc.prop.site.tags).find( x => ( AS.test.obj(x) && x.name && ( x.name == d[b.prop][b._.idx].name )));
+			}
+			let o = jc.edit.form._base(b,d);
+			const isStrict = !!( to.strict && to.strict.length );
+			const useProps = !! ( to.props && to.props.length );
+			o.options.title = to.label||to.name;
+			o.fields.push(
+				['type','hidden',{value:'tags'}],
+				['name','hidden',{value:to.name}],
+				['show','bool',{asLabel:'Visibile'}],
+				['view','select',{asLabel:'blockTextAspect',options:[{label:AS.label('Bullet list'),value:'ul,li'},{label:AS.label('Numbered list'),value:'ol,li'},{label:AS.label('Plain list'),value:'div,div'}],depends:'show'}],
+				['position','select',{asLabel:'Position',options:[{label:AS.label('Block'),value:''},{label:AS.label('FloatRight'),value:'jcBoxRight'}],depends:'show'}],
+				['showtitle','bool',{asLabel:'Title',depends:'show'}],
+				['customtitle','text',{asLabel:'Title',placeholder:(to.label||to.name),normalize:true,skipempty:true,depends:'showtitle'}],
+			);
+			if ( useProps ) o.fields.push(['verbose','bool',{asLabel:'Verbose',depends:'show'}]);
+			o.fields.push(
+				['tags','subform',{asLabel:'Tags',subform:'tags'}],
+				['spacer','freehtml',{value:'<br />'}],
+			);
+			let options = isStrict ? to.strict.map( x => x.tag ) : Object.keys(tdata).sort();
+			let sf = {
+				name : 'tags',
+				subtype: 'array',
+				preview : ['tag'],
+				values:[ ['tag','select2',{asLabel:'Tag',options:options,select2:{allowClear:!isStrict,tags:!isStrict}}] ]
+			};
+			if ( useProps ) to.props.forEach( p => {
+				sf.preview.push( p.name );
+				sf.values.push([p.name,'text',{label:(p.label||p.name),normalize:true,skipempty:true}]);
+			} );
+			o.options.subforms.push(sf);
+			return o;
+		},
+		add : ( b, d, tt, ttdata ) => {
+			if ( ! tt ) {
+				if ( ! (AS.test.obj(jc.prop.site) && AS.test.arr(jc.prop.site.tags)) ) return;
+				if ( jc.prop.site.tags.length == 1 ) {
+					jc.edit.custom.tags.add(b,d,jc.prop.site.tags[0].name);
+					return;
+				}
+				let opts={};
+				jc.prop.site.tags.forEach( t => { opts[t.name] = (t.label||t.name)} );
+				Swal.fire({
+					title: AS.label('Tag'),
+					text: AS.label('Select'),
+					input: 'select',
+					icon: 'question',
+					inputOptions : opts,
+					inputPlaceholder: AS.label('Choose')+'…',
+					showCancelButton: true,
+					cancelButtonText: AS.label('Cancel'),
+					confirmButtonText: AS.label('OK'),
+					inputValidator : (v) => {
+						return new Promise((resolve) => {
+							if (v.length) {
+								resolve()
+							} else {
+								resolve(AS.label('Select'));
+							}
+						})
+					},
+				}).then( result => {
+					if ( ! result.isConfirmed ) return;
+					jc.edit.custom.tags.add(b,d,result.value);
+				});
+				return;
+			}
+			let tag = AS.def.arr(jc.prop.site && jc.prop.site.tags).find( x => ( AS.test.obj(x) && x.name && ( x.name == tt )));
+			if (! tag) return;
+			if ( (! (tag.strict && tag.strict.length )) && (! ttdata) ) {
+				jc.lists.tag.get( tt, l => { jc.edit.custom.tags.add(b,d,tt,l); });
+				return;
+			}
+			let nb = {prop:b.prop,_:{idx:AS.label('New')}};
+			if ( (! b._ ) || AS.test.udef(b._.qt) ) {
+				nb._.qt = 0;
+			} else {
+				nb._.qt = b._.qt;
+			}
+			let $mod = jc.edit.getModal(true);
+			let fopt = jc.edit.custom.tags.form(nb,d,tag,ttdata);
+			fopt.options.jsaction = (fd,fo) => {
+				fo.destroy();
+				jc.edit.noModal();
+				if ( b._ && AS.test.def(b._.qt)) {
+					d[b.prop].splice( b._.idx, 1, d[b.prop][b._.idx], fd );
+				} else {
+					if ( ! AS.test.arr(d[b.prop])) d[b.prop] = [];
+					d[b.prop].push(fd);
+				}
+				jc.edit.fixBlocks(b,d);
+				jc.page.reload();
+			};
+			$mod.on('shown.bs.modal',()=>{ AS.form.create( fopt ); }).modal('show');
+		},
+		edit : ( b, d, ttdata ) => {
+			let bd = d[b.prop][b._.idx];
+			let tag = AS.def.arr(jc.prop.site && jc.prop.site.tags).find( x => ( AS.test.obj(x) && x.name && ( x.name == bd.name )));
+			if (! tag) return;
+			if ( (! (tag.strict && tag.strict.length )) && (! ttdata) ) {
+				jc.lists.tag.get( bd.name, l => { jc.edit.custom.tags.edit(b,d,l); });
+				return;
+			}
+			let $mod = jc.edit.getModal(true);
+			$mod.on('shown.bs.modal',()=>{ AS.form.create( jc.edit.custom.tags.form(b,d,tag,ttdata) ); });
+			$mod.modal('show');
 		},
 	}
 };

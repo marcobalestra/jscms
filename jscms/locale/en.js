@@ -67,6 +67,7 @@ AS.labels.load('en',[{
 	'SavingArticleList' : 'Saving comprehensive article list…',
 	'SavingLasts' : 'Saving list of last updated…',
 	'SavingPage' : 'Saving page…',
+	'SavingTags' : 'Saving tags…',
 	'SelectBlockType' : 'Select block type',
 	'SelectBlockTypeDesc' : 'Select which type of block you want to add:',
 	'SelectPageType' : 'Select page type',
