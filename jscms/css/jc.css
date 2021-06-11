@@ -134,6 +134,8 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 
 .jcDate { text-transform: capitalize; }
 
+.jcHtml img { max-width: 100%;}
+
 .jcGallery a { background-color: #fff; box-shadow: -1px 0 #aaa, 1px 0 #aaa, 0 -1px #aaa, 0 1px #aaa, 4px 4px 2px #ddd; display: inline-block; height: 96px; margin: 8px; position: relative; text-align: center; transform: skew(-10deg); vertical-align: middle; width: 96px; }
 .jcGallery.sizeXS a { height: 48px; width: 48px; }
 .jcGallery.sizeS a { height: 64px; width: 64px; }

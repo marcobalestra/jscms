@@ -1697,7 +1697,7 @@ jc.render = {
 		},
 		html : (b,d)=> {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
-			return d[b.prop];
+			return '<div class="jcHtml">'+d[b.prop]+'</div>';
 		},
 		date : (b,d) => {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
