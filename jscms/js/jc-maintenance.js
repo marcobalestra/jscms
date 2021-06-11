@@ -31,9 +31,19 @@ jc.maint = {
 			});
 			return;
 		}
+		if ( ! jc.maint.prop.tags ) {
+			jc.maint.prop.tagnames = [];
+			jc.maint.prop.tags = {};
+			AS.def.arr(jc.prop.site && jc.prop.site.tags).forEach( x => {
+				jc.maint.prop.tagnames.push( x.name );
+				jc.maint.prop.tags[x.name] = {};
+			});
+		}
 		if ( ! (params.scanlist||params.tobescanned) ) {
 			params.initial = { page: jc.page.current(), id : jc.page.data().id };
-			if ( ! params.afterscan ) params.afterscan = ()=>{ jc.maint.scan( ()=>{ jc.maint.proc( params ) }) };
+			if ( ! params.afterscan ) params.afterscan = ()=>{ jc.maint.scan( ()=>{
+				jc.maint.proc( params )
+			})};
 			jc.maint.prog({ text:'Listing pages…'});
 			jc.jdav.ls({dir:'pages'},(x) => {
 				params.tobescanned = x.list;
@@ -126,17 +136,41 @@ jc.maint = {
 			}
 			return;
 		}
+		if ( ! params.savedTagsLists ) {
+			if ( ! params.tagnames ) {
+				params.tagnames = jc.maint.prop.tagnames.clone();
+				params.tagnamesCount = params.tagnames.length;
+			}
+			if ( params.tagnames.length ) {
+				let k = params.tagnames.shift();
+				jc.maint.prog({ text: 'Saving tags: '+k, prog: (parseInt(10*(params.tagnamesCount - params.tagnames.length)/params.tagnamesCount)/10) });
+				jc.lists.tag.set(k,jc.maint.prop.tags[k],()=>{
+					jc.maint.proc( params );
+				});
+			} else {
+				params.savedTagsLists = true;
+				delete params.tagnames;
+				delete params.tagnamesCount;
+				jc.maint.proc( params );
+			}
+			return;
+		}
 		Swal.close();
 		jc.page.open( params.initial.page, params.initial.id );
+		jc.maint.prop = { full: {} };
 	},
 	scan : ( cb ) => {
 		let pd = jc.page.data().pageContent;
 		let page = jc.page.current();
 		jc.maint.prog({ text:'Scan: '+pd.metadata.title });
-		let nm = Object.assign(pd.metadata);
+		let nm = JSON.parse(JSON.stringify(pd.metadata));
 		if ( pd.blogdate ) nm.date = pd.blogdate;
 		if ( ! jc.maint.prop.full[page] ) jc.maint.prop.full[page] = {};
 		jc.maint.prop.full[page][String((pd.id||0))] = nm;
+		let pdtags = jc.objFindAll( pd, 'type', 'tags' ).clone();
+		jc.maint.prop.tagnames.forEach( tagname => {
+			jc.maint.prop.tags[tagname] = jc.page.parseTagsOne( pd, tagname, jc.maint.prop.tags[tagname], pdtags );
+		} );
 		jc.dav.rm(AS.path('jsdatastatics')+page+(pd.id||'')+'.html',()=>{ jc.page.makeStatic( cb ) });
 	},
 };
