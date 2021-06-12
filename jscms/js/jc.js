@@ -1753,7 +1753,7 @@ jc.render = {
 					let r = jc.render.block[sb.type].call(window,{prop:sb.type, editable:b.editable},sb,d) || '';
 					if ( b.editable && (jc.page.prop.editMode=='page') ) {
 						let editable = { prop: b.prop, type: 'block', subtype: sb.type, _ : { idx: idx, qt: qt } };
-						if ( AS.test.udef(r) || (AS.test.str(r) && (r.length==0)) ) r = '<span class="jcPlaceHolder">Block: '+sb.type+' '+(sb.name||'')+'</span>';
+						if ( AS.test.udef(r) || (AS.test.str(r) && (r.length==0)) ) r = '<span class="jcPlaceHolder">Block: '+sb.type+' '+(sb.label||sb.name||'')+'</span>';
 						r = $('<div class="jcEditable"></div>').data('editable',editable).append( r );
 					}
 					out.append( r );
