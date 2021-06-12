@@ -66,6 +66,7 @@
 				jc.page.data().args.f = $b.data('family');
 				jc.page.data().args.t = $b.data('tag');
 				jc.URI.push();
+				def_family = def_tag = false;
 				if ( AS.test.func(cb)) cb.call(window);
 			});
 		};
@@ -80,8 +81,6 @@
 					let $li = $('<span class="badge ml-1 click badge-secondary"></span>').html(k).data({'family':family,'tag':k}).on('click',()=>{ makelist($li) });
 					$ul.append($li);
 					if ( def_family && (def_family == family) && (def_tag == k ) ) {
-						delete def_tag;
-						delete def_family;
 						found = $li;
 					}
 				} );
