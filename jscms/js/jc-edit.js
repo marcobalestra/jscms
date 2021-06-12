@@ -281,9 +281,15 @@ $.extend( true, jc.lists, {
 jc.page.create = ( options ) => {
 	options = AS.def.obj(options);
 	if ( AS.test.udef(options.page) ) {
-		let l = jc.edit.prop.pageTypes.clone().sort();
 		let opts = {};
-		l.forEach( (k) => { opts[k] = k; } );
+		jc.edit.prop.pageTypes.filter( k => ( ! jc.edit.prop.pageTypesInfo[k].service )).forEach( k => {
+			opts[k] = jc.edit.prop.pageTypesInfo[k].display + ' ['+k+']';
+		} );
+		let s = {};
+		jc.edit.prop.pageTypes.filter( k => ( jc.edit.prop.pageTypesInfo[k].service )).forEach( k => {
+			s[k] = jc.edit.prop.pageTypesInfo[k].display;
+		} );
+		opts[ AS.label('Special') ] = s;
 		Swal.fire({
 			title: AS.label('SelectPageType'),
 			text: AS.label('SelectPageTypeDesc'),
@@ -716,6 +722,10 @@ jc.page.makeLasts = ( list, callback ) => {
 };
 
 jc.page.makeTypeLasts = ( pagetype, typelist, callback ) => {
+	if ( jc.edit.prop.pageTypesInfo[pagetype].service ) {
+		if (AS.test.func(callback)) callback.call( window );
+		return;
+	}
 	if ( ! AS.test.obj(typelist) ) {
 		jc.lists.list.get(pagetype,(l)=>{
 			typelist = l||{};
@@ -745,6 +755,10 @@ jc.page.makeTypeLasts = ( pagetype, typelist, callback ) => {
 };
 
 jc.page.makeTypeDates = ( pagetype, typelist, callback ) => {
+	if ( jc.edit.prop.pageTypesInfo[pagetype].service || ((pagetype != '_all') && (! jc.edit.prop.pageTypesInfo[pagetype].hasdate)) ) {
+		if (AS.test.func(callback)) callback.call( window );
+		return;
+	}
 	if ( ! AS.test.obj(typelist) ) {
 		jc.lists.list.get(pagetype,(l)=>{
 			typelist = l||{};
@@ -1080,7 +1094,19 @@ jc.edit = {
 	loadPageTypes : ( force )=>{
 		if ( force || (! jc.edit.prop.pageTypes) ) {
 			jc.edit.prop.pageTypes = true;
-			jc.jdav.get(AS.path('jsauth') + 'auth/lstemplates', r => { jc.edit.prop.pageTypes = r.list; });
+			jc.edit.prop.pageTypesInfo = {};
+			jc.jdav.get(AS.path('jsauth') + 'auth/lstemplates', r => {
+				jc.edit.prop.pageTypes = r.list.clone();
+				const getinfo = () => {
+					if ( ! r.list.length ) return;
+					let k = r.list.shift();
+					jc.template.info.get( k, (d) => {
+						jc.edit.prop.pageTypesInfo[k] = { display: d.display||k, service: d.service||false, hasdate: !!(jc.objFind(d,'prop','blogdate'))};
+						getinfo();
+					})
+				};
+				getinfo();
+			});
 		}
 	},
 	loadPageParts : ( force )=>{
@@ -1291,8 +1317,10 @@ jc.edit = {
 		},
 		lasts : (b,d) => {
 			let o = jc.edit.form._base(b,d);
-			let ptypes = jc.edit.prop.pageTypes.clone();
-			ptypes.unshift({label:AS.label('Choose'),value:''},{label:'* '+AS.label('All'),value:'_all'});
+			let ptypes = [{label:AS.label('Choose'),value:''},{label:'* '+AS.label('All'),value:'_all'}];
+			jc.edit.prop.pageTypes.filter( k => (! jc.edit.prop.pageTypesInfo[k].service )).forEach( k => {
+				ptypes.push( {label:jc.edit.prop.pageTypesInfo[k].display,value:k} );
+			});
 			let vtypes = [{label:AS.label('Numbered list'),value:'ol,li'},{label:AS.label('Bullet list'),value:'ul,li'},{label:AS.label('Plain list'),value:'div,div'}];
 			o.fields.push(
 				['type','hidden',{value:'lasts'}],
@@ -2420,20 +2448,6 @@ jc.edit.uploads = {
 		if ( AS.test.func(params.callback) ) params.callback.call( window, $out );
 		return $out;
 	},
-};
-
-jc.edit.loadPageTypes = ( force )=>{
-	if ( force || (! jc.edit.prop.pageTypes) ) {
-		jc.edit.prop.pageTypes = true;
-		jc.jdav.get(AS.path('jsauth') + 'auth/lstemplates', r => { jc.edit.prop.pageTypes = r.list; });
-	}
-};
-
-jc.edit.loadPageParts = ( force )=>{
-	if ( force || (! jc.edit.prop.pageParts) ) {
-		jc.edit.prop.pageParts = true;
-		jc.jdav.get(AS.path('jsauth') + 'auth/lsparts', r => { jc.edit.prop.pageParts = r.list; });
-	}
 };
 
 $( ()=>{ jc.edit.onload(); });

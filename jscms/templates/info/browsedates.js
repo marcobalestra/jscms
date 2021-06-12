@@ -2,7 +2,9 @@
 	let ti = {
 		html : "index",
 		editable : true,
-		repository : "navigatedate",
+		repository : "browsedates",
+		display: "Date navigation",
+		service: true,
 	};
 	ti.content = [
 		{ selector: "#aboveTopBar", content: false },
@@ -26,7 +28,8 @@
 		]},
 	];
 	jc.render.block.navigatebydate = (b,d) => {
-		const ntype = d[b.prop]||'blog';
+		const ntype = (d[b.prop] && d[b.prop].pagetype) ? d[b.prop].pagetype : 'blog';
+		const restrict = (d[b.prop] && d[b.prop].year) ? String(d[b.prop].year) : false;
 		const $div = $('<div class="jcDateNavigator" id="'+AS.generateId('datenavigator')+'"></div>');
 		jc.render.queue(1);
 		const nocontent = () => {
@@ -34,6 +37,7 @@
 			jc.render.queue(-1);
 		};
 		jc.jdav.get('struct/'+ntype+'-bydate-index.json',(l)=>{
+			if ( restrict ) l.byyear = l.byyear.filter( x => ( x.key == restrict ) );
 			if ( ! (AS.test.obj(l) && AS.test.arr(l.byyear) && l.byyear.length ) ) return nocontent();
 			const $tgt = $('<div class="jcDateNavigate" id="'+AS.generateId('datenavigate')+'"></div>');
 			const makelist = ($b,cb) => {
@@ -84,5 +88,5 @@
 		});
 		return $div;
 	};
-	jc.template.info.set('navigatedate',ti);
+	jc.template.info.set('browsedates',ti);
 })();

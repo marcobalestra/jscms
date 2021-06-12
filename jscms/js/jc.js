@@ -1359,12 +1359,16 @@ jc.page = {
 		},
 		data : ( page, id ) => {
 			jc.page.loadData( page, id, j => {
+				let data = jc.page.data();
 				if ( ! j ) {
-					jc.page.open('index');
-					return;
+					if ( (! id) && data.template.service ) {
+						j = {  metadata : { type: page }};
+					} else {
+						jc.page.open('index');
+						return;
+					}
 				}
 				window.tp = {};
-				let data = jc.page.data();
 				jc.page.addData( { pageContent: j } );
 				jc.URI.push();
 				$('#jcHiddenPageIndicator').remove();
@@ -1720,16 +1724,17 @@ jc.render = {
 					}
 					prev = prev ? `onclick="jc.page.open('${d.metadata.type}',${prev.id})" title="${ jc.sql2date(prev.date).toblogdate() }"` : 'disabled="disabled"';
 					next = next ? `onclick="jc.page.open('${d.metadata.type}',${next.id})" title="${ jc.sql2date(next.date).toblogdate() }"` : 'disabled="disabled"';
-					let idxpage = $(`<button class="btn btn-secondary btn-sm d-none">${AS.icon('list')}</button>`);
+					let idxpage = $(`<button type="button" class="btn btn-secondary btn-sm">${AS.icon('list')}</button>`);
 					$out.append( $('<span class="btn-group ml-2 mb-1"></span>')
-						.append(`<button class="btn btn-secondary btn-sm" ${prev}>${AS.icon('arrow-up')}</button>`)
+						.append(`<button type="button" class="btn btn-secondary btn-sm" ${prev}>${AS.icon('arrow-up')}</button>`)
 						.append(idxpage)
-						.append(`<button class="btn btn-secondary btn-sm" ${next}>${AS.icon('arrow-down')}</button>`)
+						.append(`<button type="button" class="btn btn-secondary btn-sm" ${next}>${AS.icon('arrow-down')}</button>`)
 					);
 					let finalize = ()=>{
 						$(document.body).off('jc_render_end',finalize);
 						let pd = $('.jcNavbar .nav-item.active').data();
-						if ( pd && pd.page ) $(idxpage).removeClass('d-none').on('click',()=>{ jc.page.open(pd.page,pd.id) });
+						if ( pd && pd.page ) $(idxpage).on('click',()=>{ jc.page.open(pd.page,pd.id) });
+						else $(idxpage).on('click',()=>{ jc.page.open('browsedates') });
 					}
 					$(document.body).on('jc_render_end',finalize);
 					jc.render.queue(-1);
@@ -2051,7 +2056,7 @@ jc.actionsMenu = (e) => {
 			{icon:'jcicon',iconKey:'pageEdit',label:AS.label('menuEditStart'),action:()=>{jc.page.edit('page');} },
 			{icon:'jcicon',iconKey:'uploads',label:AS.label('Attachments'),action:()=>{jc.edit.uploads.edit();} }
 		);
-		if ( (jc.page.current()!='index')||AS.test.def(jc.page.data().id)) {
+		if ( AS.test.def(jc.page.data().id)) {
 			tp.content.push('-',{icon:'jcicon danger',iconKey:'pageRm',label:AS.label('DeleteThisPage')+'…',action:()=>{jc.page.rm();} });
 		}
 		ws.content.push(

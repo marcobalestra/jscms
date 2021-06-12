@@ -3,6 +3,7 @@
 		html : "index",
 		editable : true,
 		repository : "index",
+		display: "Blog",
 	};
 	ti.content = [
 		{ selector: "#aboveTopBar", content: false },
