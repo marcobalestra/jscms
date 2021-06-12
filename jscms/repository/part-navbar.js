@@ -1,8 +1,15 @@
 (()=>{
 	let data = {
 		form : ( callback ) => {
-			let ptypes = jc.edit.prop.pageTypes.clone().sort();
-			ptypes.unshift({value:'',label:'['+AS.label('None')+']'});
+			let ptypes = [{value:'',label:'['+AS.label('None')+']'}];
+			jc.edit.prop.pageTypes.filter( k => ( ! jc.edit.prop.pageTypesInfo[k].service )).forEach( k => {
+				ptypes.push({label:jc.edit.prop.pageTypesInfo[k].display,value:k});
+			} );
+			let stypes = [];
+			jc.edit.prop.pageTypes.filter( k => ( jc.edit.prop.pageTypesInfo[k].service )).forEach( k => {
+				stypes.push({label:jc.edit.prop.pageTypesInfo[k].display,value:k});
+			} );
+			ptypes.push({label:AS.label('Special'),options:stypes});
 			let fo = {
 				requires : ['basic','pikaday','tinymce','iro','slider'],
 				options : {
