@@ -1755,7 +1755,7 @@ jc.render = {
 						let editable = { prop: b.prop, type: 'block', subtype: sb.type, _ : { idx: idx, qt: qt } };
 						if ( AS.test.udef(r) || (AS.test.str(r) && (r.length==0)) ) {
 							let lab = 'Block: '+sb.type+' '+(sb.label||sb.name||'');
-							if ( sb.type == 'tags' ) lab = 'Tags: '+(AS.def.obj(jc.prop.site.tags.find(x=>(x.name=sb.name))).label||'Unknown');
+							if ( sb.type == 'tags' ) lab = 'Tags: '+(AS.def.obj(jc.prop.site.tags.find(x=>(x.name==sb.name))).label||'Unknown');
 							r = '<span class="jcPlaceHolder">'+lab+'</span>';
 						}
 						r = $('<div class="jcEditable"></div>').data('editable',editable).append( r );
