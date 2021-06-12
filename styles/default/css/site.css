@@ -20,7 +20,7 @@ body { background-color: #ddd; margin: 0; overflow: auto; padding: 0; }
 #topContainer { background-color: #fff; border: solid 1px #ccc; border-radius: 4px; margin: 24px auto; max-width: 1300px; padding: 0; position: relative; }
 #topNavbar { margin: 0 0 10px 0; }
 #topNavbar a[onclick] { cursor: pointer; }
-#mainContainer { margin: 10px; overflow-y: auto; overflow-x: visible;}
+#mainContainer { margin: 10px; }
 #mainContainer div.jcDate { color: #999; font-size: bigger; font-style: italic; text-align: right; }
 
 /* Mobile only */
