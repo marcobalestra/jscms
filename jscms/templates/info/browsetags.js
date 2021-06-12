@@ -99,7 +99,8 @@
 		const maketabs = ( cb ) => {
 			if ( ! jc.prop.site ) return setTimeout( ()=>{maketabs(cb);},100);
 			let found = false;
-			AS.def.arr( jc.prop.site.tags ).forEach( (to,tidx) => {
+			if ( AS.test.udef(jc.prop.site.tags)) jc.prop.site.tags = [];
+			jc.prop.site.tags.clone().forEach( (to,tidx) => {
 				let tid = AS.generateId('tab_'+to.name);
 				let selected = def_family ? (def_family == to.name) : (!tidx);
 				let $tab = $(`<li class="nav-item${ tidx ? '' : ' ml-4'}"></li>`);
