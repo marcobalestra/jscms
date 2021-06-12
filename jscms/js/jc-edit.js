@@ -848,7 +848,10 @@ jc.page.parseTagsOne = ( pd, tagname, tdata, pdtags ) => {
 	if ( pd.metadata.id ) md.id = parseInt(pd.metadata.id);
 	md.title = String(pd.metadata.title);
 	md.upd = parseInt( pd.metadata.upd);
-	Object.keys( tdata ).forEach( k => { tdata[k] = tdata[k].filter( x => ( (x.type != md.type) || (x.id != md.id )) ); } );
+	Object.keys( tdata ).forEach( k => {
+		tdata[k] = tdata[k].filter( x => ( (x.type != md.type) || (x.id != md.id )) );
+		if ( ! tdata[k].length ) delete tdata[k];
+	});
 	if ( ttags.length ) {
 		let atags = {};
 		ttags.forEach( (tc) => { tc.tags.forEach( (t) => { atags[ t.tag ] = true; } ); });

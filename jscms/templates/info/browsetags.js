@@ -78,7 +78,10 @@
 				$pane.html('');
 				let $ul = $('<p class="mt-1"></p>');
 				Object.keys(l).sort().forEach( k => {
-					let $li = $('<span class="badge ml-1 click badge-secondary"></span>').html(k).data({'family':family,'tag':k}).on('click',()=>{ makelist($li) });
+					let $li = $('<span class="badge ml-1 click badge-secondary"></span>')
+						.html(k + ' ['+l[k].length+']')
+						.data({'family':family,'tag':k})
+						.on('click',()=>{ makelist($li) });
 					$ul.append($li);
 					if ( def_family && (def_family == family) && (def_tag == k ) ) {
 						found = $li;
