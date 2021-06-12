@@ -746,7 +746,7 @@ jc.URI = {
 			pars.data = {};
 			parsitems.forEach( p => {
 				let kv = p.split(':');
-				pars.data[ kv[0] ] = decodeURIComponent(kv[1]);
+				pars.data[ kv[0] ] = decodeURIComponent(kv[1]).replace(/\+/g,' ');
 			} );
 		}
 		if ( pars.page.match(/[0-9]+$/) ) {
@@ -774,7 +774,7 @@ jc.URI = {
 				}
 				if ( AS.test.obj(parsdata) ) {
 					Object.keys(parsdata).sort().forEach( k => {
-						uri += ',' + k + ':' + encodeURIComponent(parsdata[k]);
+						uri += ',' + k + ':' + encodeURIComponent(parsdata[k]).replace(/\%20/g,'+');
 					} );
 				}
 			}
@@ -1306,7 +1306,8 @@ jc.page = {
 		if ( data ) {
 			let args = {};
 			Object.keys(AS.def.obj(data)).filter( k => AS.test.str(data[k]) ).filter( k => (k.indexOf('_') != 0)).forEach( k => {
-				args[k] = data[k];
+				args[k] = String(data[k]);
+				delete data[k];
 			} );
 			data.args = args;
 		}
@@ -2010,7 +2011,9 @@ jc.render = {
 				const useProps = !! (tag.props && tag.props.length);
 				d.tags.forEach( t => {
 					let $li = $('<'+nodes[1]+' class="jcTagEntry jcEntry"></'+nodes[1]+'>');
-					$li.append(`<span class="title">${ t.tag.escape() }</span>`);
+					let $s = $(`<span class="title click">${ t.tag.escape() }</span>`);
+					$s.on('click',()=>{jc.page.open('browsetags',undefined,{f:d.name,t:t.tag});});
+					$li.append($s);
 					if ( useProps ) {
 						let props = [];
 						tag.props.forEach( p => {

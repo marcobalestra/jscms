@@ -5,6 +5,17 @@
 <link>https://ricette.lan.crossbow.it/</link>
 <generator>jBloud CMS - jscms</generator>
 <item>
+	<link>https://ricette.lan.crossbow.it/browsetags/tag-browser</link>
+	<pubDate>Sat, 12 Jun 2021 16:30:36 GMT</pubDate>
+	<title>Tag browser</title>
+</item>
+<item>
+	<link>https://ricette.lan.crossbow.it/blog2/static-version</link>
+	<pubDate>Sat, 12 Jun 2021 10:30:27 GMT</pubDate>
+	<title>Happy SEO</title>
+	<description><![CDATA[Building a static version of the page on page saving]]></description>
+</item>
+<item>
 	<link>https://ricette.lan.crossbow.it/index/home-page</link>
 	<pubDate>Sat, 12 Jun 2021 08:37:51 GMT</pubDate>
 	<title>JSCMS is here!</title>
@@ -21,12 +32,6 @@
 	<pubDate>Fri, 11 Jun 2021 15:38:17 GMT</pubDate>
 	<title>Overview</title>
 	<description><![CDATA[A quick overview on the CMS]]></description>
-</item>
-<item>
-	<link>https://ricette.lan.crossbow.it/blog2/static-version</link>
-	<pubDate>Thu, 03 Jun 2021 12:05:43 GMT</pubDate>
-	<title>Happy SEO</title>
-	<description><![CDATA[Building a static version of the page on page saving]]></description>
 </item>
 <item>
 	<link>https://ricette.lan.crossbow.it/blog1/</link>

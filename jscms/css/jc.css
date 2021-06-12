@@ -58,6 +58,8 @@ a[href^="http://"]::after, #jcToplevelContainer a[href^="https://"]::after { con
 a[href^="http://"]:hover::after, #jcToplevelContainer a[href^="https://"]:hover::after { opacity: 1; }
 a[href^="mailto:"]::after { content: ' ✉'; }
 
+.click { cursor: pointer; }
+
 .jcMenu { cursor: pointer; width: 32px; height: 32px; }
 
 .jcBannerArea { position: relative; }
