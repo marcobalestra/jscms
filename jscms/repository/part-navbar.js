@@ -2,12 +2,15 @@
 	let data = {
 		form : ( callback ) => {
 			let ptypes = [{value:'',label:'['+AS.label('None')+']'}];
-			jc.edit.prop.pageTypes.filter( k => ( ! jc.edit.prop.pageTypesInfo[k].service )).forEach( k => {
-				ptypes.push({label:jc.edit.prop.pageTypesInfo[k].display,value:k});
-			} );
 			let stypes = [];
-			jc.edit.prop.pageTypes.filter( k => ( jc.edit.prop.pageTypesInfo[k].service )).forEach( k => {
-				stypes.push({label:jc.edit.prop.pageTypesInfo[k].display,value:k});
+			jc.edit.prop.pageTypes.forEach( k => {
+				let lab = jc.edit.prop.pageTypesInfo[k].display;
+				if ( lab != k ) lab += ' ['+k+']';
+				if ( jc.edit.prop.pageTypesInfo[k].service ) {
+					stypes.push({label:lab,value:k});
+				} else {
+					ptypes.push({label:lab,value:k});
+				}
 			} );
 			ptypes.push({label:AS.label('Special'),options:stypes});
 			let fo = {

@@ -3,7 +3,7 @@
 		html : "index",
 		editable : true,
 		repository : "browsedates",
-		display: "Date navigation",
+		display: "Browse by date",
 		service: true,
 	};
 	ti.content = [

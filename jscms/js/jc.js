@@ -736,7 +736,7 @@ jc.URI = {
 		}
 		if ( parsitems.indexOf('/') > 0 ) {
 			fakepath = parsitems.replace(/^.+\/(.*)$/,"$1");
-			parsitems = parsitems.replace(/\/.*$/,'');
+			parsitems = parsitems.replace(/\/[^\/]*$/,'');
 		}
 		if (l.indexOf(jc.prop.uriPrefixOfbs)>=0) parsitems = window.atob(parsitems);
 		parsitems = parsitems.split(',');
@@ -746,7 +746,7 @@ jc.URI = {
 			pars.data = {};
 			parsitems.forEach( p => {
 				let kv = p.split(':');
-				pars.data[ kv[0] ] = parseInt(kv[1]);
+				pars.data[ kv[0] ] = decodeURIComponent(kv[1]);
 			} );
 		}
 		if ( pars.page.match(/[0-9]+$/) ) {
@@ -760,7 +760,7 @@ jc.URI = {
 		jc.console('Decoded location:',pars);
 		return pars;
 	},
-	encode : (o,title)=>{
+	encode : (o,title,parsdata)=>{
 		let uri = '';
 		if ( AS.test.obj(o)) {
 			if ( ! AS.test.str(o.page) ) return '/';
@@ -771,20 +771,11 @@ jc.URI = {
 			if ( AS.test.obj(o.data) ) {
 				if ( (! o.id) && o.data && o.data.id ) {
 					uri += o.data.id;
-				} else {
-					let parts = [];
-					for (const [key, value] of Object.entries(o.data)) {
-						let v = false;
-						if ( AS.test.str(value) && (! isNaN(parseInt(value))) ) {
-							o.data[key] = parseInt(value);
-							parts.push(key);
-						} else if ( AS.test.num(value) && (parseInt(value)==value) ) {
-							parts.push(key);
-						}
-					}
-					if ( parts.length ) {
-						uri += ',' + parts.sort().map( p => ( p + ':' + o.data[p]) ).join(',');
-					}
+				}
+				if ( AS.test.obj(parsdata) ) {
+					Object.keys(parsdata).sort().forEach( k => {
+						uri += ',' + k + ':' + encodeURIComponent(parsdata[k]);
+					} );
 				}
 			}
 		} else if ( AS.test.str(o) ) {
@@ -811,7 +802,7 @@ jc.URI = {
 				else if ( data.id && data.pageContent.metadata.title ) title = data.pageContent.metadata.title;
 			}
 		}
-		let up = jc.URI.encode( uriparams, title );
+		let up = jc.URI.encode( uriparams, title, jc.page.data().args );
 		if ( up != jc.prop.lastHiEntry ) {
 			jc.prop.lastHiEntry = up;
 			history.pushState({},title, up );
@@ -1296,9 +1287,7 @@ jc.page = {
 	},
 	open : ( page, id, data, infokey ) => {
 		if ( ! AS && AS.labels && AS.labels.loaded ) return setTimeout( ()=>{ jc.page.open(page, id, data, infokey) }, 100);
-		let initialargs = JSON.parse(JSON.stringify([page,data]));
 		if ( ! page ) page = 'index';
-		
 		if ( page == jc.page.current() ) {
 			if ( id ) {
 				if ( jc.page.data() && jc.page.data().id && ( id == jc.page.data().id )) return;
@@ -1308,10 +1297,18 @@ jc.page = {
 		}
 		if ( jc.edit && jc.edit.data() ) jc.edit.data(false);
 		$(document.body).trigger('jc_page_open_requested',{page:page,id:id,uriparams:data});
-		if ( AS.test.str(data) ) data = $.parseParams( data );
+		if ( AS.test.udef(data) ) data = {};
+		else if ( AS.test.str(data) ) data = $.parseParams( data );
 		if ( data && AS.test.str(data.template) ) {
 			if (! infokey) infokey = String(data.template);
 			delete data.template;
+		}
+		if ( data ) {
+			let args = {};
+			Object.keys(AS.def.obj(data)).filter( k => AS.test.str(data[k]) ).filter( k => (k.indexOf('_') != 0)).forEach( k => {
+				args[k] = data[k];
+			} );
+			data.args = args;
 		}
 		if ( (! infokey) && data && AS.test.obj(data.template) ) infokey = data.template.key;
 		if ( ! infokey ) infokey = page;
