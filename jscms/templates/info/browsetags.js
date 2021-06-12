@@ -49,7 +49,7 @@
 				if ( AS.test.func(cb)) cb.call(window);
 				return;
 			}
-			$('span.badge',$tabs).removeClass('badge-primary badge-danger').addClass('badge-secondary');
+			$('span.badge',$panes).removeClass('badge-primary badge-danger').addClass('badge-secondary');
 			$b.removeClass('badge-secondary').addClass('badge-danger');
 			jc.lists.tag.get( $b.data('family'),(l)=>{
 				$tgt.html('');
