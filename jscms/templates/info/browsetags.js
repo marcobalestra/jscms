@@ -50,7 +50,7 @@
 				return;
 			}
 			$('span.badge',$tabs).removeClass('badge-primary badge-danger').addClass('badge-secondary');
-			$b.removeClass('badge-secondary badge-primary').addClass('badge-danger');
+			$b.removeClass('badge-secondary').addClass('badge-danger');
 			jc.lists.tag.get( $b.data('family'),(l)=>{
 				$tgt.html('');
 				let $ul = $('<ul></ul>');
