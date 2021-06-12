@@ -23,6 +23,7 @@ AS.labels.load('en',[{
 	'FloatRight': 'On the right',
 	'ForceAlsoHidden' : 'Even if page is hidden',
 	'GotoPage' : 'Go to page',
+	'GlobalFooter' : 'Powered by <a href="https://jbloud.com">JBLOUD</a>, © 2021 <a href="https://altersoftware.it">altersoftware.IT</a>',
 	'headerTag' : 'Recipes from real Chefs',
 	'HideComments' : 'Disable comments',
 	'HighlightForType' : 'Also active for type',

@@ -26,6 +26,7 @@
 // 			{ type:"part", content: "fbcomments.json" },
 			{ type:"part", content: "sharethis.json" },
 		]},
+		{ selector: '#topFooter', type:'text', content: '{{label:GlobalFooter}}' },
 	];
 	jc.render.block.navigatebytag = (b,d) => {
 		if ( AS.test.udef(d[b.prop]) ) d[b.prop] = {};

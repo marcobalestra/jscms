@@ -22,6 +22,7 @@
 // 			{ type:"part", content: "fbcomments.json" },
 			{ type:"part", content: "sharethis.json" },
 		]},
+		{ selector: '#topFooter', type:'text', content: '{{label:GlobalFooter}}' },
 	];
 	jc.template.info.set('index',ti);
 })();

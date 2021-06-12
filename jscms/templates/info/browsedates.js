@@ -26,6 +26,7 @@
 // 			{ type:"part", content: "fbcomments.json" },
 			{ type:"part", content: "sharethis.json" },
 		]},
+		{ selector: '#topFooter', type:'text', content: '{{label:GlobalFooter}}' },
 	];
 	jc.render.block.navigatebydate = (b,d) => {
 		const ntype = (d[b.prop] && d[b.prop].pagetype) ? d[b.prop].pagetype : 'blog';

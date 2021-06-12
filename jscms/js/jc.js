@@ -1553,6 +1553,7 @@ jc.render = {
 				if ( ! Array.isArray(e.content) ) e.content = [e.content];
 				e.content.forEach( c => {
 					jc.render.prepare( c, pdata );
+					if ( AS.test.str(c) ) c = { rendered: AS.labels.labelize(c) };
 					if ( AS.test.obj(c) ) {
 						if ( ! c.id ) {
 							c.id = AS.generateId('jc-block-');
