@@ -2163,7 +2163,7 @@ jc.edit.custom = {
 				['show','bool',{asLabel:'Visibile',checked:(b._.idx=='New')}],
 				['view','select',{asLabel:'blockTextAspect',options:[{label:AS.label('Compact'),value:'p,span'},{label:AS.label('Bullet list'),value:'ul,li'},{label:AS.label('Numbered list'),value:'ol,li'},{label:AS.label('Plain list'),value:'div,div'}],depends:'show'}],
 				['position','select',{asLabel:'Position',options:[{label:AS.label('Block'),value:''},{label:AS.label('FloatRight'),value:'jcBoxRight'}],depends:'show'}],
-				['showtitle','bool',{asLabel:'Title',depends:'show'}],
+				['showtitle','bool',{asLabel:'Title',checked:(b._.idx=='New'),depends:'show'}],
 				['customtitle','text',{asLabel:'Title',placeholder:(to.label||to.name),normalize:true,skipempty:true,depends:'showtitle'}],
 			);
 			if ( useProps ) o.fields.push(['verbose','bool',{asLabel:'Verbose',depends:'show'}]);
