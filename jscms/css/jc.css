@@ -225,10 +225,18 @@ button[data-ismonth] { text-transform: capitalize; }
 
 label svg.bannerPreview { width: 220px; vertical-align: -20px; }
 
+/* 
 .jcTags ul { list-style: none; margin-left: 0; padding-left: 0; position: relative; }
 .jcTags ul li {
     padding-left: 40px;
     background: url(data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iZ2x5cGhpY29ucy1iYXNpYyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSI0IDQgMjQgMjQiIHdpZHRoPSIxOHB4IiBoZWlnaHQ9IjE4cHgiPjxwYXRoIGNsYXNzPSJ0YWciIGQ9Ik0yNy4wNDE2MywxNy4xNDIwOSwxNS4xOTIzOCw1LjI5M0EuOTk5NzUuOTk5NzUsMCwwLDAsMTQuNDg1MjksNUg2QTEsMSwwLDAsMCw1LDZ2OC40ODUxMWExLjAwMDE2LDEuMDAwMTYsMCwwLDAsLjI5MjkxLjcwNzI3TDE3LjE0MjE1LDI3LjA0MTVhMS4wMDAyMywxLjAwMDIzLDAsMCwwLDEuNDE0MTksMGw4LjQ4NTI5LTguNDg1MzVBLjk5OTg2Ljk5OTg2LDAsMCwwLDI3LjA0MTYzLDE3LjE0MjA5Wk0xMSwxM2EyLDIsMCwxLDEsMi0yQTIuMDAwMDYsMi4wMDAwNiwwLDAsMSwxMSwxM1oiLz48L3N2Zz4=) no-repeat 12px 3px;
+}
+ */
+.jcTags ul { list-style: none; margin-left: 0; padding-left: 40px; position: relative; }
+.jcTags ul li:before {
+	position: absolute;
+	left: 12px;
+	content: '🔖';
 }
 
 #topFooter { text-align: center; margin: 1em; }
