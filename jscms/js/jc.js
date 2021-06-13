@@ -2016,7 +2016,7 @@ jc.render = {
 				const useProps = !! (tag.props && tag.props.length);
 				d.tags.forEach( t => {
 					let $li = $('<'+nodes[1]+' class="jcTagEntry jcEntry"></'+nodes[1]+'>');
-					let $s = $(`<span class="title click">${ t.tag.escape() }</span>`);
+					let $s = $(`<span class="title">${ t.tag.escape() }</span>`);
 					$s.on('click',()=>{jc.page.open('browsetags',undefined,{f:d.name,t:t.tag});});
 					$li.append($s);
 					if ( useProps ) {
