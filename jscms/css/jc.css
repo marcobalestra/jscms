@@ -241,6 +241,7 @@ label svg.bannerPreview { width: 220px; vertical-align: -20px; }
 .jcTags .title  { cursor: pointer ;}
 .jcTags .title:hover  { text-decoration: underline; }
 .jcTagEntries.compact i:first-child::before { content: '🔖 '; }
+.jcTagEntries.compact { margin: 0 0 8px 8px; }
 .jcTagEntries.compact .jcTagEntry::after { content: ', '; }
 .jcTagEntries.compact .jcTagEntry:last-child::after { content: '.'; }
 
