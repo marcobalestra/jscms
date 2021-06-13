@@ -2006,14 +2006,22 @@ jc.render = {
 			const build = () => {
 				if ( ! jc.prop.site ) return setTimeout( build, 100 );
 				let tag = AS.def.arr(jc.prop.site.tags).find( x => ( AS.test.obj(x) && x.name && ( x.name == d.name )));
+				const minimal = (nodes[0] == 'p');
 				if (! tag) {
 					$div.remove();
 					jc.render.queue(-1);
 					return;
 				};
-				if ( d.showtitle ) $div.append( $('<h5></h5>').append(d.customtitle||tag.label||tag.name) );
 				let $ol = $('<'+nodes[0]+' class="jcTagEntries jcEntries"></'+nodes[0]+'>');
-				const useProps = !! (tag.props && tag.props.length);
+				if ( d.showtitle ) {
+					if ( minimal ) {
+						$ol.addClass('compact');
+						$ol.append( $('<i></i>').append((d.customtitle||tag.label||tag.name)+': ') );
+					} else {
+						$div.append( $('<h5></h5>').append(d.customtitle||tag.label||tag.name) );
+					}
+				}
+				const useProps = !! ((! minimal) && tag.props && tag.props.length);
 				d.tags.forEach( t => {
 					let $li = $('<'+nodes[1]+' class="jcTagEntry jcEntry"></'+nodes[1]+'>');
 					let $s = $(`<span class="title">${ t.tag.escape() }</span>`);

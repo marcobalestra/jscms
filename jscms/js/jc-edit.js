@@ -2160,8 +2160,8 @@ jc.edit.custom = {
 			o.fields.push(
 				['type','hidden',{value:'tags'}],
 				['name','hidden',{value:to.name}],
-				['show','bool',{asLabel:'Visibile'}],
-				['view','select',{asLabel:'blockTextAspect',options:[{label:AS.label('Bullet list'),value:'ul,li'},{label:AS.label('Numbered list'),value:'ol,li'},{label:AS.label('Plain list'),value:'div,div'}],depends:'show'}],
+				['show','bool',{asLabel:'Visibile',checked:(b._.idx=='New')}],
+				['view','select',{asLabel:'blockTextAspect',options:[{label:AS.label('Compact'),value:'p,span'},{label:AS.label('Bullet list'),value:'ul,li'},{label:AS.label('Numbered list'),value:'ol,li'},{label:AS.label('Plain list'),value:'div,div'}],depends:'show'}],
 				['position','select',{asLabel:'Position',options:[{label:AS.label('Block'),value:''},{label:AS.label('FloatRight'),value:'jcBoxRight'}],depends:'show'}],
 				['showtitle','bool',{asLabel:'Title',depends:'show'}],
 				['customtitle','text',{asLabel:'Title',placeholder:(to.label||to.name),normalize:true,skipempty:true,depends:'showtitle'}],
@@ -2407,6 +2407,11 @@ jc.edit.uploads = {
 					if ( params.gallery.gallery.find( k=>( k.uri == u.uri) ) ) $i.attr('checked',true);
 					$tr.append('<td></td>');
 					$('td',$tr).append($i);
+				} else if ( params.image ) {
+					let $i = $('<input type="radio" name="image" />');
+					if ( params.image == u.uri ) $i.attr('checked',true);
+					$tr.append('<td></td>');
+					$('td',$tr).append($i);
 				}
 				if ( u.au ) {
 					$tr.append(`<td class="fn"><a data-type="iframe" data-src="${u.uri}" href="javascript:;" data-fancybox="uploads" data-caption="${u.caption.escape()}">${u.name.escape()}</a></td>`);
@@ -2436,6 +2441,8 @@ jc.edit.uploads = {
 					if ( params.gallery.gallery.find( k=>( k.uri == u.uri) ) ) return;
 					makeRow(u);
 				});
+			} else if ( params.image ) {
+				params.uploads.filter( u => u.img ).forEach( u=>{ makeRow(u); } );
 			} else {
 				params.uploads.forEach( u=>{ makeRow(u); } );
 			}

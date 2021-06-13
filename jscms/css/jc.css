@@ -240,6 +240,9 @@ label svg.bannerPreview { width: 220px; vertical-align: -20px; }
 .jcTags ul li:before { position: absolute; left: 12px; content: '🔖'; }
 .jcTags .title  { cursor: pointer ;}
 .jcTags .title:hover  { text-decoration: underline; }
+.jcTagEntries.compact i:first-child::before { content: '🔖 '; }
+.jcTagEntries.compact .jcTagEntry::after { content: ', '; }
+.jcTagEntries.compact .jcTagEntry:last-child::after { content: '.'; }
 
 #topFooter { text-align: center; margin: 2em 0; background-color : rgba(255,255,255,.75); }
 
