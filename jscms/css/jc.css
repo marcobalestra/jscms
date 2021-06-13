@@ -230,7 +230,7 @@ label svg.bannerPreview { width: 220px; vertical-align: -20px; }
 .jcTags .title  { cursor: pointer ;}
 .jcTags .title:hover  { text-decoration: underline; }
 
-#topFooter { text-align: center; margin: 1em; }
+#topFooter { text-align: center; margin: 1em; background-color : rgba(255,255,255,.75); }
 
 /* Bootstrap enhancements */
 a[onclick] { cursor: pointer; }
