@@ -40,10 +40,6 @@
 		const $panes = $('<div class="tab-content"></div>');
 		const $tgt = $('<div class="jcTagsNavigate" id="'+AS.generateId('tagsnavigate')+'"></div>');
 		$div.append( $tabs, $panes, $tgt );
-// 		const nocontent = () => {
-// 			$div.html('<div class="alert alert-warning">'+AS.label('NoItemsFound')+' — <i>“'+ntype+'”</i>.</div>' );
-// 			jc.render.queue(-1);
-// 		};
 		const makelist = (b,cb) => {
 			let $b = $(b);
 			if ( ($tgt.data('family') == $b.data('family')) && ($tgt.data('tag') == $b.data('tag')) ) {
@@ -55,7 +51,7 @@
 			jc.lists.tag.get( $b.data('family'),(l)=>{
 				$tgt.html('');
 				let $ul = $('<ul></ul>');
-				(AS.def.arr(l[$b.data('tag')])).forEach( e => {
+				(AS.def.arr(l[$b.data('tag')])).sort( (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? -1 : 1 ) ).forEach( e => {
 					let $li = $('<li></li>');
 					$li.append(`<a class="" onclick="jc.page.open('${e.type}'${e.id?','+e.id:''})"><strong>${e.title}</strong></a>`);
 					$li.append(`<small class="jcDate date ml-2"> ${ (new Date(e.upd)).toLocaleDateString() } </small>`);
