@@ -85,7 +85,18 @@ a[href^="mailto:"]::after { content: ' ✉'; }
 
 
 @media (max-width: 600px) {
+	.jcBannerArea .jcCover { height: 64px; }
+	.jcBannerArea.nop .jcCover { height: 48px; }
+	.jcBannerArea .jcBannerText { font-size: 100%; }
+	.jcBannerArea.nop .jcBannerText { left: 5px; bottom: 5px; right: 40px; }
 	.jcBannerArea .jcMenu { top: 8px; right: 8px; }
+	.jcBannerArea .jcProfile { width: 60px; height: 60px; }
+	.jcBannerArea.pbleft .jcProfile { top: 2px; left: 2%; border: 2px solid #fff; }
+	.jcBannerArea.pbleft .jcBannerText { left: calc(5% + 60px); bottom: 5px; right: 40px; }
+	.jcBannerArea.pleft .jcProfile { width: 64px; height: 64px; }
+	.jcBannerArea.pleft .jcBannerText { left: calc(1% + 60px); bottom: 5px; width: calc(98% - 60px); }
+	.jcBannerArea.pbcenter .jcProfile { left: calc(50% - 32px); border: 2px solid #fff; }
+	.jcBannerArea.pbcenter .jcBannerText { left: 5px; top: 10px; width: calc(50% - 45px); line-height: .8em; }
 }
 
 
