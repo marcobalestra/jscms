@@ -133,7 +133,7 @@
 					$('<div class="col-lg-4"></div>').append( $cb, `<label for="${tid}">${ to.label||to.name }</label>`),
 					$('<div class="col-lg-8" style="display:none;"></div>').append( $sel ),
 				));
-				$sel.select2({ width: '100%' });
+				$sel.select2({ width: '100%', multiple: true });
 			} );
 			$('input[type="checkbox"]',$panes).on('change',makesearch);
 			$('input[name="filter"]',$panes).on('keyup',makesearch);
