@@ -7,6 +7,8 @@ AS.path({
 	jsroot : '/jscms/',
 	jscdn : jc.prop.isDeveloper ? '/jscms/' : 'https://cdn.altersoftware.org/js-as-cms/',
 	jsdataroot: '/jscms/data/',
+	jstemplates : '/jscms/templates/',
+	jsreporoot: '/jscms/repository/',
 	jsauth: '/jscms/login/',
 });
 ( ()=>{
