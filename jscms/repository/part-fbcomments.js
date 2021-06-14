@@ -17,8 +17,8 @@
 			};
 			jc.edit.prop.pageTypes.sort().forEach( s => {
 				let i = jc.edit.prop.pageTypesInfo[s];
-				if ( s.service ) return;
-				fo.fields.push(['hide-'+s,'bool',{label:(i.label||s),depends:'comments'}]) }
+				if ( i.service ) return;
+				fo.fields.push(['hide-'+s,'bool',{label:(i.display||s),depends:'comments'}]) }
 			);
 			if ( AS.test.func(callback) ) callback.call(window,fo);
 			return fo;

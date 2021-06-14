@@ -38,7 +38,7 @@
 		const $div = $('<div class="jcTagsNavigator" id="'+AS.generateId('tagsnavigator')+'"></div>');
 		const $tabs = $('<ul class="nav nav-tabs mt-4" role="tablist"></ul>');
 		const $panes = $('<div class="tab-content"></div>');
-		const $tgt = $('<div class="jcTagsNavigate" id="'+AS.generateId('tagsnavigate')+'"></div>');
+		const $tgt = $('<div class="jcTagsNavigate" id="'+AS.generateId('tagsnavigate')+'"></div>').css('min-height','200px');
 		$div.append( $tabs, $panes, $tgt );
 		const makelist = (b,cb) => {
 			let $b = $(b);

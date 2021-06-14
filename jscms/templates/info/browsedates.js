@@ -40,7 +40,7 @@
 		jc.jdav.get('struct/'+ntype+'-bydate-index.json',(l)=>{
 			if ( restrict ) l.byyear = l.byyear.filter( x => ( x.key == restrict ) );
 			if ( ! (AS.test.obj(l) && AS.test.arr(l.byyear) && l.byyear.length ) ) return nocontent();
-			const $tgt = $('<div class="jcDateNavigate" id="'+AS.generateId('datenavigate')+'"></div>');
+			const $tgt = $('<div class="jcDateNavigate" id="'+AS.generateId('datenavigate')+'"></div>').css('min-height','200px');
 			const makelist = ($b,cb) => {
 				if ( $tgt.data('selector') == $b.data('selector') ) return;
 				$('button[data-ismonth]',$div).each( (idx,b) => { b.className = 'btn btn-secondary' } );
