@@ -1,4 +1,4 @@
 (()=>{
 	let data = { form : { } };
-	jc.template.repo.set('seachtags',data);
+	jc.template.repo.set('searchtags',{});
 })();
