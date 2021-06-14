@@ -246,8 +246,10 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcMediaRecordArea video { max-width: 100%; display: block; }
 .jcMediaRecordArea.recording video, .jcMediaRecordArea.recording audio { opacity: .3; background-color : #c00; }
 
-.jcBoxRight { display: block; float: right; margin: 0 0 0 1em; max-width: 480px; z-index: 2; clear: right; }
-.jcEditable .jcBoxRight { float: unset; margin-left: calc(100% - 480px); clear: unset; }
+@media (min-width: 601px) {
+	.jcBoxRight { display: block; float: right; margin: 0 0 0 1em; max-width: 480px; z-index: 2; clear: right; }
+	.jcEditable .jcBoxRight { float: unset; margin-left: calc(100% - 480px); clear: unset; }
+}
 
 .jcMixedBlocks { overflow-y: auto; }
 
