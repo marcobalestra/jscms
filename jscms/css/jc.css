@@ -170,7 +170,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 
 .jcGallery.inline a { box-shadow: -1px 0 #aaa, 1px 0 #aaa, 0 -1px #aaa, 0 1px #aaa; transform: none; }
 @media (max-width: 600px) {
-	.jcGallery.inline a { display: block; max-width: 100%; }
+	.jcGallery.inline a { display: block; max-width: 100%; height: unset; width: unset; }
 }
 @media (min-width: 601px) {
 	.jcGallery.inline a { height: 240px; max-width: 100%; width: 240px; }
