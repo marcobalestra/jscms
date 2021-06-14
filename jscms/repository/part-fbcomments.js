@@ -12,10 +12,10 @@
 					['fbid','text',{asLabel:'FacebookID',trim:true,skipempty:true,mandatory:true,asHelp:'FacebookIdHelp',depends:'mod'}],
 					['comments','bool',{asLabel:'UseFbComments',depends:'active,mod'}],
 					['numposts','slider',{asLabel:'Max',min:1,max:100,report:{value:true},default:10,depends:'comments'}],
-					['hide','freehtml',{value:AS.label('Hide')+':',depends:'active'}]
+					['hide','freehtml',{value:AS.label('Hide')+':',depends:'comments'}]
 				],
 			};
-			jc.edit.prop.pageTypes.sort().forEach( s => { fo.fields.push(['hide-'+s,'bool',{label:s,depends:'active'}]) } );
+			jc.edit.prop.pageTypes.sort().forEach( s => { fo.fields.push(['hide-'+s,'bool',{label:s,depends:'comments'}]) } );
 			if ( AS.test.func(callback) ) callback.call(window,fo);
 			return fo;
 		},
