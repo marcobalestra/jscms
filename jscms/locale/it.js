@@ -28,6 +28,7 @@ AS.labels.load('it',[{
 	'FacebookIdHelp' : '<a href="https://www.facebook.com/help/1397933243846983" target="_blank">Come conoscere il proprio Facebook ID</a>\nÈ necessario per attivare i commenti, identifica l’utente che potrà moderarli.\nSei un geek? Leggi il cookie <code>c_user</code> di FB.',
 	'FileName' : 'Nome',
 	'FileSize' : 'Peso',
+	'Filter' : 'Filtra',
 	'FloatRight': 'Sulla destra',
 	'ForceAlsoHidden' : 'Anche se è nascosta',
 	'GotoPage' : 'Vai alla pagina',
