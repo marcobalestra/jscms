@@ -148,6 +148,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcDate { text-transform: capitalize; }
 
 .jcHtml img { max-width: 100%;}
+.jcHtml ul, .jcHtml ol { display: inline-block; }
 
 .jcGallery a { background-color: #fff; box-shadow: -1px 0 #aaa, 1px 0 #aaa, 0 -1px #aaa, 0 1px #aaa, 4px 4px 2px #ddd; display: inline-block; height: 96px; margin: 8px; position: relative; text-align: center; transform: skew(-10deg); vertical-align: middle; width: 96px; }
 .jcGallery.sizeXS a { height: 48px; width: 48px; }
@@ -249,7 +250,7 @@ button[data-ismonth] { text-transform: capitalize; }
 
 label svg.bannerPreview { width: 220px; vertical-align: -20px; }
 
-.jcTags ul { list-style: none; margin-left: 0; padding-left: 40px; position: relative; }
+.jcTags ul { list-style: none; margin-left: 0; padding-left: 40px; position: relative; display: inline-block; }
 .jcTags ul li:before { position: absolute; left: 12px; content: '🔖'; }
 .jcTags .title  { cursor: pointer ;}
 .jcTags .title:hover  { text-decoration: underline; }
