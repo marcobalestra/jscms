@@ -9,8 +9,8 @@
 					['active','bool',{asLabel:'Active'}],
 					['like','bool',{asLabel:'UseFbLike',depends:'active'}],
 					['mod','select',{asLabel:'Moderator',options:[{value:'',label:AS.label('None')},{value:'U',label:'FB user'},{value:'A',label:'FB app/page/group'}]}],
-					['fbid','text',{asLabel:'FacebookID',trim:true,skipempty:true,asHelp:'FacebookIdHelp',depends:'mod'}],
-					['comments','bool',{asLabel:'UseFbComments',depends:'active,fbid'}],
+					['fbid','text',{asLabel:'FacebookID',trim:true,skipempty:true,mandatory:true,asHelp:'FacebookIdHelp',depends:'mod'}],
+					['comments','bool',{asLabel:'UseFbComments',depends:'active,mod'}],
 					['numposts','slider',{asLabel:'Max',min:1,max:100,report:{value:true},default:10,depends:'comments'}],
 					['hide','freehtml',{value:AS.label('Hide')+':',depends:'comments'}]
 				],
