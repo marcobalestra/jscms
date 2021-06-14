@@ -15,7 +15,7 @@
 					['hide','freehtml',{value:AS.label('Hide')+':',depends:'active'}]
 				],
 			};
-			jc.edit.prop.pageTypes.sort().forEach( s => { fo.fields.push(['hide-'+s,'bool',{label:s,depends:'comments'}]) } );
+			jc.edit.prop.pageTypes.sort().forEach( s => { fo.fields.push(['hide-'+s,'bool',{label:s,depends:'active'}]) } );
 			if ( AS.test.func(callback) ) callback.call(window,fo);
 			return fo;
 		},
