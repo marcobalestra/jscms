@@ -1319,7 +1319,7 @@ jc.page = {
 		let finalize = ()=>{
 			$(document.body).off('jc_render_end',finalize);
 			if ( ! jc.page.prop.editMode ) window.scrollTo(0,0);
-			$( ()=>{ $(document.body).trigger('jc_page_open_completed',{page:page,id:id,uriparams:data}); } );
+			$( ()=>{ $(document.body).trigger('jc_page_open_completed',{page:page,id:id,uriparams:data.args}); } );
 		}
 		$(document.body).on('jc_render_end',finalize);
 		jc.page.step.info( page, id, data, infokey );
@@ -1332,7 +1332,18 @@ jc.page = {
 		let url = AS.path('jsdatapages') + page + ( id||'') + '.json';
 		jc.jdav.get( url, (data) =>{ if ( AS.test.func(callback) ) callback.call( window, data ); });
 	},
-	reload : () => { jc.page.step.data( jc.page.current(), jc.page.data().id ); },
+	reload : () => {
+		let cs = $(window).scrollTop();
+		let finalize = ()=>{
+			$(document.body).off('jc_render_end',finalize);
+			setTimeout( ()=>{
+				$(window).scrollTop(cs);
+				$(document.body).trigger('jc_page_open_completed',{page:jc.page.current(),id:jc.page.data().id,uriparams:jc.page.data().args});
+			}, 100 );
+		}
+		$(document.body).on('jc_render_end',finalize);
+		jc.page.step.data( jc.page.current(), jc.page.data().id );
+	},
 	step : {
 		info : ( page, id, data, infokey ) => {
 			jc.template.info.get( infokey, ( tdata )=>{
