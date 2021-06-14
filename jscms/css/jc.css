@@ -148,7 +148,6 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcDate { text-transform: capitalize; }
 
 .jcHtml img { max-width: 100%;}
-.jcHtml ul, .jcHtml ol { display: inline-block; }
 
 .jcGallery a { background-color: #fff; box-shadow: -1px 0 #aaa, 1px 0 #aaa, 0 -1px #aaa, 0 1px #aaa, 4px 4px 2px #ddd; display: inline-block; height: 96px; margin: 8px; position: relative; text-align: center; transform: skew(-10deg); vertical-align: middle; width: 96px; }
 .jcGallery.sizeXS a { height: 48px; width: 48px; }
@@ -242,8 +241,8 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcMediaRecordArea video { max-width: 100%; display: block; }
 .jcMediaRecordArea.recording video, .jcMediaRecordArea.recording audio { opacity: .3; background-color : #c00; }
 
-.jcBoxRight { display: block; float: right; margin: 0 0 0 1em; max-width: 480px; z-index: 2; }
-.jcEditable .jcBoxRight { float: unset; margin-left: calc(100% - 480px); }
+.jcBoxRight { display: block; float: right; margin: 0 0 0 1em; max-width: 480px; z-index: 2; clear: right; }
+.jcEditable .jcBoxRight { float: unset; margin-left: calc(100% - 480px); clear: unset; }
 
 .jcMixedBlocks { overflow-y: auto; }
 
