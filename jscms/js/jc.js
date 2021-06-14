@@ -1813,6 +1813,7 @@ jc.render = {
 				);
 			} else {
 				$div.addClass('jcGallery');
+				if ( d.aspect == 'I' ) $div.addClass('inline');
 				d[b.prop].forEach( uu => {
 					let u = pdata.uploads.find( x => ( x.uri == uu.uri ));
 					if ( ! u ) return;

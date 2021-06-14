@@ -2326,14 +2326,14 @@ jc.edit.uploads = {
 			jc.page.save({ maintenance: true, mute: false, callback: ()=>{ } });
 		};
 		if ( params.gallery ) {
-			let $st = $('<select class="mr-1 mt-1"><option value="T">Thumbnails</option><option value="C">Carousel</option></select>');
+			let $st = $('<select class="mr-1 mt-1"><option value="T">Thumbnails</option><option value="I">Inline</option><option value="C">Carousel</option></select>');
 			let $sf = $('<select class="mr-1 mt-1"><option value="">Plain</option><option value="c">With captions</option><option value="x">With controls</option><option value="i">With indicators</option><option value="ci">With captions + indicators</option><option value="xi">With controls + indicators</option><option value="cxi">With captions + controls + indicators</option></select>');
 			let $ss = $('<select class="mr-1 mt-1"><option>XS</option><option>S</option><option value="">M</option><option>L</option><option>XL</option><option>XXL</option></select>');
 			$st.val( params.gallery.aspect||'T' );
 			$st.on('change',()=>{
 				params.gallery.aspect = $st.val();
 				if ( params.gallery.aspect != 'C' ) delete params.gallery.flags;
-				$ss.toggle( params.gallery.aspect != 'C' );
+				//$ss.toggle( params.gallery.aspect != 'C' );
 				$sf.toggle( params.gallery.aspect == 'C' );
 				jc.page.save({ maintenance: true, mute: false, callback: ()=>{
 					jc.edit.noModal();
@@ -2407,11 +2407,6 @@ jc.edit.uploads = {
 					if ( params.gallery.gallery.find( k=>( k.uri == u.uri) ) ) $i.attr('checked',true);
 					$tr.append('<td></td>');
 					$('td',$tr).append($i);
-				} else if ( params.image ) {
-					let $i = $('<input type="radio" name="image" />');
-					if ( params.image == u.uri ) $i.attr('checked',true);
-					$tr.append('<td></td>');
-					$('td',$tr).append($i);
 				}
 				if ( u.au ) {
 					$tr.append(`<td class="fn"><a data-type="iframe" data-src="${u.uri}" href="javascript:;" data-fancybox="uploads" data-caption="${u.caption.escape()}">${u.name.escape()}</a></td>`);
@@ -2441,8 +2436,6 @@ jc.edit.uploads = {
 					if ( params.gallery.gallery.find( k=>( k.uri == u.uri) ) ) return;
 					makeRow(u);
 				});
-			} else if ( params.image ) {
-				params.uploads.filter( u => u.img ).forEach( u=>{ makeRow(u); } );
 			} else {
 				params.uploads.forEach( u=>{ makeRow(u); } );
 			}

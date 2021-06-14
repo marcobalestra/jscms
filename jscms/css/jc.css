@@ -168,6 +168,19 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
     min-height : 320px;
 }
 
+.jcGallery.inline a { box-shadow: -1px 0 #aaa, 1px 0 #aaa, 0 -1px #aaa, 0 1px #aaa; height: 240px; max-width: 100%; transform: none; width: 240px; }
+.jcGallery.inline.sizeXS a { height: 128px; width: 128px; }
+.jcGallery.inline.sizeS a { height: 180px; width: 180px; }
+.jcGallery.inline.sizeL a { height: 320px; width: 320px; }
+.jcGallery.inline.sizeXL a { height: 480px; width: 480px; }
+.jcGallery.inline.sizeXXL a { height: 640px; width: 640px; }
+.jcGallery.inline a:hover { box-shadow: -1px 0 #666, 1px 0 #666, 0 -1px #666, 0 1px #666; transform: none; }
+.jcGallery.inline a img { box-shadow: none; height: 100%; margin: 0; width: 100%; }
+.jcGallery.inline a svg {  width: 90%; height: 90%; margin: 5%; fill: #999; }
+.jcGallery.inline a:hover svg {  width: 90%; height: 90%; margin: 5%; fill: #336; }
+.jcGallery.inline a span { bottom: 10%; right: 2%; font-size: 100%; }
+
+
 .jcCarousel { display: block; width: 100%; margin: 1em 0; box-shadow: -1px 0 2px #666,0 1px 2px #666, 1px 0 2px #666,0 -1px 2px #666; }
 .jcCarousel .carousel-inner { background-color: #999; background-image : linear-gradient(to top,#666,#999,#ccc,#666); overflow: hidden; }
 .jcCarousel .carousel-item { height: 280px; text-align: center; }
