@@ -171,7 +171,7 @@
 			$tgt.html($ul.append('<hr/>'));
 			found.sort( (a,b) => (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1 ) ).forEach( (f) => {
 				let $li = $('<li class="jcEntry"></li>').append(
-					$('<span class="title"></span>').append(f.title).on('click',()=>{ jc.page.open(f.type,f.id); }),
+					$('<a class="title click"></a>').append(f.title).on('click',()=>{ jc.page.open(f.type,f.id); }),
 					$('<span class="date"></span>').html( (new Date(f.upd)).toLocaleDateString() )
 				);
 				if ( f.description && f.description.length) $li.append('<br />', $('<small class="desc"></small>').html(f.description));
