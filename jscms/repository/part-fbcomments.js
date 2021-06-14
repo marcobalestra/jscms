@@ -15,16 +15,21 @@
 					['hide','freehtml',{value:AS.label('Hide')+':',depends:'comments'}]
 				],
 			};
-			jc.edit.prop.pageTypes.sort().forEach( s => { fo.fields.push(['hide-'+s,'bool',{label:s,depends:'comments'}]) } );
+			jc.edit.prop.pageTypes.sort().forEach( s => {
+				let i = jc.edit.prop.pageTypesInfo[s];
+				if ( s.service ) return;
+				fo.fields.push(['hide-'+s,'bool',{label:(i.label||s),depends:'comments'}]) }
+			);
 			if ( AS.test.func(callback) ) callback.call(window,fo);
 			return fo;
 		},
 		render : ( data ) => {
 			$('.jcFbcomments').remove();
 			const $out = $('<div class="jcFbcomments"></div>');
-			let nocomment = ( (! data.comments) || data['hide-'+jc.page.current()] || (jc.page.data().pageContent.metadata && jc.page.data().pageContent.metadata.hideComments) );
+			const servicepage = (jc.page.data().template && jc.page.data().template.service);
+			let nocomment = ( servicepage || (! data.comments) || data['hide-'+jc.page.current()] || (jc.page.data().pageContent.metadata && jc.page.data().pageContent.metadata.hideComments) );
 			const head = document.documentElement.querySelector('head');
-			if ( nocomment && (! data.like) ) {
+			if ( servicepage || (nocomment && (! data.like)) ) {
 				$out.data('inactive',true);
 				if ( jc.page.prop.editMode == 'parts' ) {
 					$out.append(`<span class="jcPlaceHolder">Facebook comments — Inactive</span>`);
