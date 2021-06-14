@@ -135,6 +135,7 @@
 				));
 				$sel.select2({ width: '100%' });
 			} );
+			$('input[type="checkbox"]',$panes).on('change',makesearch);
 			$('input[name="filter"]',$panes).on('keyup',makesearch);
 			$('input[name="filter"],select',$panes).on('change',makesearch);
 			if ( AS.test.func(cb) ) cb.call(window);
@@ -148,6 +149,14 @@
 		const makesearch = ( cb ) => {
 			let filter = $('input.active[name="filter"]',$panes).val();
 			filter = filter ? filter.toLowerCase() : false;
+			if ( ! filter ) {
+				let qt = 0;
+				$('select.active',$panes).each( (idx,s) => { qt += $(s).select2('data').length } );
+				if ( ! qt ) {
+					$tgt.html('');
+					return;
+				}
+			}
 			let found = all.clone().filter( p => ( filter ? txtsearch(p,filter) : true ));
 			$('select.active',$panes).each( (idx,s) => {
 				let $s = $(s);
