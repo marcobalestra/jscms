@@ -1704,10 +1704,11 @@ jc.render = {
 	},
 	block : {
 		text : (b,d)=>{
-			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
-			let out = $(b.wrap||d.wrap||'<div></div>');
-			out.append( d[b.prop] );
-			return out;
+			let ct;
+			if ( AS.test.def(d[b.prop]) && AS.test.str(d[b.prop]) && d[b.prop].length ) ct = d[b.prop];
+			else if ( b.content && AS.test.str(b.content) && b.content.length ) ct = b.content;
+			if ( ! ct ) return undefined;
+			return $(b.wrap||d.wrap||'<div></div>').append( ct );
 		},
 		html : (b,d)=> {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;

@@ -78,6 +78,7 @@ AS.labels.load('it',[{
 	'SavingLasts' : 'Salvataggio degli ultimi aggiornamenti…',
 	'SavingPage' : 'Salvataggio pagina…',
 	'SavingTags' : 'Salvataggio tag…',
+	'Search' : 'Cerca',
 	'SelectBlockType' : 'Scegli un tipo',
 	'SelectBlockTypeDesc' : 'Scegli il tipo di blocco che vuoi aggiungere:',
 	'SelectPageType' : 'Scegli un tipo',

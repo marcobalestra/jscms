@@ -16,6 +16,7 @@
 				type:"blocks",
 				editable:true,
 				blocks:[
+					{ type:"text",content:`<button type="button" onclick="jc.page.open('searchtags')" style="float:right;">${ AS.label('Search') }</button>`, editable:false },
 					{ type:"text",wrap:"<h3></h3>",prop:"title" },
 					{ type:"text",wrap:`<h6 class="jcAbstract"></h6>`,prop:"abstract" },
 					{ type:"mixed",prop:"blocks" },
