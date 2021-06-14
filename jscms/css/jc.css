@@ -241,7 +241,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcMediaRecordArea video { max-width: 100%; display: block; }
 .jcMediaRecordArea.recording video, .jcMediaRecordArea.recording audio { opacity: .3; background-color : #c00; }
 
-.jcBoxRight { display: block; float: right; margin: 0 0 0 1em; max-width: 480px; }
+.jcBoxRight { display: block; float: right; margin: 0 0 0 1em; max-width: 480px; z-index: 2; }
 
 .jcMixedBlocks { overflow-y: auto; }
 
