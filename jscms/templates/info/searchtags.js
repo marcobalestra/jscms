@@ -103,8 +103,8 @@
 		const makeform = (cb) => {
 			if ( all ) {
 				let tid = AS.generateId('tag');
-				let $pc = $('<div class="row" title="'+AS.label('FilterTextHelp')+'"></div>');
-				let $sel = $(`<input type="text" name="filter" id="${tid}fld" value="" style="width:100%"/>`);
+				let $pc = $('<div class="row"></div>');
+				let $sel = $(`<input type="text" name="filter" id="${tid}fld" placeholder="${ AS.label('FilterTextHelp') }" value="" style="width:100%"/>`);
 				let $cb = $(`<input type="checkbox" class="mr-2"/>`).attr('id',tid).on('click',()=>{
 					let t = $cb.is(':checked');
 					$sel.closest('div').toggle( t );
