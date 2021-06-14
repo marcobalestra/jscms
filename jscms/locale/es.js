@@ -29,6 +29,8 @@ AS.labels.load('es',[{
 	'FileName' : 'Nombre',
 	'FileSize' : 'Tamaño',
 	'Filter' : 'Filtrar',
+	'FilterText' : 'Filtra el texto',
+	'FilterTextHelp' : 'El filtro actúa sobre título, descripción y palabras clave',
 	'FloatRight': 'A la derecha',
 	'ForceAlsoHidden' : 'Aunque sea escondida',
 	'GotoPage' : 'Ve a la página',

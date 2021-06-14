@@ -103,7 +103,7 @@
 		const makeform = (cb) => {
 			if ( all ) {
 				let tid = AS.generateId('tag');
-				let $pc = $('<div class="row"></div>');
+				let $pc = $('<div class="row" title="'+AS.label('FilterTextHelp')+'"></div>');
 				let $sel = $(`<input type="text" name="filter" id="${tid}fld" value="" style="width:100%"/>`);
 				let $cb = $(`<input type="checkbox" class="mr-2"/>`).attr('id',tid).on('click',()=>{
 					let t = $cb.is(':checked');
@@ -112,7 +112,7 @@
 					if ( t ) $sel.focus();
 				});
 				$panes.append( $('<div class="row"></div>').append(
-					$('<div class="col-lg-4"></div>').append( $cb, `<label for="${tid}">${ AS.label('Filter') }</label>`),
+					$('<div class="col-lg-4"></div>').append( $cb, `<label for="${tid}">${ AS.label('FilterText') }</label>`),
 					$('<div class="col-lg-8" style="display:none;"></div>').append( $sel ),
 				));
 			}

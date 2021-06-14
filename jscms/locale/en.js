@@ -20,6 +20,8 @@ AS.labels.load('en',[{
 	'FacebookIdHelp' : '<a href="https://www.facebook.com/help/1397933243846983" target="_blank">How to find your Facebook ID</a>\nThis value is required to activate comments: the user with such ID will be able to moderate comments.\nGeek? Get value from <code>c_user</code> FB cookie.',
 	'FileName' : 'File name',
 	'FileSize' : 'Weight',
+	'FilterText' : 'Filter text',
+	'FilterTextHelp' : 'Filter acts on title, description and keywords',
 	'FloatRight': 'On the right',
 	'ForceAlsoHidden' : 'Even if page is hidden',
 	'GotoPage' : 'Go to page',
