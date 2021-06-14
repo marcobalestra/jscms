@@ -1,3 +1,4 @@
 (()=>{
-	jc.template.repo.set('seachtags',{ form : { } });
+	let data = { form : { } };
+	jc.template.repo.set('seachtags',data);
 })();
