@@ -48,7 +48,14 @@
 			if ( ! nocomment ) {
 				$out.append(`<div class="fb-comments" data-href="${location.href.replace(/^[^:]+:../,'')}" data-width="550" data-numposts="${data.numposts}"></div>`);
 				$('meta[property="fb:admins"],meta[property="fb:app_id"]',head).remove();
-				$(head).append(`<meta property="fb:${ data.mod == 'A' ? 'app_id' : 'admins' }" content="${ data.fbid }"/>`);
+				let ids = data.fbid.replace(/[^0-9]+/g,' ').split(' ');
+				if ( data.mod == 'A') {
+					$(head).append(`<meta property="fb:app_id" content="${ ids[0] }"/>`);
+				} else {
+					ids.forEach( i => {
+						$(head).append(`<meta property="fb:admins" content="${ i }"/>`);
+					} );
+				}
 			}
 			if ( ! $(document.body).data('jcFbcommentsEvent') ) {
 				$(document.body).on('jc_render_end',()=>{
