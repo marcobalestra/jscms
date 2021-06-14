@@ -48,8 +48,8 @@
 			}
 			$('span.badge',$panes).removeClass('badge-primary badge-danger').addClass('badge-secondary');
 			$b.removeClass('badge-secondary').addClass('badge-danger');
+			$tgt.html('');
 			jc.lists.tag.get( $b.data('family'),(l)=>{
-				$tgt.html('');
 				let $ul = $('<ul></ul>');
 				(AS.def.arr(l[$b.data('tag')])).sort( (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1 ) ).forEach( e => {
 					let $li = $('<li></li>');
@@ -71,6 +71,8 @@
 			let tid = $('a.nav-link[data-family="'+family+'"]',$tabs).attr('aria-controls');
 			let $pane = $('#'+tid,$panes);
 			let found = false;
+			$pane.html('<span class="jcPlaceHolder">'+AS.label('Loading')+'…</span>');
+			$tgt.html('').removeData();
 			jc.lists.tag.get( family,(l)=>{
 				$pane.html('');
 				let $ul = $('<p class="mt-1"></p>');
@@ -88,7 +90,6 @@
 				delete jc.page.data().args.t;
 				jc.URI.push();
 				$pane.append($ul);
-				$tgt.html('').removeData();
 				if ( found ) {
 					makelist(found,cb);
 				} else if ( AS.test.func(cb)) {
