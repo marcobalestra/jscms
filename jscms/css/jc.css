@@ -243,7 +243,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcMediaRecordArea.recording video, .jcMediaRecordArea.recording audio { opacity: .3; background-color : #c00; }
 
 .jcBoxRight { display: block; float: right; margin: 0 0 0 1em; max-width: 480px; z-index: 2; }
-.jcEditable .jcBoxRight { float: unset; text-align: right; margin-left: calc(100% - 480px); }
+.jcEditable .jcBoxRight { float: unset; margin-left: calc(100% - 480px); }
 
 .jcMixedBlocks { overflow-y: auto; }
 
