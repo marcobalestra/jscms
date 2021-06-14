@@ -8,7 +8,8 @@
 					['type','hidden',{value:"fbcomments"}],
 					['active','bool',{asLabel:'Active'}],
 					['like','bool',{asLabel:'UseFbLike',depends:'active'}],
-					['fbid','text',{asLabel:'FacebookID',trim:true,skipempty:true,asHelp:'FacebookIdHelp'}],
+					['mod','select',{asLabel:'Moderator',options:[{value:'',label:AS.label('None')},{value:'U',label:'FB user'},{value:'A',label:'FB app/page/group'}]}],
+					['fbid','text',{asLabel:'FacebookID',trim:true,skipempty:true,asHelp:'FacebookIdHelp',depends:'mod'}],
 					['comments','bool',{asLabel:'UseFbComments',depends:'active,fbid'}],
 					['numposts','slider',{asLabel:'Max',min:1,max:100,report:{value:true},default:10,depends:'comments'}],
 					['hide','freehtml',{value:AS.label('Hide')+':',depends:'comments'}]
@@ -46,8 +47,8 @@
 			}
 			if ( ! nocomment ) {
 				$out.append(`<div class="fb-comments" data-href="${location.href.replace(/^[^:]+:../,'')}" data-width="550" data-numposts="${data.numposts}"></div>`);
-				$('meta[property="fb:admins"]',head).remove();
-				$(head).append(`<meta property="fb:admins" content="${ data.fbid }"/>`);
+				$('meta[property="fb:admins"],meta[property="fb:app_id"]',head).remove();
+				$(head).append(`<meta property="fb:${ data.mod == 'A' ? 'app_id' : 'admins' }" content="${ data.fbid }"/>`);
 			}
 			if ( ! $(document.body).data('jcFbcommentsEvent') ) {
 				$(document.body).on('jc_render_end',()=>{
