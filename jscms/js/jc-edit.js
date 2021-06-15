@@ -657,7 +657,7 @@ jc.page.makeStatic = ( cb ) => {
 		return;
 	}
 	$(document.body).trigger('jc_saving_static');
-	const uri = AS.path('jsdatastatics')+jc.page.current()+(jc.page.data().id||jc.page.data().pageContent.id||'')+'.html';
+	const uri = AS.path('jsdatastatics')+jc.page.current()+(jc.page.data() && jc.page.data().id||(jc.page.data().pageContent && jc.page.data().pageContent.id)||'')+'.html';
 	let cn = document.body.className;
 	let cs = document.body.getAttribute('style');
 	document.body.className = '';

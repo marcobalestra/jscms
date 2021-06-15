@@ -1564,10 +1564,13 @@ jc.render = {
 			if (AS.test.udef(jc.render.prop.pending)) jc.render.prop.pending = 0;
 			jc.render.prop.pending += delta;
 			if ( jc.render.prop.pending == 0 ) {
-				$(document.body).trigger('jc_render_end');
-				jc.console('Rendering is over');
-				window.scrollTo(0,0);
-				delete jc.render.prop.pending;
+				if ( jc.render.prop.overtimeout ) window.clearTimeout( jc.render.prop.overtimeout );
+				jc.render.prop.overtimeout = setTimeout( ()=>{
+					delete jc.render.prop.overtimeout;
+					delete jc.render.prop.pending;
+					$(document.body).trigger('jc_render_end');
+					jc.console('Rendering is over');
+				},100);
 			}
 		}
 		return jc.render.prop.pending;
