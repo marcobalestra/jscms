@@ -46,8 +46,8 @@
 				const pd = jc.page.data().pageContent;
 				let fo = {};
 				fo.uri = encodeURIComponent(window.location.href);
-				fo.title = encodeURIComponent(((pd.metadata && pd.metadata.title && pd.metadata.title.length) ? pd.metadata.title : 'Look at this page')+': ');
-				fo.desc = ((pd.metadata && pd.metadata.desc && pd.metadata.desc.length) ? encodeURIComponent(pd.metadata.desc) : fo.title);
+				fo.title = encodeURIComponent(((pd && pd.metadata && pd.metadata.title && pd.metadata.title.length) ? pd.metadata.title : 'Look at this page')+': ');
+				fo.desc = (( pd && pd.metadata && pd.metadata.desc && pd.metadata.desc.length) ? encodeURIComponent(pd.metadata.desc) : fo.title);
 				shares.forEach( s => {
 					if ( blockdata['hide-'+s.key] ) return;
 					$('a.jcSharing-'+s.key).attr('href',AS.label(s.key,fo,'sharethis'));
