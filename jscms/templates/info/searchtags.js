@@ -192,7 +192,7 @@
 				} );
 			} );
 			let $ul = $('<ul class="jcEntries"></ul>');
-			$tgt.html('<div><span class="jcPlaceHolder">'+found.length+'</span></div>').append($ul);
+			$tgt.html('<div><span class="jcPlaceHolder">'+AS.label('Results')+': '+found.length+'</span></div>').append($ul);
 			found.sort( (a,b) => (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1 ) ).forEach( (f) => {
 				let $li = $('<li class="jcEntry"></li>').append(
 					$('<a class="title click"></a>').append(f.title).on('click',()=>{ jc.page.open(f.type,f.id); }),

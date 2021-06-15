@@ -75,6 +75,7 @@ AS.labels.load('es',[{
 	'RecordAudio' : 'Registra en audio',
 	'RecordVideo' : 'Registra en video',
 	'RelatedPages' : 'Páginas relacionadas',
+	'Results' : 'Resultados',
 	'Save' : 'Guardar',
 	'SaveChangesBody' : '¿Quieres guardar los cambios de la página?',
 	'SaveChangesTitle': 'Cierre editor',
