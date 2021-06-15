@@ -158,8 +158,8 @@ jc.maint = {
 	scan : ( cb ) => {
 		let pd = jc.page.data().pageContent;
 		let page = jc.page.current();
-		jc.progressbar({ text:'Scan: '+pd.metadata.title });
-		let nm = JSON.parse(JSON.stringify(pd.metadata));
+		if ( pd && pd.metadata ) jc.progressbar({ text:'Scan: '+pd.metadata.title });
+		let nm = JSON.parse(JSON.stringify(pd.metadata||{}));
 		if ( pd.blogdate ) nm.date = pd.blogdate;
 		if ( ! jc.maint.prop.full[page] ) jc.maint.prop.full[page] = {};
 		jc.maint.prop.full[page][String((pd.id||0))] = nm;
