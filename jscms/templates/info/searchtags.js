@@ -59,6 +59,7 @@
 		const $filter = $('<div class="jcTagsSearchFilter container"></div>');
 		const $panes = $('<div class="jcTagsSearchPars container" style="display:none;"></div>');
 		const $tgt = $('<div class="jcTagsFound mt-1" id="'+AS.generateId('tagsfound')+'"></div>').css('min-height','200px');
+		let nosearch = false;
 		$div.append( $filter, $panes, $tgt );
 		let all, ttags, tdata, totsteps; 
 		const load = ( cb ) => {
@@ -99,8 +100,10 @@
 				let newall = [];
 				Object.keys(all).forEach( pt => {
 					Object.keys( all[pt] ).forEach( id => {
-						if ( all[pt][id].tags ) all[pt][id].tags = all[pt][id].tags.join(', ');
-						newall.push( all[pt][id] );
+						let p = all[pt][id];
+						if ( p.hidden ) return;
+						if ( p.tags ) p.tags = p.tags.join(', ');
+						newall.push( p );
 					} );
 				} );
 				all = newall;
@@ -168,6 +171,7 @@
 			return false;
 		};
 		const makesearch = ( cb ) => {
+			if ( nosearch ) return;
 			let filter = $('input[name="filter"]',$filter).val();
 			filter = filter ? filter.toLowerCase().split(/\W+/).filter( x => (x && (x.length > 2))) : false;
 			let found, sels = $panes.hasClass('active') ? $('select.active',$panes) : false;
@@ -195,7 +199,11 @@
 			$tgt.html('<div><span class="jcPlaceHolder">'+AS.label('Results')+': '+found.length+'</span></div>').append($ul);
 			found.sort( (a,b) => (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1 ) ).forEach( (f) => {
 				let $li = $('<li class="jcEntry"></li>').append(
-					$('<a class="title click"></a>').append(f.title).on('click',()=>{ jc.page.open(f.type,f.id); }),
+					$(`<a class="title click">${ f.title }</a>`)
+						.on('click',()=>{ jc.page.open(f.type,f.id);})
+						.on('mouseenter',()=>{ nosearch = true;})
+						.on('mouseleave',()=>{ nosearch = false;})
+					,
 					$('<span class="date"></span>').html( (new Date(f.upd)).toLocaleDateString() )
 				);
 				if ( f.description && f.description.length) $li.append('<br />', $('<small class="desc"></small>').html(f.description));

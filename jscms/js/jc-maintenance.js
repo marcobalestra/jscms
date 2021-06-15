@@ -1,20 +1,27 @@
 jc.maint = {
 	prop : { full: {} },
 	prog : (options) => {
-		if ( ! Swal.getContainer() ) {
-			Swal.fire({
+		if ( ! jc.maint.prop.swal ) {
+			jc.maint.prop.swal = Swal.fire({
 				toast: true,
 				title : '<div class="jcProgressbar"></div>',
 				html : ' ',
 				position: 'top-end',
 				showConfirmButton : false,
 			});
+			return setTimeout( ()=>{ jc.maint.prog(options) }, 10 );
 		}
-		if ( ! Swal.isVisible() ) return setTimeout( ()=>{ jc.maint.prog(options) }, 10 );
+		if ( options.close ) {
+			let e;
+			try { Swal.close(); } catch(e) {};
+			try { jc.maint.prop.swal._destroy(); } catch(e) {};
+			delete jc.maint.prop.swal;
+			return;
+		}
 		let newopts = {};
 		if ( options.text ) newopts.html = `${ options.text }`;
 		if ( options.prog ) newopts.title = `<div class="jcProgressbar"><div style="width:${ 100 * options.prog }%;"></div></div>`;
-		Swal.update(newopts);
+		jc.maint.prop.swal.update(newopts);
 	},
 	start : () => { jc.maint.proc({}); },
 	proc : ( params ) => {
@@ -27,7 +34,7 @@ jc.maint = {
 					jc.maint.prop.uploads[k] = true;
 					jc.maint.prop.uploadsOrphans[k] = true;
 				} );;
-				jc.maint.proc( params );
+				setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 			});
 			return;
 		}
@@ -41,14 +48,16 @@ jc.maint = {
 		}
 		if ( ! (params.scanlist||params.tobescanned) ) {
 			params.initial = { page: jc.page.current(), id : jc.page.data().id };
-			if ( ! params.afterscan ) params.afterscan = ()=>{ jc.maint.scan( ()=>{
-				jc.maint.proc( params )
-			})};
+			if ( ! params.afterscan ) params.afterscan = ()=>{
+				jc.maint.scan( ()=>{
+					setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
+				})
+			};
 			jc.maint.prog({ text:'Listing pages…'});
 			jc.jdav.ls({dir:'pages'},(x) => {
 				params.tobescanned = x.list;
 				params.totpages = x.list.length;
-				jc.maint.proc( params );
+				setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 			});
 			return;
 		}
@@ -66,7 +75,8 @@ jc.maint = {
 			let page = nxt.replace(/^([^0-9.]+).*/,"$1");
 			let id = nxt.match(/^[^0-9]+[0-9]+\..*$/) ? parseInt( nxt.replace(/^[^0-9]+([0-9]+)\..*$/,"$1")) : undefined;
 			if ( isfirst && (page == params.initial.page) && ( id == params.initial.id )) {
-				params.afterscan()
+				params.tobescanned.push( params.scanlist.pop() );
+				setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 			} else {
 				jc.page.open( page, id );
 			}
@@ -85,20 +95,20 @@ jc.maint = {
 				jc.jdav.ls({dir:'struct'},(x) => {
 					params.tbdLists = x.list;
 					params.tbdCount = params.tbdLists.length;
-					jc.maint.proc( params );
+					setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 				});
 				return;
 			}
 			if ( params.tbdLists.length ) {
 				jc.maint.prog({ prog: (parseInt(10*(params.tbdCount - params.tbdLists.length)/params.tbdCount)/10) });
 				jc.dav.rm('struct/'+params.tbdLists.shift(),()=>{
-					jc.maint.proc( params );
+					setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 				});
 			} else {
 				params.listsPurged = true;
 				delete params.tbdLists;
 				delete params.tbdCount;
-				jc.maint.proc( params );
+				setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 			}
 			return;
 		}
@@ -108,7 +118,7 @@ jc.maint = {
 				jc.maint.prog({ prog: .3 });
 				jc.page.makeLasts( jc.maint.prop.full, ()=>{
 					params.savedFullList = true;
-					jc.maint.proc( params );
+					setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 				});
 			});
 			return;
@@ -124,7 +134,7 @@ jc.maint = {
 				jc.lists.list.set(k,jc.maint.prop.full[k],()=>{
 					jc.page.makeTypeLasts( k, jc.maint.prop.full[k], ()=>{
 						jc.page.makeTypeDates( k, jc.maint.prop.full[k], ()=>{
-							jc.maint.proc( params );
+							setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 						});
 					});
 				});
@@ -132,7 +142,7 @@ jc.maint = {
 				params.savedTypeLists = true;
 				delete params.ptypes;
 				delete params.ptypesCount;
-				jc.maint.proc( params );
+				setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 			}
 			return;
 		}
@@ -145,19 +155,19 @@ jc.maint = {
 				let k = params.tagnames.shift();
 				jc.maint.prog({ text: 'Saving tags: '+k, prog: (parseInt(10*(params.tagnamesCount - params.tagnames.length)/params.tagnamesCount)/10) });
 				jc.lists.tag.set(k,jc.maint.prop.tags[k],()=>{
-					jc.maint.proc( params );
+					setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 				});
 			} else {
 				params.savedTagsLists = true;
 				delete params.tagnames;
 				delete params.tagnamesCount;
-				jc.maint.proc( params );
+				setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 			}
 			return;
 		}
-		Swal.close();
-		jc.page.open( params.initial.page, params.initial.id );
+		jc.maint.prog({close:true});
 		jc.maint.prop = { full: {} };
+		jc.page.open( params.initial.page, params.initial.id );
 	},
 	scan : ( cb ) => {
 		let pd = jc.page.data().pageContent;
