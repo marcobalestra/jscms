@@ -794,7 +794,7 @@ jc.URI = {
 		let uri = '';
 		if ( AS.test.obj(o)) {
 			if ( ! AS.test.str(o.page) ) return '/';
-			uri += encodeURIComponent(o.page);
+			uri += encodeURIComponent(o.page||o.type);
 			if ( o.id ) {
 				uri += o.id;
 			}
