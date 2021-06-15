@@ -56,27 +56,23 @@
 			swalalert.update(newopts);
 		};
 		const $div = $('<div class="jcTagsSearch" id="'+AS.generateId('tagssearch')+'"></div>');
-		const $panes = $('<div class="jcTagsSearchPars container" id="'+AS.generateId('tagssearchpars')+'"></div>');
+		const $filter = $('<div class="jcTagsSearchFilter container"></div>');
+		const $panes = $('<div class="jcTagsSearchPars container" style="display:none;"></div>');
 		const $tgt = $('<div class="jcTagsFound" id="'+AS.generateId('tagsfound')+'"></div>').css('min-height','200px');
-		$div.append( $panes, $tgt );
+		$div.append( $filter, $panes, $tgt );
 		let all, ttags, tdata, totsteps; 
 		const load = ( cb ) => {
 			if ( ! jc.prop.site ) return setTimeout( ()=>{ load(cb) },100);
 			if ( ! tdata ) {
 				tdata = {};
 				ttags = AS.def.arr( jc.prop.site.tags ).map( x => x.name );
-				totsteps = 1 + ttags.length;
+				totsteps = 2 + ttags.length;
 			}
 			if ( ! all ) {
 				prog({text:AS.label('Loading')+'…',prog:(0)});
 				jc.lists.list.get( (l) => {
-					all = [];
-					Object.keys(l).forEach( pt => {
-						Object.keys( l[pt] ).forEach( id => {
-							all.push( l[pt][id] );
-						} );
-					} );
-					load(cb);
+					all = l;
+					setTimeout( ()=>{ load(cb) }, 1);
 				});
 				return;
 			}
@@ -85,15 +81,37 @@
 				prog({prog:((1+Object.keys(tdata).length)/totsteps)});
 				jc.lists.tag.get( nt, tt => {
 					tdata[nt] = tt;
-					load(cb);
+					setTimeout( ()=>{ load(cb) }, 1);
 				});
 				return;
 			}
-			if ( totsteps ) {
+			if ( ! AS.test.arr(all) ) {
 				prog({prog:((1+Object.keys(tdata).length)/totsteps)});
+				Object.keys(tdata).forEach( tf => {
+					Object.keys( tdata[tf] ).forEach( k => {
+						tdata[tf][k].forEach( pt => {
+							let tp = all[pt.type][String(pt.id||0)];
+							if ( ! tp.tags ) tp.tags = [];
+							if ( ! tp.tags.find( x => ( x == k.toLowerCase()))) tp.tags.push(k.toLowerCase());
+						} );
+					} );
+				} );
+				let newall = [];
+				Object.keys(all).forEach( pt => {
+					Object.keys( all[pt] ).forEach( id => {
+						if ( all[pt][id].tags ) all[pt][id].tags = all[pt][id].tags.join(', ');
+						newall.push( all[pt][id] );
+					} );
+				} );
+				all = newall;
+				setTimeout( ()=>{ load(cb) }, 1);
+				return;
+			}
+			if ( totsteps ) {
+				prog({prog:1});
 				makeform( ()=>{
 					totsteps=0;
-					load(cb);
+					setTimeout( ()=>{ load(cb) }, 1);
 				});
 				return;
 			}
@@ -105,16 +123,16 @@
 				let tid = AS.generateId('tag');
 				let $pc = $('<div class="row"></div>');
 				let $sel = $(`<input type="text" name="filter" id="${tid}fld" placeholder="${ AS.label('FilterTextHelp') }" value="" style="width:100%"/>`);
-				let $cb = $(`<input type="checkbox" class="mr-2"/>`).attr('id',tid).on('click',()=>{
-					let t = $cb.is(':checked');
-					$sel.closest('div').toggle( t );
-					$sel.toggleClass('active', t );
-					if ( t ) $sel.focus();
-				});
-				$panes.append( $('<div class="row"></div>').append(
-					$('<div class="col-lg-4"></div>').append( $cb, `<label for="${tid}">${ AS.label('FilterText') }</label>`),
-					$('<div class="col-lg-8" style="display:none;"></div>').append( $sel ),
-				));
+				$filter.append( $('<div class="row"></div>').append( $('<div class="col-lg-8"></div>').append( $sel ) ));
+				if ( jc.prop.site.tags && jc.prop.site.tags.length ) {
+					let $cb = $(`<input type="checkbox" class="mr-2"/>`).attr('id',tid).on('click',()=>{
+						let t = $cb.is(':checked');
+						$panes.toggle( t );
+						$panes.toggleClass('active', t );
+					});
+					$('div.row',$filter).append( $('<div class="col-lg-4"></div>').append( $cb, `<label for="${tid}">${ AS.label('Advanced') }</label>`) );
+					$panes.append( '<hr />' );
+				}
 			}
 			AS.def.arr( jc.prop.site.tags ).forEach( to => {
 				let keys = Object.keys(tdata[to.name]);
@@ -135,30 +153,35 @@
 				));
 				$sel.select2({ width: '100%', multiple: true });
 			} );
-			$('input[type="checkbox"]',$panes).on('change',makesearch);
-			$('input[name="filter"]',$panes).on('keyup',makesearch);
-			$('input[name="filter"],select',$panes).on('change',makesearch);
+			$('input[type="checkbox"]',$div).on('change',makesearch);
+			$('input[name="filter"]',$filter).on('keyup change',makesearch);
+			$('select',$panes).on('change',makesearch);
 			if ( AS.test.func(cb) ) cb.call(window);
 		};
-		const txtsearch = ( p, t ) => {
-			if ( p.title && p.title.toLowerCase().indexOf(t) >= 0 ) return true;
-			if ( p.description && p.description.toLowerCase().indexOf(t) >= 0 ) return true;
-			if ( p.keywords && p.keywords.toLowerCase().indexOf(t) >= 0 ) return true;
+		const asearch = ( txt, fs ) => ( fs.find( f => (txt.toLowerCase().indexOf(f) >= 0) ) );
+		const dosearch = ( p, t ) => {
+			if ( p.title && asearch(p.title,t)) return true;
+			if ( p.description && asearch(p.description,t)) return true;
+			if ( p.keywords && asearch(p.keywords,t)) return true;
+			if ( p.tags && asearch(p.tags,t)) return true;
 			return false;
 		};
 		const makesearch = ( cb ) => {
-			let filter = $('input.active[name="filter"]',$panes).val();
-			filter = filter ? filter.toLowerCase() : false;
-			if ( ! filter ) {
+			let filter = $('input[name="filter"]',$filter).val();
+			filter = filter ? filter.toLowerCase().split(/\W+/).filter( x => (x && (x.length > 1))) : false;
+			let found, sels = $panes.hasClass('active') ? $('select.active',$panes) : false;
+			if ( filter && filter.length) {
+				found = all.clone().filter( p => ( dosearch(p,filter) ) );
+			} else {
 				let qt = 0;
-				$('select.active',$panes).each( (idx,s) => { qt += $(s).select2('data').length } );
+				if ( sels ) sels.each( (idx,s) => { qt += $(s).select2('data').length } );
 				if ( ! qt ) {
 					$tgt.html('');
 					return;
 				}
+				found = all.clone();
 			}
-			let found = all.clone().filter( p => ( filter ? txtsearch(p,filter) : true ));
-			$('select.active',$panes).each( (idx,s) => {
+			if ( sels ) sels.each( (idx,s) => {
 				let $s = $(s);
 				let keys = $s.select2('data').map( x => x.id );
 				if ( ! keys.length ) return;
@@ -168,7 +191,7 @@
 				} );
 			} );
 			let $ul = $('<ul class="jcEntries"></ul>');
-			$tgt.html($ul.append('<hr/>'));
+			$tgt.html('<div><span class="jcPlaceHolder">'+found.length+'</span></div>').append($ul);
 			found.sort( (a,b) => (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1 ) ).forEach( (f) => {
 				let $li = $('<li class="jcEntry"></li>').append(
 					$('<a class="title click"></a>').append(f.title).on('click',()=>{ jc.page.open(f.type,f.id); }),

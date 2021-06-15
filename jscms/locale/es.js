@@ -1,4 +1,5 @@
 AS.labels.load('es',[{
+	'Advanced','Avanzada',
 	'Attachments' : 'Adjuntos',
 	'blockAddContent' : 'Añadir bloque',
 	'blockContent' : 'Contenido',
@@ -30,7 +31,7 @@ AS.labels.load('es',[{
 	'FileSize' : 'Tamaño',
 	'Filter' : 'Filtrar',
 	'FilterText' : 'Filtra el texto',
-	'FilterTextHelp' : 'El filtro actúa sobre título, descripción y palabras clave',
+	'FilterTextHelp' : 'Título, descripción, palabras clave y etiquetas',
 	'FloatRight': 'A la derecha',
 	'ForceAlsoHidden' : 'Aunque sea escondida',
 	'GotoPage' : 'Ve a la página',

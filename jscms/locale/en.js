@@ -21,7 +21,7 @@ AS.labels.load('en',[{
 	'FileName' : 'File name',
 	'FileSize' : 'Weight',
 	'FilterText' : 'Filter text',
-	'FilterTextHelp' : 'Filter acts on title, description and keywords',
+	'FilterTextHelp' : 'Title, description, keywords and tags',
 	'FloatRight': 'On the right',
 	'ForceAlsoHidden' : 'Even if page is hidden',
 	'GotoPage' : 'Go to page',
