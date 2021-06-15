@@ -1,5 +1,5 @@
 AS.labels.load('it',[{
-	'Advanced','Avanzata',
+	'Advanced':'Avanzata',
 	'Attachments' : 'Allegati',
 	'blockAddContent' : 'Aggiungi un blocco',
 	'blockContent' : 'Contenuto',
