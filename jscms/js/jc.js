@@ -2013,8 +2013,9 @@ jc.render = {
 					}
 				} );
 				if ( list && list.length ) {
-					let pd = jc.page.data();
-					list = list.filter( x => ( ! ( (x.type==pd.type)&&(x.id==pd.id) )));
+					let pt = jc.page.current();
+					let id =jc.page.data().id;
+					list = list.filter( x => ( ! ( (x.type==pt)&&(x.id==id) )));
 				};
 				if ( list && list.length ) {
 					if ( d.title ) $div.append( $('<h5></h5>').append(d.title) );
