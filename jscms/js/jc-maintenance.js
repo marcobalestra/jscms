@@ -1,6 +1,7 @@
 jc.maint = {
 	prop : { full: {} },
 	prog : (options) => {
+		let e;
 		if ( ! jc.maint.prop.swal ) {
 			jc.maint.prop.swal = Swal.fire({
 				toast: true,
@@ -12,7 +13,6 @@ jc.maint = {
 			return setTimeout( ()=>{ jc.maint.prog(options) }, 10 );
 		}
 		if ( options.close ) {
-			let e;
 			try { Swal.close(); } catch(e) {};
 			try { jc.maint.prop.swal._destroy(); } catch(e) {};
 			delete jc.maint.prop.swal;
@@ -21,7 +21,7 @@ jc.maint = {
 		let newopts = {};
 		if ( options.text ) newopts.html = `${ options.text }`;
 		if ( options.prog ) newopts.title = `<div class="jcProgressbar"><div style="width:${ 100 * options.prog }%;"></div></div>`;
-		jc.maint.prop.swal.update(newopts);
+		if (jc.maint.prop.swal && Swal.isVisible() ) try { jc.maint.prop.swal.update(newopts); } catch(e){ }
 	},
 	start : () => { jc.maint.proc({}); },
 	proc : ( params ) => {
@@ -48,11 +48,6 @@ jc.maint = {
 		}
 		if ( ! (params.scanlist||params.tobescanned) ) {
 			params.initial = { page: jc.page.current(), id : jc.page.data().id };
-			if ( ! params.afterscan ) params.afterscan = ()=>{
-				jc.maint.scan( ()=>{
-					setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
-				})
-			};
 			jc.maint.prog({ text:'Listing pages…'});
 			jc.jdav.ls({dir:'pages'},(x) => {
 				params.tobescanned = x.list;
@@ -64,9 +59,21 @@ jc.maint = {
 		if ( params.tobescanned ) {
 			let isfirst = false;
 			if ( ! params.scanlist ) {
-				$(document.body).on('jc_page_open_completed',params.afterscan);
 				params.scanlist = [];
 				isfirst = true;
+			}
+			if ( ! params.afterscan ) {
+				params.afterscan = ()=>{
+					console.log('AFTERSCAN');
+					console.log( JSON.stringify(params.scanlist) );
+					console.log( JSON.stringify(params.tobescanned) );
+					if ( jc.maint.prop.swal ) setTimeout( ()=>{
+						jc.maint.scan( ()=>{
+							setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
+						})
+					},100);
+				};
+				$(document.body).on('jc_page_open_completed',params.afterscan);
 			}
 			let nxt = params.tobescanned.shift();
 			jc.maint.prog({ text:'Loading page…', prog: (parseInt(10*(params.totpages - params.tobescanned.length)/params.totpages)/10) });
@@ -74,11 +81,12 @@ jc.maint = {
 			if ( ! params.tobescanned.length ) delete params.tobescanned;
 			let page = nxt.replace(/^([^0-9.]+).*/,"$1");
 			let id = nxt.match(/^[^0-9]+[0-9]+\..*$/) ? parseInt( nxt.replace(/^[^0-9]+([0-9]+)\..*$/,"$1")) : undefined;
+			console.log(page,id);
 			if ( isfirst && (page == params.initial.page) && ( id == params.initial.id )) {
 				params.tobescanned.push( params.scanlist.pop() );
 				setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 			} else {
-				jc.page.open( page, id );
+				setTimeout( ()=> { jc.page.open( page, id ); }, 10 );
 			}
 			return;
 		}
@@ -166,8 +174,10 @@ jc.maint = {
 			return;
 		}
 		jc.maint.prog({close:true});
-		jc.maint.prop = { full: {} };
-		jc.page.open( params.initial.page, params.initial.id );
+		setTimeout( ()=>{
+			jc.maint.prop = { full: {} };
+			jc.page.open( params.initial.page, params.initial.id );
+		},10);
 	},
 	scan : ( cb ) => {
 		let pd = jc.page.data().pageContent;

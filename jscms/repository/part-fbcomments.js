@@ -47,8 +47,9 @@
 			}
 			if ( ! AS.test.num(data.numposts) ) data.numposts = 10;
 			if ( ! (window.FB && window.FB.XFBML)) {
-				if ( ! $('#fb-root') ) $(document.body).prepend('<div id="fb-root"></div>');
-				$out.append(`<script async defer crossorigin="anonymous" src="https://connect.facebook.net/${data.language}/sdk.js#xfbml=1&version=v10.0"></script>`);
+// 				if ( ! $('#fb-root') ) $(document.body).prepend('<div id="fb-root"></div>');
+				$out.append('<div id="fb-root"></div>');
+				$out.append(`<script async defer crossorigin="anonymous" src="https://connect.facebook.net/${data.language}/sdk.js#xfbml=1&version=v11.0"></script>`);
 			}
 			if ( data.like ) {
 				$out.append(`<div class="fb-like" data-href="${location.href.replace(/^[^:]+:../,'')}" data-width="550" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>`);
@@ -60,6 +61,14 @@
 					let ids = String(data.fbid).replace(/[^0-9]+/g,' ').split(' ');
 					if ( data.mod == 'A') {
 						$(head).append(`<meta property="fb:app_id" content="${ ids[0] }"/>`);
+						window.fbAsyncInit = function() {
+							FB.init({
+								appId      : ids[0],
+								xfbml      : true,
+								version    : 'v11.0'
+							});
+							FB.AppEvents.logPageView();
+						};
 					} else {
 						ids.forEach( i => { $(head).append(`<meta property="fb:admins" content="${ i }"/>`); } );
 					}
