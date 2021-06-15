@@ -159,7 +159,7 @@
 			$('select',$panes).on('change',makesearch);
 			if ( AS.test.func(cb) ) cb.call(window);
 		};
-		const asearch = ( txt, fs ) => ( fs.find( f => (txt.toLowerCase().indexOf(f) >= 0) ) );
+		const asearch = ( txt, fs ) => ( ! fs.find( f => ( txt.toLowerCase().indexOf(f) < 0) ) );
 		const dosearch = ( p, t ) => {
 			if ( p.title && asearch(p.title,t)) return true;
 			if ( p.description && asearch(p.description,t)) return true;
