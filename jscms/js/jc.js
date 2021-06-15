@@ -793,7 +793,7 @@ jc.URI = {
 	encode : (o,title,parsdata)=>{
 		let uri = '';
 		if ( AS.test.obj(o)) {
-			if ( ! AS.test.str(o.page) ) return '/';
+			if ( ! AS.test.str(o.page||o.type) ) return '/';
 			uri += encodeURIComponent(o.page||o.type);
 			if ( o.id ) {
 				uri += o.id;
@@ -2024,7 +2024,7 @@ jc.render = {
 					list.forEach( i => {
 						if ( ! ( i && i.type )) return;
 						let $li = $('<'+nodes[1]+' class="jcPbytgagEntry jcEntry"></'+nodes[1]+'>');
-						let $a = $(`<a class="title" href="${ jc.URI.encode(i,i.url) }"></a>`).on('click',(e)=>{
+						let $a = $(`<a class="title" href="${ jc.URI.encode(i) }"></a>`).on('click',(e)=>{
 							e.preventDefault();
 							jc.page.open(i.type,i.id);
 						}).html(i.title);
