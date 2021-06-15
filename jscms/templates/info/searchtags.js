@@ -122,13 +122,14 @@
 			if ( all ) {
 				let tid = AS.generateId('tag');
 				let $pc = $('<div class="row"></div>');
-				let $sel = $(`<input type="text" name="filter" id="${tid}fld" placeholder="${ AS.label('FilterTextHelp') }" value="" style="width:100%"/>`);
+				let $sel = $(`<input type="search" name="filter" class="form-control" placeholder="${ AS.label('FilterTextHelp') }" value="" style="width:100%"/>`);
 				$filter.append( $('<div class="row"></div>').append( $('<div class="col-lg-8"></div>').append( $sel ) ));
 				if ( jc.prop.site.tags && jc.prop.site.tags.length ) {
 					let $cb = $(`<input type="checkbox" class="mr-2"/>`).attr('id',tid).on('click',()=>{
 						let t = $cb.is(':checked');
 						$panes.toggle( t );
 						$panes.toggleClass('active', t );
+						$('input[name="filter"]',$filter).focus();
 					});
 					$('div.row',$filter).append( $('<div class="col-lg-4"></div>').append( $cb, `<label for="${tid}">${ AS.label('Advanced') }</label>`) );
 					$panes.append( '<hr />' );
@@ -203,7 +204,10 @@
 			if ( AS.test.func(cb) ) cb.call(window);
 		};
 		jc.render.queue(1);
-		load( ()=>{ jc.render.queue(-1); });
+		load( ()=>{
+			$('input[name="filter"]',$filter).focus();
+			jc.render.queue(-1);
+		});
 		return $div;
 	};
 	jc.template.info.set('searchtags',ti);
