@@ -1388,7 +1388,8 @@ jc.page = {
 					let keywords = (md.keywords ? md.keywords : '').split(/, */);
 					jc.objFindAll(jc.objFindAll(j,'type','tags'),'show').forEach( tf => {
 						if ( tf.tags ) tf.tags.forEach( (t) => {
-							keywords.push( t.tag.toLowerCase() );
+							let tt = t.tag.toLowerCase();
+							if ( ! keywords.find( x => (x == tt))) keywords.push( tt );
 						} );
 					});
 					if ( keywords.length ) {
