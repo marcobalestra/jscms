@@ -1385,7 +1385,15 @@ jc.page = {
 					const h = document.documentElement.querySelector('head');
 					const md = j.metadata;
 					if ( md.title ) $('title',h).html(md.title);
-					if ( md.keywords ) $('meta[name="keywords"]',h).attr('content',md.keywords);
+					let keywords = (md.keywords ? md.keywords : '').split(/, */);
+					jc.objFindAll(jc.objFindAll(j,'type','tags'),'show').forEach( tf => {
+						if ( tf.tags ) tf.tags.forEach( (t) => {
+							keywords.push( t.tag.toLowerCase() );
+						} );
+					});
+					if ( keywords.length ) {
+						$('meta[name="keywords"]',h).attr('content',keywords.join(', '));
+					}
 					if ( md.description ) $('meta[name="description"]',h).attr('content',md.description);
 					if ( md.hidden ) $(document.body).append(`<div id="jcHiddenPageIndicator"><span>${ AS.label('PageHidden')}</span></div>`);
 					$(document.body).attr('style','');
