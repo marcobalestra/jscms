@@ -49,7 +49,7 @@
 			if ( ! (window.FB && window.FB.XFBML)) {
 // 				if ( ! $('#fb-root') ) $(document.body).prepend('<div id="fb-root"></div>');
 				$out.append('<div id="fb-root"></div>');
-				$out.append(`<script async defer crossorigin="anonymous" src="https://connect.facebook.net/${data.language}/sdk.js#xfbml=1&version=v11.0"></script>`);
+				$out.append(`<script async defer crossorigin="anonymous" src="https://connect.facebook.net/${data.language}/sdk.js#xfbml=1&version=v11.0" id="facebook-jssdk"></script>`);
 			}
 			if ( data.like ) {
 				$out.append(`<div class="fb-like" data-href="${location.href.replace(/^[^:]+:../,'')}" data-width="550" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>`);
