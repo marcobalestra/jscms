@@ -5,6 +5,12 @@
 <link>https://ricette.lan.crossbow.it/</link>
 <generator>jBloud CMS - jscms</generator>
 <item>
+	<link>https://ricette.lan.crossbow.it/index2/</link>
+	<pubDate>Tue, 15 Jun 2021 16:39:11 GMT</pubDate>
+	<title>Overview</title>
+	<description><![CDATA[A quick overview on the CMS]]></description>
+</item>
+<item>
 	<link>https://ricette.lan.crossbow.it/searchtags/</link>
 	<pubDate>Tue, 15 Jun 2021 09:57:58 GMT</pubDate>
 	<title>Search</title>
@@ -19,12 +25,6 @@
 	<pubDate>Mon, 14 Jun 2021 06:03:32 GMT</pubDate>
 	<title>Happy SEO</title>
 	<description><![CDATA[Building a static version of the page on page saving]]></description>
-</item>
-<item>
-	<link>https://ricette.lan.crossbow.it/index2/</link>
-	<pubDate>Fri, 11 Jun 2021 15:38:17 GMT</pubDate>
-	<title>Overview</title>
-	<description><![CDATA[A quick overview on the CMS]]></description>
 </item>
 </channel>
 </rss>

@@ -1953,6 +1953,7 @@ jc.render = {
 			$div.attr('id',id);
 			if ( d.position ) $div.addClass( d.position );
 			if ( d.title ) $div.append( $('<h5></h5>').append(d.title) );
+			jc.render.queue(1);
 			jc.lists.list.get( data => {
 				let $ol = $('<'+nodes[0]+' class="jcRelatedEntries jcEntries"></'+nodes[0]+'>');
 				d.relateds.forEach( i => {
@@ -1967,7 +1968,75 @@ jc.render = {
 					$ol.append($li);
 				});
 				$div.append($ol);
+				jc.render.queue(-1);
 			});
+			return $div;
+		},
+		pbytag : (b,d) => {
+			let id = AS.generateId('pbytag');
+			let $div = $('<div class="jcPbytgag jcEntriesArea"></div>');
+			$div.attr('id',id);
+			let tobegrabbedtags = d.rules.map( x => x.tf );
+			let tf = {};
+			const process = () => {
+				if ( tobegrabbedtags.length ) {
+					let tfn = tobegrabbedtags.shift();
+					jc.lists.tag.get( tfn, l => {
+						tf[tfn] = l;
+						process();
+					})
+					return;
+				}
+				let list = false;
+				d.rules.forEach( r => {
+					let rlists = r.tv.map( tag =>{ return tf[r.tf][tag.tv]});
+					let rlist = false;
+					rlists.forEach( (l) => {
+						if ( ! rlist ) {
+							rlist = l;
+						} else if ( r.op == 'or' ) {
+							l.forEach( (li) => {
+								if ( ! rlist.find( x => ( (x.type==li.type)&&( x.id==li.id) )) ) rlist.push(li);
+							} );
+						} else {
+							rlist = rlist.filter( x => l.find( li => ( (x.type==li.type)&&( x.id==li.id) )));
+						}
+					} );
+					if ( ! list ) {
+						list = rlist;
+					} else if ( d.op == 'or') {
+						rlist.forEach( (li) => {
+							if ( ! list.find( x => ( (x.type==li.type)&&( x.id==li.id) )) ) list.push(li);
+						} );
+					} else {
+						list = list.filter( x => rlist.find( li => ( (x.type==li.type)&&( x.id==li.id) )));
+					}
+				} );
+				if ( list && list.length ) {
+					let pd = jc.page.data();
+					list = list.filter( x => ( ! ( (x.type==pd.type)&&(x.id==pd.id) )));
+				};
+				if ( list && list.length ) {
+					if ( d.title ) $div.append( $('<h5></h5>').append(d.title) );
+					if ( d.position ) $div.addClass( d.position );
+					let nodes = (d.view||'ul,li').split(',');
+					let $ol = $('<'+nodes[0]+' class="jcPbytgagEntries jcEntries"></'+nodes[0]+'>');
+					list.forEach( i => {
+						if ( ! ( i && i.type )) return;
+						let $li = $('<'+nodes[1]+' class="jcPbytgagEntry jcEntry"></'+nodes[1]+'>');
+						let $a = $(`<a class="title" href="${ jc.URI.encode(i,i.url) }"></a>`).on('click',(e)=>{
+							e.preventDefault();
+							jc.page.open(i.type,i.id);
+						}).html(i.title);
+						$li.append( $a );
+						$ol.append($li);
+					} );
+					$div.append($ol);
+				}
+				jc.render.queue(-1);
+			};
+			jc.render.queue(1);
+			setTimeout( process, 100);
 			return $div;
 		},
 		subpage : (b,d) => {

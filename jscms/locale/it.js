@@ -68,6 +68,7 @@ AS.labels.load('it',[{
 	'PageKewordsHelp' : 'Un elenco di parole chiave contenute nella pagina. L’elenco è composto di singole parole separate da una virgola.',
 	'PageSavedBody' : 'La pagina di tipo “{{page|unknown}}” ID: {{id|(nessuno)}} è stata salvata.',
 	'PageSavedTitle' : 'Pagina salvata',
+	'PagesByTags' : 'Pagine per tag',
 	'PageTitleHelp' : 'Il nome della pagina come comparirà nella barra del titolo (o dei tab) del browser.',
 	'PageType' : 'Tipo di pagina',
 	'PageUriHelp' : 'Un indirizzo personalizzabile che costituirà l’ultima parte dello URI della pagina.',

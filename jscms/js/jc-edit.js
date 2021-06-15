@@ -1056,6 +1056,7 @@ jc.edit = {
 			{type:'youtube',label:'YtVimeo',menu:true},
 			{type:'gallery',label:'Gallery',menu:true},
 			{type:'tags',label:'Tags',menu:true},
+			{type:'pbytag',label:'PagesByTags'},
 			{type:'relateds',label:'RelatedPages'},
 			{type:'audio',label:'Audio'},
 			{type:'video',label:'Video'},
@@ -1446,6 +1447,55 @@ jc.edit = {
 				['view','select',{asLabel:'View',options:[{label:AS.label('Bullet list'),value:'ul,li'},{label:AS.label('Numbered list'),value:'ol,li'},{label:AS.label('Plain list'),value:'div,div'}]}],
 				['position','select',{asLabel:'Position',options:[{label:AS.label('Block'),value:''},{label:AS.label('FloatRight'),value:'jcBoxRight'}]}],
 				['relateds','subform',{asLabel:'Content',subform:'item',mandatory:true}],
+			);
+			return o;
+		},
+		pbytag : (b,d) => {
+			let o = jc.edit.form._base(b,d);
+			const tfinit = (fo,$f) => {
+				let tf = $f.select2('data')[0].id;
+				let sf = fo.getForm().fieldByName('tv').prop.subforms.find( x => ( x.name == 'tagvals' ));
+				jc.lists.tag.get( tf, ( l )=>{
+					sf.values.find( x => (x[0]=='tv'))[2].options = Object.keys(l);
+				});
+			};
+			o.options.subforms.push(
+				{
+					name: 'tagvals',
+					subtype: 'array',
+					preview: ['tv'],
+					values: [
+						['tv','select2',{
+							asLabel:'Value',
+							options:[],
+							select2:{allowClear:false,tags:false},
+						}],
+					]
+				},
+				{
+					name: 'tagfamily',
+					subtype: 'array',
+					preview: ['tf'],
+					values: [
+						['tf','select2',{
+							asLabel:'Tag',
+							options:AS.def.arr(jc.prop.site.tags).map( x => { return { value: x.name, label: (x.label||x.name) }}),
+							select2:{allowClear:false,tags:false},
+							jconchange : tfinit,
+							jconrender : tfinit,
+						}],
+						['op','select',{asLabel:'Operator',options:[{label:'OR',value:'or'},{label:'AND',value:'and'}]}],
+						['tv','subform',{asLabel:'Values',subform:'tagvals'}]
+					]
+				}
+			);
+			o.fields.push(
+				['type','hidden',{value:'relateds'}],
+				['title','text',{asLabel:'Title',normalize:true,skipempty:true}],
+				['view','select',{asLabel:'View',options:[{label:AS.label('Bullet list'),value:'ul,li'},{label:AS.label('Numbered list'),value:'ol,li'},{label:AS.label('Plain list'),value:'div,div'}]}],
+				['position','select',{asLabel:'Position',options:[{label:AS.label('Block'),value:''},{label:AS.label('FloatRight'),value:'jcBoxRight'}]}],
+				['op','select',{asLabel:'Operator',options:[{label:'OR',value:'or'},{label:'AND',value:'and'}]}],
+				['rules','subform',{asLabel:'Filter',subform:'tagfamily',mandatory:true}],
 			);
 			return o;
 		},

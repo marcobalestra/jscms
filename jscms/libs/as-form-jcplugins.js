@@ -97,6 +97,7 @@ AS.form.fields.select2 = class extends AS.form.fields.select {
 			if ( AS.test.func(to.prop.jconchange) ) window.setTimeout( ()=>{ to.prop.jconchange.call( window, to, $f ); }, 10 );
 		});
 		$f.addClass('jcParsed');
+		if ( AS.test.func(to.prop.jconrender) ) window.setTimeout( ()=>{ to.prop.jconrender.call( window, to, $f ); }, 10 );
 		return AS.form.field.postRender.call(window,to);
 	};
 	parse(v) {

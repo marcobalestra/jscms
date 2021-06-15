@@ -68,6 +68,7 @@ AS.labels.load('es',[{
 	'PageKewordsHelp' : 'Un listado de palabras clave contenidas en la página. El listado está hecho por palabras únicas separadas por coma.',
 	'PageSavedBody' : 'La página de tipo “{{page|desconocido}}” ID: {{id|(nadie)}} ha sido guardada.',
 	'PageSavedTitle' : 'Página guardada',
+	'PagesByTags' : 'Páginas por etiquetas',
 	'PageTitleHelp' : 'El nombre de la página aparecerá en la barra del título (o de la pestañas) del navegador.',
 	'PageType' : 'Tipo de página',
 	'PageUriHelp' : 'Un enlace personalizable que costituirá el ultimo apartado de lo URI de la página.',

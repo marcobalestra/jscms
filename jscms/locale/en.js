@@ -59,6 +59,7 @@ AS.labels.load('en',[{
 	'PageKewordsPlaceholder' : 'keyword1, keyword2, …',
 	'PageSavedBody' : 'The page of type “{{page|unknown}}” ID: {{id|(no id)}} was saved.',
 	'PageSavedTitle' : 'Page was saved',
+	'PagesByTags' : 'Pages by tags',
 	'PageTitleHelp' : 'Page name that will appear in browser’s title bar (or tabs bar).',
 	'PageType' : 'Page type',
 	'PageUriHelp' : 'A customizable address that will be the leading section of page URI.',
