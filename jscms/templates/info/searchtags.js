@@ -169,7 +169,7 @@
 		};
 		const makesearch = ( cb ) => {
 			let filter = $('input[name="filter"]',$filter).val();
-			filter = filter ? filter.toLowerCase().split(/\W+/).filter( x => (x && (x.length > 1))) : false;
+			filter = filter ? filter.toLowerCase().split(/\W+/).filter( x => (x && (x.length > 2))) : false;
 			let found, sels = $panes.hasClass('active') ? $('select.active',$panes) : false;
 			if ( filter && filter.length) {
 				found = all.clone().filter( p => ( dosearch(p,filter) ) );
