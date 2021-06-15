@@ -1,32 +1,9 @@
 jc.maint = {
 	prop : { full: {} },
-	prog : (options) => {
-		let e;
-		if ( ! jc.maint.prop.swal ) {
-			jc.maint.prop.swal = Swal.fire({
-				toast: true,
-				title : '<div class="jcProgressbar"></div>',
-				html : ' ',
-				position: 'top-end',
-				showConfirmButton : false,
-			});
-			return setTimeout( ()=>{ jc.maint.prog(options) }, 10 );
-		}
-		if ( options.close ) {
-			try { Swal.close(); } catch(e) {};
-			try { jc.maint.prop.swal._destroy(); } catch(e) {};
-			delete jc.maint.prop.swal;
-			return;
-		}
-		let newopts = {};
-		if ( options.text ) newopts.html = `${ options.text }`;
-		if ( options.prog ) newopts.title = `<div class="jcProgressbar"><div style="width:${ 100 * options.prog }%;"></div></div>`;
-		if (jc.maint.prop.swal && Swal.isVisible() ) try { jc.maint.prop.swal.update(newopts); } catch(e){ }
-	},
 	start : () => { jc.maint.proc({}); },
 	proc : ( params ) => {
 		if ( ! jc.maint.prop.uploads ) {
-			jc.maint.prog({ text:'Listing uploads…'});
+			jc.progressbar({ text:'Listing uploads…'});
 			jc.jdav.ls({dir:'uploads'},(x) => {
 				jc.maint.prop.uploads = {};
 				jc.maint.prop.uploadsOrphans = {};
@@ -48,7 +25,7 @@ jc.maint = {
 		}
 		if ( ! (params.scanlist||params.tobescanned) ) {
 			params.initial = { page: jc.page.current(), id : jc.page.data().id };
-			jc.maint.prog({ text:'Listing pages…'});
+			jc.progressbar({ text:'Listing pages…'});
 			jc.jdav.ls({dir:'pages'},(x) => {
 				params.tobescanned = x.list;
 				params.totpages = x.list.length;
@@ -58,30 +35,29 @@ jc.maint = {
 		}
 		if ( params.tobescanned ) {
 			let isfirst = false;
-			if ( ! params.scanlist ) {
-				params.scanlist = [];
-				isfirst = true;
-			}
 			if ( ! params.afterscan ) {
+				if ( ! jc.progressbar() ) return setTimeout( ()=> { jc.maint.proc(params)}, 100);
 				params.afterscan = ()=>{
-					console.log('AFTERSCAN');
-					console.log( JSON.stringify(params.scanlist) );
-					console.log( JSON.stringify(params.tobescanned) );
-					if ( jc.maint.prop.swal ) setTimeout( ()=>{
+					setTimeout( ()=>{
 						jc.maint.scan( ()=>{
 							setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 						})
 					},100);
 				};
 				$(document.body).on('jc_page_open_completed',params.afterscan);
+				setTimeout( ()=> { jc.maint.proc(params)}, 100)
+			}
+			if ( ! params.scanlist ) {
+				params.scanlist = [];
+				isfirst = true;
 			}
 			let nxt = params.tobescanned.shift();
-			jc.maint.prog({ text:'Loading page…', prog: (parseInt(10*(params.totpages - params.tobescanned.length)/params.totpages)/10) });
+			jc.progressbar({ text:'Loading page…', prog: (parseInt(10*(params.totpages - params.tobescanned.length)/params.totpages)/10) });
 			params.scanlist.push(nxt);
 			if ( ! params.tobescanned.length ) delete params.tobescanned;
 			let page = nxt.replace(/^([^0-9.]+).*/,"$1");
 			let id = nxt.match(/^[^0-9]+[0-9]+\..*$/) ? parseInt( nxt.replace(/^[^0-9]+([0-9]+)\..*$/,"$1")) : undefined;
-			console.log(page,id);
+			console.log('Scanning:',page,id);
 			if ( isfirst && (page == params.initial.page) && ( id == params.initial.id )) {
 				params.tobescanned.push( params.scanlist.pop() );
 				setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
@@ -95,7 +71,7 @@ jc.maint = {
 			delete params.afterscan;
 		}
 		if ( ! params.listsPurged ) {
-			jc.maint.prog({ text:'Deleting old lists…', prog: 0 });
+			jc.progressbar({ text:'Deleting old lists…', prog: 0 });
 			if ( ! params.tbdLists ) {
 				jc.jdav.ls({dir:'struct',ext:'rss'},(x) => {
 					x.list.forEach( (k) => { jc.dav.rm('struct/'+k,()=>{ }); } );
@@ -108,7 +84,7 @@ jc.maint = {
 				return;
 			}
 			if ( params.tbdLists.length ) {
-				jc.maint.prog({ prog: (parseInt(10*(params.tbdCount - params.tbdLists.length)/params.tbdCount)/10) });
+				jc.progressbar({ prog: (parseInt(10*(params.tbdCount - params.tbdLists.length)/params.tbdCount)/10) });
 				jc.dav.rm('struct/'+params.tbdLists.shift(),()=>{
 					setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 				});
@@ -121,9 +97,9 @@ jc.maint = {
 			return;
 		}
 		if ( ! params.savedFullList ) {
-			jc.maint.prog({ text:'Saving full list…', prog: 0 });
+			jc.progressbar({ text:'Saving full list…', prog: 0 });
 			jc.lists.list.set(jc.maint.prop.full,()=>{
-				jc.maint.prog({ prog: .3 });
+				jc.progressbar({ prog: .3 });
 				jc.page.makeLasts( jc.maint.prop.full, ()=>{
 					params.savedFullList = true;
 					setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
@@ -138,7 +114,7 @@ jc.maint = {
 			}
 			if ( params.ptypes.length ) {
 				let k = params.ptypes.shift();
-				jc.maint.prog({ text: 'Saving type: '+k, prog: (parseInt(10*(params.ptypesCount - params.ptypes.length)/params.ptypesCount)/10) });
+				jc.progressbar({ text: 'Saving type: '+k, prog: (parseInt(10*(params.ptypesCount - params.ptypes.length)/params.ptypesCount)/10) });
 				jc.lists.list.set(k,jc.maint.prop.full[k],()=>{
 					jc.page.makeTypeLasts( k, jc.maint.prop.full[k], ()=>{
 						jc.page.makeTypeDates( k, jc.maint.prop.full[k], ()=>{
@@ -161,7 +137,7 @@ jc.maint = {
 			}
 			if ( params.tagnames.length ) {
 				let k = params.tagnames.shift();
-				jc.maint.prog({ text: 'Saving tags: '+k, prog: (parseInt(10*(params.tagnamesCount - params.tagnames.length)/params.tagnamesCount)/10) });
+				jc.progressbar({ text: 'Saving tags: '+k, prog: (parseInt(10*(params.tagnamesCount - params.tagnames.length)/params.tagnamesCount)/10) });
 				jc.lists.tag.set(k,jc.maint.prop.tags[k],()=>{
 					setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 				});
@@ -173,7 +149,7 @@ jc.maint = {
 			}
 			return;
 		}
-		jc.maint.prog({close:true});
+		jc.progressbar({close:true});
 		setTimeout( ()=>{
 			jc.maint.prop = { full: {} };
 			jc.page.open( params.initial.page, params.initial.id );
@@ -182,7 +158,7 @@ jc.maint = {
 	scan : ( cb ) => {
 		let pd = jc.page.data().pageContent;
 		let page = jc.page.current();
-		jc.maint.prog({ text:'Scan: '+pd.metadata.title });
+		jc.progressbar({ text:'Scan: '+pd.metadata.title });
 		let nm = JSON.parse(JSON.stringify(pd.metadata));
 		if ( pd.blogdate ) nm.date = pd.blogdate;
 		if ( ! jc.maint.prop.full[page] ) jc.maint.prop.full[page] = {};

@@ -426,6 +426,36 @@ jc.progress = ( msg ) => {
 	}
 };
 
+jc.progressbar = (options) => {
+	let e;
+	if ( ! jc.prop.progressbar ) {
+		jc.prop.progressbar = Swal.fire({
+			toast: true,
+			title : '<div class="jcProgressbar"></div>',
+			html : ' ',
+			position: 'top-end',
+			showConfirmButton : false,
+		});
+		setTimeout( ()=>{ jc.progressbar(options) }, 10 )
+		return jc.prop.progressbar;
+	}
+	if ( options && options.close ) {
+		setTimeout( ()=>{
+			try { Swal.close(); } catch(e) {};
+			try { jc.prop.progressbar._destroy(); } catch(e) {};
+			delete jc.prop.progressbar;
+		},10);
+		return false;
+	}
+	if ( options ) {
+		let newopts = {};
+		if ( options.text ) newopts.html = `${ options.text }`;
+		if ( options.prog ) newopts.title = `<div class="jcProgressbar"><div style="width:${ 100 * options.prog }%;"></div></div>`;
+		if (jc.prop.progressbar && Swal.isVisible() && Object.keys(newopts).length ) try { jc.prop.progressbar.update(newopts); } catch(e){ }
+	}
+	return jc.prop.progressbar;
+};
+
 jc.dav = {
 	get : ( url, success, fail ) => {
 		fail = jc.evalFunc(fail)||jc.evalFunc(success)||jc.getError;

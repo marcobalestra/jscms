@@ -30,31 +30,6 @@
 	];
 	jc.render.block.searchbytag = (b,d) => {
 		if ( AS.test.udef(d[b.prop]) ) d[b.prop] = {};
-		let swalalert;
-		const prog = (options) => {
-			if ( ! swalalert ) {
-				swalalert = Swal.fire({
-					toast: true,
-					title : '<div class="jcProgressbar"></div>',
-					html : ' ',
-					position: 'top-end',
-					showConfirmButton : false,
-				});
-				return setTimeout( ()=>{ prog(options) }, 10 )
-			}
-			let newopts = {};
-			if ( options.close ) {
-				setTimeout( ()=>{
-					Swal.close();
-					swalalert._destroy();
-					swalalert = false;
-				},100);
-				return;
-			}
-			if ( options.text ) newopts.html = `${ options.text }`;
-			if ( options.prog ) newopts.title = `<div class="jcProgressbar"><div style="width:${ 100 * options.prog }%;"></div></div>`;
-			swalalert.update(newopts);
-		};
 		const $div = $('<div class="jcTagsSearch" id="'+AS.generateId('tagssearch')+'"></div>');
 		const $filter = $('<div class="jcTagsSearchFilter container"></div>');
 		const $panes = $('<div class="jcTagsSearchPars container" style="display:none;"></div>');
@@ -70,7 +45,7 @@
 				totsteps = 2 + ttags.length;
 			}
 			if ( ! all ) {
-				prog({text:AS.label('Loading')+'…',prog:(0)});
+				jc.progressbar({text:AS.label('Loading')+'…',prog:(0)});
 				jc.lists.list.get( (l) => {
 					all = l;
 					setTimeout( ()=>{ load(cb) }, 1);
@@ -79,7 +54,7 @@
 			}
 			if ( ttags.length ) {
 				let nt = ttags.shift();
-				prog({prog:((1+Object.keys(tdata).length)/totsteps)});
+				jc.progressbar({prog:((1+Object.keys(tdata).length)/totsteps)});
 				jc.lists.tag.get( nt, tt => {
 					tdata[nt] = tt;
 					setTimeout( ()=>{ load(cb) }, 1);
@@ -87,7 +62,7 @@
 				return;
 			}
 			if ( ! AS.test.arr(all) ) {
-				prog({prog:((1+Object.keys(tdata).length)/totsteps)});
+				jc.progressbar({prog:((1+Object.keys(tdata).length)/totsteps)});
 				Object.keys(tdata).forEach( tf => {
 					Object.keys( tdata[tf] ).forEach( k => {
 						tdata[tf][k].forEach( pt => {
@@ -111,14 +86,14 @@
 				return;
 			}
 			if ( totsteps ) {
-				prog({prog:1});
+				jc.progressbar({prog:1});
 				makeform( ()=>{
 					totsteps=0;
 					setTimeout( ()=>{ load(cb) }, 1);
 				});
 				return;
 			}
-			prog({close:true});
+			jc.progressbar({close:true});
 			if ( AS.test.func(cb) ) cb.call(window);
 		};
 		const makeform = (cb) => {
