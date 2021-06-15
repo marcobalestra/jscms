@@ -147,7 +147,7 @@
 					$sel.toggleClass('active', t );
 					if ( t ) $sel.focus();
 				});
-				keys.forEach( k => { $sel.append(`<option>${k}</option>`) } );
+				keys.sort().forEach( k => { $sel.append(`<option>${k}</option>`) } );
 				$panes.append( $('<div class="row"></div>').append(
 					$('<div class="col-lg-4"></div>').append( $cb, `<label for="${tid}">${ to.label||to.name }</label>`),
 					$('<div class="col-lg-8" style="display:none;"></div>').append( $sel ),
