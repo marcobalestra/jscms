@@ -58,7 +58,7 @@
 		const $div = $('<div class="jcTagsSearch" id="'+AS.generateId('tagssearch')+'"></div>');
 		const $filter = $('<div class="jcTagsSearchFilter container"></div>');
 		const $panes = $('<div class="jcTagsSearchPars container" style="display:none;"></div>');
-		const $tgt = $('<div class="jcTagsFound" id="'+AS.generateId('tagsfound')+'"></div>').css('min-height','200px');
+		const $tgt = $('<div class="jcTagsFound mt-1" id="'+AS.generateId('tagsfound')+'"></div>').css('min-height','200px');
 		$div.append( $filter, $panes, $tgt );
 		let all, ttags, tdata, totsteps; 
 		const load = ( cb ) => {
