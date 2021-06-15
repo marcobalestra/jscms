@@ -158,16 +158,20 @@ jc.maint = {
 	scan : ( cb ) => {
 		let pd = jc.page.data().pageContent;
 		let page = jc.page.current();
-		if ( pd && pd.metadata ) jc.progressbar({ text:'Scan: '+pd.metadata.title });
-		else console.log( page, pd );
-		let nm = JSON.parse(JSON.stringify(pd.metadata||{}));
-		if ( pd.blogdate ) nm.date = pd.blogdate;
-		if ( ! jc.maint.prop.full[page] ) jc.maint.prop.full[page] = {};
-		jc.maint.prop.full[page][String((pd.id||0))] = nm;
-		let pdtags = jc.objFindAll( pd, 'type', 'tags' ).clone();
-		jc.maint.prop.tagnames.forEach( tagname => {
-			jc.maint.prop.tags[tagname] = jc.page.parseTagsOne( pd, tagname, jc.maint.prop.tags[tagname], pdtags );
-		} );
-		jc.dav.rm(AS.path('jsdatastatics')+page+(pd.id||'')+'.html',()=>{ jc.page.makeStatic( cb ) });
+		if ( pd && pd.metadata ) {
+			jc.progressbar({ text:'Scan: '+pd.metadata.title });
+			let nm = JSON.parse(JSON.stringify(pd.metadata||{}));
+			if ( pd.blogdate ) nm.date = pd.blogdate;
+			if ( ! jc.maint.prop.full[page] ) jc.maint.prop.full[page] = {};
+			jc.maint.prop.full[page][String((pd.id||0))] = nm;
+			let pdtags = jc.objFindAll( pd, 'type', 'tags' ).clone();
+			jc.maint.prop.tagnames.forEach( tagname => {
+				jc.maint.prop.tags[tagname] = jc.page.parseTagsOne( pd, tagname, jc.maint.prop.tags[tagname], pdtags );
+			} );
+			jc.dav.rm(AS.path('jsdatastatics')+page+(pd.id||'')+'.html',()=>{ jc.page.makeStatic( cb ) });
+		} else {
+			console.log( 'Unknown metadata:',page, pd );
+			jc.dav.rm(AS.path('jsdatastatics')+page+(pd.id||'')+'.html', cb );
+		}
 	},
 };
