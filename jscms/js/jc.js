@@ -2021,7 +2021,7 @@ jc.render = {
 					if ( d.position ) $div.addClass( d.position );
 					let nodes = (d.view||'ul,li').split(',');
 					let $ol = $('<'+nodes[0]+' class="jcPbytgagEntries jcEntries"></'+nodes[0]+'>');
-					list.forEach( i => {
+					list.sort( (a,b) => (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1 ) ).forEach( i => {
 						if ( ! ( i && i.type )) return;
 						let $li = $('<'+nodes[1]+' class="jcPbytgagEntry jcEntry"></'+nodes[1]+'>');
 						let $a = $(`<a class="title" href="${ jc.URI.encode(i) }"></a>`).on('click',(e)=>{
