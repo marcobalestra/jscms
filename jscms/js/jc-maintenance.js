@@ -170,8 +170,9 @@ jc.maint = {
 			} );
 			jc.dav.rm(AS.path('jsdatastatics')+page+(pd.id||'')+'.html',()=>{ jc.page.makeStatic( cb ) });
 		} else {
-			console.log( 'Unknown metadata:',page, pd );
-			jc.dav.rm(AS.path('jsdatastatics')+page+(pd.id||'')+'.html', cb );
+			let id = ( pd && AS.test.def(pd.id) ) ? String(pd.id) : '';
+			console.log( 'Unknown metadata:',page,id,pd);
+			jc.dav.rm(AS.path('jsdatastatics')+page+id+'.html', cb );
 		}
 	},
 };
