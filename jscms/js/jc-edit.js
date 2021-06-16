@@ -499,6 +499,16 @@ jc.page.rm = ( params ) => {
 		});
 		return;
 	}
+	if ( ! params.tagsPurged ) {
+		if ( ! params.data.metadata ) params.data.metadata = {};
+		params.data.metadata.hidden = true;
+		jc.page.makeTagsAll( params.data, ()=>{
+			$(document.body).trigger('jc_saved_page_tags',params);
+			params.tagsPurged = true;
+			jc.page.rm( params );
+		});
+		return;
+	}
 	if ( ! params.mute ) {
 		jc.progress(false);
 		if (! params.noDialog) {
@@ -903,7 +913,7 @@ jc.page.makeTagsAll = (pd, callback, pdtags, tagslist ) => {
 
 jc.page.parseTagsOne = ( pd, tagname, tdata, pdtags ) => {
 	if (AS.test.udef(pdtags) ) pdtags = jc.objFindAll( pd, 'type', 'tags' );
-	if ( ! (pd.metadata && pd.metadata.hidden)) {
+	if ( pd.metadata ) {
 		let ttags = jc.objFindAll( pdtags, 'name', tagname );
 		let md = { type: String(pd.metadata.type) };
 		if ( pd.metadata.id ) md.id = parseInt(pd.metadata.id);
@@ -913,7 +923,7 @@ jc.page.parseTagsOne = ( pd, tagname, tdata, pdtags ) => {
 			tdata[k] = tdata[k].filter( x => ( (x.type != md.type) || (x.id != md.id )) );
 			if ( ! tdata[k].length ) delete tdata[k];
 		});
-		if ( ttags.length ) {
+		if ( ttags.length && ( ! pd.metadata.hidden ) ) {
 			let atags = {};
 			ttags.forEach( (tc) => { if (tc.tags && tc.tags.length ) tc.tags.forEach( (t) => { atags[ t.tag ] = true; } ); });
 			Object.keys( atags ).forEach( (k) => {
