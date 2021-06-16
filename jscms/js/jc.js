@@ -827,7 +827,7 @@ jc.URI = {
 			uriparams.page = jc.page.current();
 			let data = jc.page.data();
 			if ( AS.test.obj( jc.page.data() ) ) uriparams.data = data;
-			if ( AS.test.udef(title) )  {
+			if ( AS.test.udef(title) && data.pageContent && data.pageContent.metadata)  {
 				if ( data.pageContent.metadata.url ) title = data.pageContent.metadata.url;
 				else if ( data.id && data.pageContent.metadata.title ) title = data.pageContent.metadata.title;
 			}

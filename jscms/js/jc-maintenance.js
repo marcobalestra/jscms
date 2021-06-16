@@ -38,14 +38,18 @@ jc.maint = {
 			if ( ! params.afterscan ) {
 				if ( ! jc.progressbar() ) return setTimeout( ()=> { jc.maint.proc(params)}, 100);
 				params.afterscan = ()=>{
+					$(document.body).off('jc_page_open_completed',params.afterscan);
 					setTimeout( ()=>{
 						jc.maint.scan( ()=>{
-							setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
+							setTimeout( ()=> {
+								$(document.body).on('jc_page_open_completed',params.afterscan);
+								jc.maint.proc( params );
+							}, 10 );
 						})
-					},100);
+					},10 );
 				};
 				$(document.body).on('jc_page_open_completed',params.afterscan);
-				setTimeout( ()=> { jc.maint.proc(params)}, 100)
+				setTimeout( ()=> { jc.maint.proc(params)}, 10)
 			}
 			if ( ! params.scanlist ) {
 				params.scanlist = [];
@@ -59,10 +63,11 @@ jc.maint = {
 			let id = nxt.match(/^[^0-9]+[0-9]+\..*$/) ? parseInt( nxt.replace(/^[^0-9]+([0-9]+)\..*$/,"$1")) : undefined;
 			console.log('Scanning:',page,id);
 			if ( isfirst && (page == params.initial.page) && ( id == params.initial.id )) {
+				console.log('Postponing:',nxt);
 				params.tobescanned.push( params.scanlist.pop() );
 				setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 			} else {
-				setTimeout( ()=> { jc.page.open( page, id ); }, 10 );
+				setTimeout( ()=> { jc.page.open( page, id ); }, 100 );
 			}
 			return;
 		}
@@ -156,8 +161,8 @@ jc.maint = {
 		},10);
 	},
 	scan : ( cb ) => {
-		let pd = jc.page.data().pageContent;
 		let page = jc.page.current();
+		let pd = jc.page.data().pageContent;
 		if ( pd && pd.metadata ) {
 			jc.progressbar({ text:'Scan: '+pd.metadata.title });
 			let nm = JSON.parse(JSON.stringify(pd.metadata||{}));

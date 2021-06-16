@@ -282,13 +282,22 @@ jc.page.create = ( options ) => {
 	options = AS.def.obj(options);
 	if ( AS.test.udef(options.page) ) {
 		let opts = {};
+		if ( jc.prop.site.models && jc.prop.site.models.length ) {
+			let t = {};
+			jc.prop.site.models.forEach( (k,idx) => {
+				t['model.'+idx] = k.title + ' ['+k.type+']';
+			} );
+			opts[ AS.label('Models') ] = t;
+		}
+		let e = {};
 		jc.edit.prop.pageTypes.filter( k => ( ! jc.edit.prop.pageTypesInfo[k].service )).forEach( k => {
-			opts[k] = jc.edit.prop.pageTypesInfo[k].display + ' ['+k+']';
+			e[k] = jc.edit.prop.pageTypesInfo[k].display + ' ['+k+']';
 		} );
 		let s = {};
 		jc.edit.prop.pageTypes.filter( k => ( jc.edit.prop.pageTypesInfo[k].service )).forEach( k => {
 			s[k] = jc.edit.prop.pageTypesInfo[k].display;
 		} );
+		opts[ AS.label('Empty pages') ] = e;
 		opts[ AS.label('Special') ] = s;
 		Swal.fire({
 			title: AS.label('SelectPageType'),
@@ -311,8 +320,20 @@ jc.page.create = ( options ) => {
 			},
 		}).then( result => {
 			if ( ! result.isConfirmed ) return;
-			options.page = result.value;
-			jc.page.create( options );
+			let v = result.value;
+			console.log(v);
+			if ( v.indexOf('model.')==0 ) {
+				let t = jc.prop.site.models[parseInt( v.replace(/[^0-9]/g,'') )];
+				console.log(t);
+				options.page = t.type;
+				jc.jdav.get( AS.path('jsdatapages')+t.type+(t.id||'')+'.json', (d)=>{
+					options.predata = d;
+					jc.page.create( options );
+				});
+			} else {
+				options.page = result.value;
+				jc.page.create( options );
+			}
 		});
 		return;
 	}
@@ -328,7 +349,13 @@ jc.page.create = ( options ) => {
 		jc.edit.meta.edit({
 			pageData : {},
 			editData : { metadata: { type: options.page, id:'new' }},
-			callback : pd => {
+			callback : (pd) => {
+				if ( options.predata ) {
+					Object.keys(options.predata).forEach( (k) => {
+						if ( AS.test.udef( pd[k] )) pd[k] = options.predata[k];
+					} );
+					delete options.predata;
+				}
 				options.data = pd;
 				jc.page.create( options );
 			}
@@ -404,6 +431,17 @@ jc.page.rm = ( params ) => {
 				});
 				return;
 			}
+		}
+	}
+	if ( ! params.modelsChecked ) {
+		params.modelsChecked = true;
+		if ( ! jc.prop.site.models ) jc.prop.site.models = [];
+		if ( jc.prop.site.models.find( x => ((x.type==params.page)&&(x.id==params.id)) ) ) {
+			jc.prop.site.models = jc.prop.site.models.filter( x => (! ((x.type==params.page)&&(x.id==params.id)) ));
+			jc.template.part.put( 'header.json', jc.prop.site, ()=>{
+				jc.page.rm( params );
+			});
+			return;
 		}
 	}
 	if ( (! params.uploadsDeleted ) && AS.test.arr(params.pdata.uploads) && params.pdata.uploads.length) {
@@ -551,6 +589,28 @@ jc.page.save = ( params ) => {
 		if ( params.data.blogdate ) params.data.metadata.date = params.data.blogdate;
 		if (! ( params.maintenance && params.data.metadata.upd )) params.data.metadata.upd = (new Date()).getTime();
 		params.metadataChecked = true;
+	}
+	if ( ! params.modelsChecked ) {
+		let savesite;
+		params.modelsChecked = true;
+		if ( ! jc.prop.site.models ) jc.prop.site.models = [];
+		if ( params.data.metadata.model ) {
+			savesite = true;
+			jc.prop.site.models = jc.prop.site.models.filter( x => (! ((x.type==params.page)&&(x.id==params.id)) ));
+			let nt = { title: params.data.metadata.title, type: params.page };
+			if ( AS.test.def(params.id) ) nt.id = params.id;
+			jc.prop.site.models.push(nt);
+			jc.prop.site.models.sort( (a,b) => (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1 ) );
+		} else if ( jc.prop.site.models.find( x => ((x.type==params.page)&&(x.id==params.id)) ) ) {
+			savesite = true;
+			jc.prop.site.models = jc.prop.site.models.filter( x => (! ((x.type==params.page)&&(x.id==params.id)) ));
+		}
+		if ( savesite ) {
+			jc.template.part.put( 'header.json', jc.prop.site, ()=>{
+				jc.page.save( params );
+			});
+			return;
+		}
 	}
 	if ( ! params.saved ) {
 		jc.jdav.put( AS.path('jsdatapages') + params.page + ( params.id || '') + '.json', params.data, ()=>{

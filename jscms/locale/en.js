@@ -44,6 +44,7 @@ AS.labels.load('en',[{
 	'menuEditOverSave' : 'Save changes',
 	'menuEditStart' : 'Start editor',
 	'modalProgress' : '<div id="jcProgressIndicator" class="modal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-body"><span class="jcicon progressIcon">{{icon:progress}}</span><span class="progressMessage"></span></div></div></div></div>',
+	'ModelHelp' : 'Creating a page from a model all model data are copied by default.',
 	'NewPage' : 'Create page',
 	'NoItemsFound' : 'No items found',
 	'onlyNonEmptyFields' : 'Field not included if empty',

@@ -103,6 +103,14 @@
 					['tags','subform',{asLabel:'Tags',subform:'tag',tab:3}],
 				],
 			};
+			if ( jc.prop.site.models && jc.prop.site.models.length ) {
+				fo.options.tabs.push( AS.label('Models') );
+				let h = '';
+				jc.prop.site.models.forEach( m => {
+					h += `<li><a href="javascript:jc.page.edit(false,false);jc.edit.noModal();jc.page.open('${m.type}',${m.id})">${m.title}</a></li>`;
+				} );
+				fo.fields.push(['modellist','freehtml',{value:'<ul>'+h+'</ul>',tab:4}]);
+			}
 			if ( AS.test.func(callback) ) callback.call(window,fo);
 			return fo;
 		},
