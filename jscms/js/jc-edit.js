@@ -903,22 +903,24 @@ jc.page.makeTagsAll = (pd, callback, pdtags, tagslist ) => {
 
 jc.page.parseTagsOne = ( pd, tagname, tdata, pdtags ) => {
 	if (AS.test.udef(pdtags) ) pdtags = jc.objFindAll( pd, 'type', 'tags' );
-	let ttags = jc.objFindAll( pdtags, 'name', tagname );
-	let md = { type: String(pd.metadata.type) };
-	if ( pd.metadata.id ) md.id = parseInt(pd.metadata.id);
-	md.title = String(pd.metadata.title);
-	md.upd = parseInt( pd.metadata.upd);
-	Object.keys( tdata ).forEach( k => {
-		tdata[k] = tdata[k].filter( x => ( (x.type != md.type) || (x.id != md.id )) );
-		if ( ! tdata[k].length ) delete tdata[k];
-	});
-	if ( ttags.length ) {
-		let atags = {};
-		ttags.forEach( (tc) => { tc.tags.forEach( (t) => { atags[ t.tag ] = true; } ); });
-		Object.keys( atags ).forEach( (k) => {
-			if ( AS.test.udef( tdata[k] ) ) tdata[k] = [];
-			tdata[k].unshift(md);
-		} );
+	if ( ! (pd.metadata && pd.metadata.hidden)) {
+		let ttags = jc.objFindAll( pdtags, 'name', tagname );
+		let md = { type: String(pd.metadata.type) };
+		if ( pd.metadata.id ) md.id = parseInt(pd.metadata.id);
+		md.title = String(pd.metadata.title);
+		md.upd = parseInt( pd.metadata.upd);
+		Object.keys( tdata ).forEach( k => {
+			tdata[k] = tdata[k].filter( x => ( (x.type != md.type) || (x.id != md.id )) );
+			if ( ! tdata[k].length ) delete tdata[k];
+		});
+		if ( ttags.length ) {
+			let atags = {};
+			ttags.forEach( (tc) => { if (tc.tags && tc.tags.length ) tc.tags.forEach( (t) => { atags[ t.tag ] = true; } ); });
+			Object.keys( atags ).forEach( (k) => {
+				if ( AS.test.udef( tdata[k] ) ) tdata[k] = [];
+				tdata[k].unshift(md);
+			} );
+		}
 	}
 	return tdata;
 };
