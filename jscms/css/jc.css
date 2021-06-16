@@ -251,7 +251,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 	.jcEditable .jcBoxRight { float: unset; margin-left: calc(100% - 480px); clear: unset; }
 }
 
-.jcMixedBlocks { overflow-y: auto; }
+.jcMixedBlocks { overflow-y: auto; overflow: visible; }
 
 button[data-ismonth] { text-transform: capitalize; }
 
