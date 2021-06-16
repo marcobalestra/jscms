@@ -66,7 +66,7 @@
 				Object.keys(tdata).forEach( tf => {
 					Object.keys( tdata[tf] ).forEach( k => {
 						tdata[tf][k].forEach( pt => {
-							let tp = all[pt.type][String(pt.id||0)];
+							let tp = all[pt.type][String(pt.id||0)]||{};
 							if ( ! tp.tags ) tp.tags = [];
 							if ( ! tp.tags.find( x => ( x == k.toLowerCase()))) tp.tags.push(k.toLowerCase());
 						} );
