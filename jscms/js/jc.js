@@ -2203,8 +2203,8 @@ jc.actionsMenu = (e) => {
 		ws.content.push(
 			{icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.create();} },
 			{icon:'jcicon',iconKey:'pageParts',label:AS.label('IncludedParts'),action:()=>{jc.page.edit('parts');} },
-			'-',
-			{icon:'jcicon',iconKey:'maintenance',label:AS.label('Maintenance'),action:()=>{jc.page.edit('maintenance');} },
+// 			'-',
+// 			{icon:'jcicon',iconKey:'maintenance',label:AS.label('Maintenance'),action:()=>{jc.page.edit('maintenance');} },
 		);
 		acts.push(AS.label('menuActionsTitle'),tp,'-',ws);
 	}
