@@ -923,7 +923,8 @@ jc.page.parseTagsOne = ( pd, tagname, tdata, pdtags ) => {
 			tdata[k] = tdata[k].filter( x => ( (x.type != md.type) || (x.id != md.id )) );
 			if ( ! tdata[k].length ) delete tdata[k];
 		});
-		if ( ttags.length && ( ! pd.metadata.hidden ) ) {
+		if ( ttags.length ) {
+			if ( pd.metadata.hidden ) md.hidden = true;
 			let atags = {};
 			ttags.forEach( (tc) => { if (tc.tags && tc.tags.length ) tc.tags.forEach( (t) => { atags[ t.tag ] = true; } ); });
 			Object.keys( atags ).forEach( (k) => {

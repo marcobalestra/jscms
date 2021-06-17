@@ -53,6 +53,7 @@
 			jc.lists.tag.get( $b.data('family'),(l)=>{
 				let $ul = $('<ul></ul>');
 				(AS.def.arr(l[$b.data('tag')])).sort( (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1 ) ).forEach( e => {
+					if ( e.hidden ) return;
 					let $li = $('<li></li>');
 					$li.append(`<a class="" onclick="jc.page.open('${e.type}'${e.id?','+e.id:''})"><strong>${e.title}</strong></a>`);
 					$li.append(`<small class="jcDate date ml-2"> ${ (new Date(e.upd)).toLocaleDateString() } </small>`);
