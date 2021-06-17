@@ -1443,6 +1443,7 @@ jc.page = {
 		$menu.addClass('jcMenuParsed');
 		let user = jc.prop.authUser||AS.getCookie('jcAuthUser');
 		if ( user ) {
+			jc.prop.isLoggedIn = true;
 			jc.springLoad('module:edit');
 			$(document.body).addClass('jcUserAuth');
 			if ( $menu.hasClass('jcMenuText') ) {

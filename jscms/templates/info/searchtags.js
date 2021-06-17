@@ -76,7 +76,7 @@
 				Object.keys(all).forEach( pt => {
 					Object.keys( all[pt] ).forEach( id => {
 						let p = all[pt][id];
-						if ( p.hidden ) return;
+						if ( (! jc.prop.isLoggedIn ) && p.hidden ) return;
 						if ( p.tags ) p.tags = p.tags.join(', ');
 						newall.push( p );
 					} );
@@ -103,13 +103,19 @@
 				let $sel = $(`<input type="search" name="filter" class="form-control" placeholder="${ AS.label('FilterTextHelp') }" value="" style="width:100%"/>`);
 				$filter.append( $('<div class="row"></div>').append( $('<div class="col-lg-8"></div>').append( $sel ) ));
 				if ( jc.prop.site.tags && jc.prop.site.tags.length ) {
-					let $cb = $(`<input type="checkbox" class="mr-2"/>`).attr('id',tid).on('click',()=>{
+					let $ca = $('<div class="col-lg-4"></div>');
+					let $cb = $(`<input type="checkbox" class="mr-1"/>`).attr('id',tid).on('click',()=>{
 						let t = $cb.is(':checked');
 						$panes.toggle( t );
 						$panes.toggleClass('active', t );
 						$('input[name="filter"]',$filter).focus();
 					});
-					$('div.row',$filter).append( $('<div class="col-lg-4"></div>').append( $cb, `<label for="${tid}">${ AS.label('Advanced') }</label>`) );
+					$ca.append( $cb, `<label for="${tid}">${ AS.label('Advanced') }</label>` );
+					if ( jc.prop.isLoggedIn ) {
+						let t2 = AS.generateId('hidden');
+						$ca.append(`<input type="checkbox" name="hidden" id="${t2}" class="ml-3 mr-1"/><label for="${t2}">${ AS.label('Hidden') }</label>`);
+					}
+					$('div.row',$filter).append( $ca );
 					$panes.append( '<hr />' );
 				}
 			}
@@ -119,7 +125,7 @@
 				let tid = AS.generateId('tag');
 				let $pc = $('<div class="row"></div>');
 				let $sel = $(`<select name="${ to.name }" id="${tid}sel" multiple="multiple"></select>`);
-				let $cb = $(`<input type="checkbox" class="mr-2"/>`).attr('id',tid).on('click',()=>{
+				let $cb = $(`<input type="checkbox" class="mr-1"/>`).attr('id',tid).on('click',()=>{
 					let t = $cb.is(':checked');
 					$sel.closest('div').toggle( t );
 					$sel.toggleClass('active', t );
@@ -127,8 +133,8 @@
 				});
 				keys.sort().forEach( k => { $sel.append(`<option>${k}</option>`) } );
 				$panes.append( $('<div class="row"></div>').append(
-					$('<div class="col-lg-4"></div>').append( $cb, `<label for="${tid}">${ to.label||to.name }</label>`),
-					$('<div class="col-lg-8" style="display:none;"></div>').append( $sel ),
+					$('<div class="col-lg-3"></div>').append( $cb, `<label for="${tid}">${ to.label||to.name }</label>`),
+					$('<div class="col-lg-9" style="display:none;"></div>').append( $sel ),
 				));
 				$sel.select2({ width: '100%', multiple: true });
 			} );
@@ -172,6 +178,9 @@
 			} );
 			let $ul = $('<ul class="jcEntries"></ul>');
 			$tgt.html('<div><span class="jcPlaceHolder">'+AS.label('Results')+': '+found.length+'</span></div>').append($ul);
+			if ( jc.prop.isLoggedIn && (! $('input[name="hidden"]',$filter).is(':checked')) ) {
+				found = found.filter( x => (!x.hidden));
+			} 
 			found.sort( (a,b) => (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1 ) ).forEach( (f) => {
 				let $li = $('<li class="jcEntry"></li>').append(
 					$(`<a class="title click">${ f.title }</a>`)
@@ -182,6 +191,7 @@
 					$('<span class="date"></span>').html( (new Date(f.upd)).toLocaleDateString() )
 				);
 				if ( f.description && f.description.length) $li.append('<br />', $('<small class="desc"></small>').html(f.description));
+				if ( f.hidden ) $li.prepend('🔴 ').attr('title',AS.label('Hidden'));
 				$ul.append($li);
 			} );
 			if ( AS.test.func(cb) ) cb.call(window);
