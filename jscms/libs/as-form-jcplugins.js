@@ -108,10 +108,9 @@ AS.form.fields.select2 = class extends AS.form.fields.select {
 				if ( ! $s.hasClass('jcParsed') ) return setTimeout( sv, 100 );
 				if ( this.prop.select2 && this.prop.select2.tags && (! $('option[value="'+av+'"]').length)) {
 					$(this.field).append(`<option value="${av}">${av}</option>`).trigger('change');
-				} else {
-					this.setValue(av);
-					$s.val(av).trigger('change');
 				}
+				this.setValue(av);
+				$s.val(av).trigger('change');
 			}
 			sv();
 		}
