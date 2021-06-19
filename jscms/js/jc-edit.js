@@ -501,7 +501,7 @@ jc.page.rm = ( params ) => {
 	}
 	if ( ! params.tagsPurged ) {
 		if ( ! params.pdata.metadata ) params.pdata.metadata = {};
-		params.pdata.metadata.hidden = true;
+		params.pdata.metadata.deleted = true;
 		jc.page.makeTagsAll( params.pdata, ()=>{
 			$(document.body).trigger('jc_saved_page_tags',params);
 			params.tagsPurged = true;
@@ -924,7 +924,7 @@ jc.page.parseTagsOne = ( pd, tagname, tdata, pdtags ) => {
 			tdata[k] = tdata[k].filter( x => ( (x.type != md.type) || (x.id != md.id )) );
 			if ( ! tdata[k].length ) delete tdata[k];
 		});
-		if ( ttags.length ) {
+		if ( ttags.length && (! pd.metadata.deleted)) {
 			if ( pd.metadata.hidden ) md.hidden = true;
 			let atags = {};
 			ttags.forEach( (tc) => { if (tc.tags && tc.tags.length ) tc.tags.forEach( (t) => { atags[ t.tag ] = true; } ); });
