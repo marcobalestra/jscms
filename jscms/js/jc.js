@@ -2190,6 +2190,7 @@ jc.render = {
 
 jc.actionsMenu = (e) => {
 	let acts = [];
+	e.stopPropagation();
 	if ( jc.page.prop.editMode == 'page' ) {
 		acts.push(
 			AS.label('ThisPage')+':',
