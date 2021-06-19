@@ -33,6 +33,12 @@
 	<title>Tag browser</title>
 </item>
 <item>
+	<link>https://ricette.lan.crossbow.it/index/home-page</link>
+	<pubDate>Sat, 12 Jun 2021 08:37:51 GMT</pubDate>
+	<title>JSCMS is here!</title>
+	<description><![CDATA[JSCMS home page (preview, still under development): the CMS without DB and without server-side languages.]]></description>
+</item>
+<item>
 	<link>https://ricette.lan.crossbow.it/browsedates/blog</link>
 	<pubDate>Sat, 12 Jun 2021 06:31:25 GMT</pubDate>
 	<title>Blog entries</title>

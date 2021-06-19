@@ -35,22 +35,6 @@ jc.maint = {
 		}
 		if ( params.tobescanned ) {
 			let isfirst = false;
-			if ( ! params.afterscan ) {
-				if ( ! jc.progressbar() ) return setTimeout( ()=> { jc.maint.proc(params)}, 100);
-				params.afterscan = ()=>{
-					$(document.body).off('jc_page_open_completed',params.afterscan);
-					setTimeout( ()=>{
-						jc.maint.scan( ()=>{
-							setTimeout( ()=> {
-								$(document.body).on('jc_page_open_completed',params.afterscan);
-								jc.maint.proc( params );
-							}, 10 );
-						})
-					},10 );
-				};
-				$(document.body).on('jc_page_open_completed',params.afterscan);
-				setTimeout( ()=> { jc.maint.proc(params)}, 10)
-			}
 			if ( ! params.scanlist ) {
 				params.scanlist = [];
 				isfirst = true;
@@ -63,17 +47,12 @@ jc.maint = {
 			let id = nxt.match(/^[^0-9]+[0-9]+\..*$/) ? parseInt( nxt.replace(/^[^0-9]+([0-9]+)\..*$/,"$1")) : undefined;
 			console.log('Scanning:',page,id);
 			if ( isfirst && (page == params.initial.page) && ( id == params.initial.id )) {
-				console.log('Postponing:',nxt);
 				params.tobescanned.push( params.scanlist.pop() );
 				setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 			} else {
-				setTimeout( ()=> { jc.page.open( page, id ); }, 100 );
+				jc.maint.scan( page, id, ()=>{ jc.maint.proc( params ); } );
 			}
 			return;
-		}
-		if ( params.afterscan ) {
-			$(document.body).off('jc_page_open_completed',params.afterscan);
-			delete params.afterscan;
 		}
 		if ( ! params.listsPurged ) {
 			jc.progressbar({ text:'Deleting old lists…', prog: 0 });
@@ -160,9 +139,38 @@ jc.maint = {
 			jc.page.open( params.initial.page, params.initial.id );
 		},10);
 	},
-	scan : ( cb ) => {
-		let page = jc.page.current();
+// 	scan : ( cb ) => {
+// 		let page = jc.page.current();
+// 		let pd = jc.page.data().pageContent;
+// 		if ( pd && pd.metadata ) {
+// 			jc.progressbar({ text:'Scan: '+pd.metadata.title });
+// 			let nm = JSON.parse(JSON.stringify(pd.metadata||{}));
+// 			if ( pd.blogdate ) nm.date = pd.blogdate;
+// 			if ( ! jc.maint.prop.full[page] ) jc.maint.prop.full[page] = {};
+// 			jc.maint.prop.full[page][String((pd.id||0))] = nm;
+// 			let pdtags = jc.objFindAll( pd, 'type', 'tags' ).clone();
+// 			jc.maint.prop.tagnames.forEach( tagname => {
+// 				jc.maint.prop.tags[tagname] = jc.page.parseTagsOne( pd, tagname, jc.maint.prop.tags[tagname], pdtags );
+// 			} );
+// 			jc.dav.rm(AS.path('jsdatastatics')+page+(pd.id||'')+'.html',()=>{ jc.page.makeStatic( cb ) });
+// 		} else {
+// 			let id = ( pd && AS.test.def(pd.id) ) ? String(pd.id) : '';
+// 			console.log( 'Unknown metadata:',page,id,pd);
+// 			jc.dav.rm(AS.path('jsdatastatics')+page+id+'.html', cb );
+// 		}
+// 	},
+	scan : ( page, id, cb ) => {
+		jc.maint.prop.afterscancb = cb;
+		$(document.body).on('jc_page_open_completed', jc.maint.doscan );
+		setTimeout( ()=>{ jc.page.open( page, id ); }, 10 );
+	},
+	doscan : ( event, edata ) => {
+		$(document.body).off('jc_page_open_completed', jc.maint.doscan );
+		let page = edata.page;
+		let id = edata.id;
 		let pd = jc.page.data().pageContent;
+		let cb = jc.maint.prop.afterscancb;
+		delete jc.maint.prop.afterscancb;
 		if ( pd && pd.metadata ) {
 			jc.progressbar({ text:'Scan: '+pd.metadata.title });
 			let nm = JSON.parse(JSON.stringify(pd.metadata||{}));
