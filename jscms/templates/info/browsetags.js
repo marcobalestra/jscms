@@ -78,9 +78,9 @@
 			jc.lists.tag.get( family,(l)=>{
 				$pane.html('');
 				let $ul = $('<p class="mt-1"></p>');
-				Object.keys(l).sort().forEach( k => {
+				Object.keys(l).sort( (a,b) => ( a.toLowerCase() > b.toLowerCase() ? 1 : -1 ) ).forEach( k => {
 					let $li = $('<span class="badge ml-1 click badge-secondary"></span>')
-						.html(k + ' ['+l[k].length+']')
+						.html(k + ' ['+l[k].filter(x=>(!x.hidden)).length+']')
 						.data({'family':family,'tag':k})
 						.on('click',()=>{ makelist($li) });
 					$ul.append($li);

@@ -181,7 +181,7 @@
 			if ( jc.prop.isLoggedIn && (! $('input[name="hidden"]',$filter).is(':checked')) ) {
 				found = found.filter( x => (!x.hidden));
 			} 
-			found.sort( (a,b) => (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1 ) ).forEach( (f) => {
+			found.sort( (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1 ) ).forEach( (f) => {
 				let $li = $('<li class="jcEntry"></li>').append(
 					$(`<a class="title click">${ f.title }</a>`)
 						.on('click',()=>{ jc.page.open(f.type,f.id);})
