@@ -150,7 +150,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 
 .jcHtml img { max-width: 100%;}
 .jcHtml blockquote { margin: 0 0 0 1rem; }
-.jcHtml + .jcHtml { clear: right; }
+.jcGallery + .jcHtml { margin-top: 10px; }
 
 .jcGallery a { background-color: #fff; box-shadow: -1px 0 #aaa, 1px 0 #aaa, 0 -1px #aaa, 0 1px #aaa, 4px 4px 2px #ddd; display: inline-block; height: 96px; margin: 8px; position: relative; text-align: center; transform: skew(-10deg); vertical-align: middle; width: 96px; }
 .jcGallery.sizeXS a { height: 48px; width: 48px; }
