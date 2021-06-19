@@ -188,6 +188,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 	.jcGallery.inline.sizeS a img { max-height: 180px; }
 	.jcGallery.inline.sizeS a svg { width: 180px; }
 	.jcGallery.inline.sizeL a img { max-height: 320px; }
+	.jcGallery.inline a img { max-height: 240px; }
 	.jcGallery.inline.sizeL a svg { width: 320px; }
 	.jcGallery.inline.sizeXL a img { max-height: 480px; }
 	.jcGallery.inline.sizeXL a svg { width: 480px; }
