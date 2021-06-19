@@ -171,20 +171,22 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
     min-height : 320px;
 }
 
-.jcGallery.inline a { box-shadow: -1px 0 #aaa, 1px 0 #aaa, 0 -1px #aaa, 0 1px #aaa; transform: none; }
+.jcGallery.inline { text-align: center; }
+.jcGallery.inline a { max-width: 100%; transform: none; display: inline; box-shadow: none; }
+
 @media (max-width: 600px) {
-	.jcGallery.inline a { display: block; max-width: 100%; height: unset; width: unset; }
+	.jcGallery.inline a { max-width: 100%; height: unset; width: unset; }
 }
 @media (min-width: 601px) {
-	.jcGallery.inline a { height: 240px; max-width: 100%; width: 240px; }
-	.jcGallery.inline.sizeXS a { height: 128px; width: 128px; }
-	.jcGallery.inline.sizeS a { height: 180px; width: 180px; }
-	.jcGallery.inline.sizeL a { height: 320px; width: 320px; }
-	.jcGallery.inline.sizeXL a { height: 480px; width: 480px; }
-	.jcGallery.inline.sizeXXL a { height: 640px; width: 640px; }
+	.jcGallery.inline a { max-height: 240px; }
+	.jcGallery.inline.sizeXS a { max-height: 128px; }
+	.jcGallery.inline.sizeS a { max-height: 180px; }
+	.jcGallery.inline.sizeL a { max-height: 320px; }
+	.jcGallery.inline.sizeXL a { max-height: 480px; }
+	.jcGallery.inline.sizeXXL a { max-height: 640px; }
 }
-.jcGallery.inline a:hover { box-shadow: -1px 0 #666, 1px 0 #666, 0 -1px #666, 0 1px #666; transform: none; }
-.jcGallery.inline a img { box-shadow: none; height: 100%; margin: 0; width: 100%; }
+.jcGallery.inline a:hover { box-shadow: none; transform: none; }
+.jcGallery.inline a img { box-shadow: none;  }
 .jcGallery.inline a svg {  width: 90%; height: 90%; margin: 5%; fill: #999; }
 .jcGallery.inline a:hover svg {  width: 90%; height: 90%; margin: 5%; fill: #336; }
 .jcGallery.inline a span { bottom: 10%; right: 2%; font-size: 100%; }
