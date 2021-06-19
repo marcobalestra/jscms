@@ -171,7 +171,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
     min-height : 320px;
 }
 
-.jcGallery.inline { text-align: center; }
+.jcGallery.inline { text-align: center; height:unset; }
 .jcGallery.inline a { max-width: 100%; transform: none; display: inline; box-shadow: none; }
 
 @media (max-width: 600px) {
@@ -179,14 +179,14 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 }
 @media (min-width: 601px) {
 	.jcGallery.inline a { max-height: 240px; }
-	.jcGallery.inline.sizeXS a { max-height: 128px; }
-	.jcGallery.inline.sizeS a { max-height: 180px; }
-	.jcGallery.inline.sizeL a { max-height: 320px; }
-	.jcGallery.inline.sizeXL a { max-height: 480px; }
-	.jcGallery.inline.sizeXXL a { max-height: 640px; }
+	.jcGallery.inline.sizeXS a { height:unset; max-height: 128px; }
+	.jcGallery.inline.sizeS a { height:unset; max-height: 180px; }
+	.jcGallery.inline.sizeL a { height:unset; max-height: 320px; }
+	.jcGallery.inline.sizeXL a { height:unset; max-height: 480px; }
+	.jcGallery.inline.sizeXXL a { height:unset; max-height: 640px; }
 }
 .jcGallery.inline a:hover { box-shadow: none; transform: none; }
-.jcGallery.inline a img { box-shadow: none;  }
+.jcGallery.inline a img { box-shadow: none; height:unset; width: unset; }
 .jcGallery.inline a svg {  width: 90%; height: 90%; margin: 5%; fill: #999; }
 .jcGallery.inline a:hover svg {  width: 90%; height: 90%; margin: 5%; fill: #336; }
 .jcGallery.inline a span { bottom: 10%; right: 2%; font-size: 100%; }
