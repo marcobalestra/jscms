@@ -500,9 +500,9 @@ jc.page.rm = ( params ) => {
 		return;
 	}
 	if ( ! params.tagsPurged ) {
-		if ( ! params.data.metadata ) params.data.metadata = {};
-		params.data.metadata.hidden = true;
-		jc.page.makeTagsAll( params.data, ()=>{
+		if ( ! params.pdata.metadata ) params.pdata.metadata = {};
+		params.pdata.metadata.hidden = true;
+		jc.page.makeTagsAll( params.pdata, ()=>{
 			$(document.body).trigger('jc_saved_page_tags',params);
 			params.tagsPurged = true;
 			jc.page.rm( params );
