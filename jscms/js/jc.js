@@ -1768,7 +1768,8 @@ jc.render = {
 		},
 		html : (b,d)=> {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
-			return '<div class="jcHtml">'+d[b.prop]+'</div>';
+			let h = d[b.prop].replace(/ href="(\.\.\/)*(\.\.)?\/!([a-z]+)([0-9]*)([^"]*)"/g," href=\"javascript:jc.page.open('$3',$4)\"");
+			return '<div class="jcHtml">'+h+'</div>';
 		},
 		date : (b,d) => {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
