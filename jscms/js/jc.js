@@ -1884,7 +1884,7 @@ jc.render = {
 				$div.addClass('jcGallery');
 				if ( d.aspect == 'I' ) {
 					$div.addClass('inline');
-					if( d[b.prop].length == 1 ) $div.addClass('jcBoxRight');
+					//if( d[b.prop].length == 1 ) $div.addClass('jcBoxRight');
 				}
 				d[b.prop].forEach( uu => {
 					let u = pdata.uploads.find( x => ( x.uri == uu.uri ));
