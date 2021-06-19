@@ -197,8 +197,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 }
 .jcGallery.inline a:hover { box-shadow: none; transform: none; }
 .jcGallery.inline a img { box-shadow: none; height:unset; width: unset; object-fit: unset; margin: 0; max-width: 100%; }
-.jcGallery.inline a svg {  margin: 10px; fill: #999; }
-.jcGallery.inline a:hover svg {  margin: 10px; fill: #336; }
+.jcGallery.inline a:hover svg {  margin: 0; fill: #336; }
 .jcGallery.inline a span { bottom: 10%; right: 0; font-size: 100%; }
 
 .jcCarousel { display: block; width: 100%; margin: 1em 0; box-shadow: -1px 0 2px #666,0 1px 2px #666, 1px 0 2px #666,0 -1px 2px #666; }
