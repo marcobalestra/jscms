@@ -5,6 +5,12 @@
 <link>https://ricette.lan.crossbow.it/</link>
 <generator>jBloud CMS - jscms</generator>
 <item>
+	<link>https://ricette.lan.crossbow.it/index1/tech</link>
+	<pubDate>Sat, 19 Jun 2021 08:28:52 GMT</pubDate>
+	<title>JSCMS tech info</title>
+	<description><![CDATA[A few tech details on the jscms backing JBLOUD]]></description>
+</item>
+<item>
 	<link>https://ricette.lan.crossbow.it/index2/</link>
 	<pubDate>Wed, 16 Jun 2021 09:56:32 GMT</pubDate>
 	<title>Overview</title>
@@ -43,12 +49,6 @@
 	<pubDate>Sat, 12 Jun 2021 06:31:25 GMT</pubDate>
 	<title>Blog entries</title>
 	<description><![CDATA[JSCMS blog entries]]></description>
-</item>
-<item>
-	<link>https://ricette.lan.crossbow.it/index1/tech</link>
-	<pubDate>Thu, 03 Jun 2021 12:02:20 GMT</pubDate>
-	<title>JSCMS tech info</title>
-	<description><![CDATA[A few tech details on the jscms backing JBLOUD]]></description>
 </item>
 </channel>
 </rss>

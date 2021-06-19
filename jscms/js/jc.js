@@ -1416,12 +1416,25 @@ jc.page = {
 					const md = j.metadata;
 					if ( md.title ) $('title',h).html(md.title);
 					let keywords = (md.keywords ? md.keywords : '').split(/, */);
-					jc.objFindAll(jc.objFindAll(j,'type','tags'),'show').forEach( tf => {
-						if ( tf.tags ) tf.tags.forEach( (t) => {
-							let tt = t.tag.toLowerCase();
-							if ( ! keywords.find( x => (x == tt))) keywords.push( tt );
-						} );
-					});
+					let lang = false;
+					let alltags = jc.objFindAll(j,'type','tags').filter( x => ( x.tags && x.tags.length));
+					if ( alltags && alltags.length ) {
+						alltags.filter( x => x.show ).forEach( tf => {
+							tf.tags.forEach( (t) => {
+								let tt = t.tag.toLowerCase();
+								if ( ! keywords.find( x => (x == tt))) keywords.push( tt );
+							} );
+						});
+						alltags.filter( x => (x.name.match(/^lang/i) && (x.tags.length == 1)) ).forEach( tf => {
+							if ( (!lang) && tf.tags[0].tag.match(/^[a-z]{2}(_[A-Z]{2})?$/) ) lang = tf.tags[0].tag;
+						});
+					}
+					if ( lang ) {
+						$(document.documentElement).attr('lang',lang);
+						keywords = keywords.filter( x => (x != lang ));
+					} else {
+						$(document.documentElement).removeAttr('lang');
+					}
 					if ( keywords.length ) {
 						$('meta[name="keywords"]',h).attr('content',keywords.join(', '));
 					}
