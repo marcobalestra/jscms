@@ -732,7 +732,8 @@ jc.page.makeStatic = ( cb ) => {
 	let cs = document.body.getAttribute('style');
 	document.body.className = '';
 	document.body.style='';
-	let html = $(document.documentElement).html();
+	let $de = $(document.documentElement);
+	let html = $de.html();
 	document.body.className = cn;
 	document.body.style = cs;
 	html = html
@@ -748,7 +749,7 @@ jc.page.makeStatic = ( cb ) => {
 		.replace(/<nav [\s\S]+?<\/nav>/g,"")
 		.replace(/<svg [\s\S]+?<\/svg>/g,"")
 		;
-	html = '<!DOCTYPE html>\n<html>\n'+html+'\n</html>';
+	html = '<!DOCTYPE html>\n<html'+($de.attr('lang') ? ' lang="'+$de.attr('lang')+'"': '')+'>\n'+html+'\n</html>';
 	jc.dav.put( uri, html, ()=>{
 		$(document.body).trigger('jc_saved_static');
 		if ( AS.test.func(cb) ) cb.call(window,true);
