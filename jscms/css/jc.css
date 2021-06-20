@@ -171,7 +171,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
     min-height : 320px;
 }
 
-.jcGallery.inline { text-align: center; height:unset; }
+.jcGallery.inline { text-align: center; height:unset; overflow: auto; }
 .jcGallery.inline a { max-width: 100%; transform: none; display: inline-block; box-shadow: none; width: auto; }
 .jcGallery.inline a svg {  width: 96px; height: unset; margin: 0; fill: #999; }
 .jcGallery.inline a:hover svg { fill: #999; }
