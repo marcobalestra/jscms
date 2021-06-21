@@ -1454,7 +1454,6 @@ jc.edit = {
 							{label:AS.label('Text'),value:'<div></div>'},
 							{label:AS.label('Note (warning)'),value:'<div class="alert alert-warning jcWarning" role="alert"></div>'},
 							{label:AS.label('Code'),value:'<div class="jcCode"></div>'},
-							{label:AS.label('OLD Note'),value:'<div class="alert alert-warning" role="alert" style="width:66%;margin-left:auto;"></div>'},
 						],depends:'type=text'}],
 					["text","textarea",{nolabel:true,trim:true,asTitle:'onlyNonEmptyFields',value:""}],
 				);
