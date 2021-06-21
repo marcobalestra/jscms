@@ -1376,7 +1376,7 @@ jc.page = {
 		if ( tbf.length ) {
 			jc.lists.list.get( (l)=>{
 				tbf.forEach( (a) => {
-					let h = a.getAttribute('href').replace(/(\.\.\/)*(\.\.)?\/!([a-z]+)([0-9]*)/,"$3$4");
+					let h = a.getAttribute('href').replace(/(\.\.\/)*(\.\.)?\/!([a-z]+)([0-9]*).*/,"$3$4");
 					let pt = h.replace(/[^a-z]/g,'');
 					let id = h.replace(/[^0-9]/g,'')||undefined;
 					a.setAttribute('href',`jc.page.open('${pt}'${ id ? ','+id : ''})`);
