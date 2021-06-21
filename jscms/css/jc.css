@@ -152,6 +152,14 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcHtml blockquote { margin: 0 0 0 1rem; }
 .jcGallery + .jcHtml { margin-top: 10px; }
 
+.jcCode { white-space: pre; background-color : #ffd; padding: 5px 2%; }
+@media (min-width: 601px) {
+	.jcWarning { max-width: 66%; margin-left: auto; }
+}
+@media (min-width: 800px) {
+	.jcWarning { max-width: 50%; }
+}
+
 .jcGallery a { background-color: #fff; box-shadow: -1px 0 #aaa, 1px 0 #aaa, 0 -1px #aaa, 0 1px #aaa, 4px 4px 2px #ddd; display: inline-block; height: 96px; margin: 8px; position: relative; text-align: center; transform: skew(-10deg); vertical-align: middle; width: 96px; }
 .jcGallery.sizeXS a { height: 48px; width: 48px; }
 .jcGallery.sizeS a { height: 64px; width: 64px; }
