@@ -1372,11 +1372,11 @@ jc.page = {
 			}, 100 );
 		};
 		let tbf = [];
-		$('a[href*="/!"]').each( (idx,a) => { if ( a.getAttribute('href').match(/(\.\.\/)*(\.\.)?\/!([a-z]+)([0-9]*)/) ) tbf.push( a ); });
+		$('a[href*="/!"]').each( (idx,a) => { if ( a.getAttribute('href').match(/^(\.\.\/)*(\.\.)?\/!([a-z]+)([0-9]*)/) ) tbf.push( a ); });
 		if ( tbf.length ) {
 			jc.lists.list.get( (l)=>{
 				tbf.forEach( (a) => {
-					let h = a.getAttribute('href').replace(/(\.\.\/)*(\.\.)?\/!([a-z]+)([0-9]*).*/,"$3$4");
+					let h = a.getAttribute('href').replace(/^(\.\.\/)*(\.\.)?\/!([a-z]+)([0-9]*).*$/,"$3$4");
 					let pt = h.replace(/[^a-z]/g,'');
 					let id = h.replace(/[^0-9]/g,'')||undefined;
 					a.setAttribute('href',`jc.page.open('${pt}'${ id ? ','+id : ''})`);
