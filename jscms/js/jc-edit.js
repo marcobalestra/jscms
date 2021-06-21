@@ -1477,7 +1477,13 @@ jc.edit = {
 					rf.show();
 				}}],
 				["html","html",{nolabel:true,trim:true,asTitle:'onlyNonEmptyFields',value:""}],
-				["wrap",'select',{asLabel:'blockTextAspect',default:'<h4></h4>',options:[{label:AS.label('H3'),value:'<h3></h3>'},{label:AS.label('H4'),value:'<h4></h4>'},{label:AS.label('Text'),value:'<div></div>'}],depends:'type=text'}],
+				["wrap",'select',{asLabel:'blockTextAspect',default:'<h4></h4>',options:[
+						{label:AS.label('H3'),value:'<h3></h3>'},
+						{label:AS.label('H4'),value:'<h4></h4>'},
+						{label:AS.label('Text'),value:'<div></div>'},
+						{label:AS.label('Note (warning)'),value:'<div class="alert alert-warning jcWarning" role="alert"></div>'},
+						{label:AS.label('Code'),value:'<div class="jcCode"></div>'},
+					],depends:'type=text'}],
 				["text","textarea",{nolabel:true,trim:true,asTitle:'onlyNonEmptyFields',value:""}],
 			);
 			return o;
