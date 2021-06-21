@@ -1346,12 +1346,7 @@ jc.page = {
 		jc.page.changed( false );
 		jc.console('Opening page:'+page, id, data, infokey );
 		jc.page.data( data );
-		let finalize = ()=>{
-			$(document.body).off('jc_render_end',finalize);
-			if ( ! jc.page.prop.editMode ) window.scrollTo(0,0);
-			setTimeout( ()=>{ $(document.body).trigger('jc_page_open_completed',{page:page,id:id,uriparams:data.args}); }, 100 );
-		}
-		$(document.body).on('jc_render_end',finalize);
+		$(document.body).on('jc_render_end',jc.page.finalize);
 		jc.page.step.info( page, id, data, infokey );
 	},
 	loadData : ( page, id, callback ) => {
@@ -1364,15 +1359,34 @@ jc.page = {
 	},
 	reload : () => {
 		let cs = $(window).scrollTop();
-		let finalize = ()=>{
-			$(document.body).off('jc_render_end',finalize);
-			setTimeout( ()=>{
-				$(window).scrollTop(cs);
-				setTimeout( ()=>{ $(document.body).trigger('jc_page_open_completed',{page:jc.page.current(),id:jc.page.data().id,uriparams:jc.page.data().args}); }, 100 );
-			}, 100 );
-		}
-		$(document.body).on('jc_render_end',finalize);
+		$(document.body).on('jc_render_end',jc.page.finalize);
 		jc.page.step.data( jc.page.current(), jc.page.data().id );
+	},
+	finalize : () => {
+		$(document.body).off('jc_render_end',jc.page.finalize);
+		const closure = ()=>{
+			if ( ! jc.page.prop.editMode ) window.scrollTo(0,0);
+			setTimeout( ()=>{
+				let d = jc.page.data();
+				$(document.body).trigger('jc_page_open_completed',{page:jc.page.current(),id:d.id,uriparams:d.args});
+			}, 100 );
+		};
+		let tbf = [];
+		$('a[href*="/!"]').each( (idx,a) => { if ( a.getAttribute('href').match(/(\.\.\/)*(\.\.)?\/!([a-z]+)([0-9]*)/) ) tbf.push( a ); });
+		if ( tbf.length ) {
+			jc.lists.list.get( (l)=>{
+				tbf.forEach( (a) => {
+					let h = a.getAttribute('href').replace(/(\.\.\/)*(\.\.)?\/!([a-z]+)([0-9]*)/,"$3$4");
+					let pt = h.replace(/[^a-z]/g,'');
+					let id = h.replace(/[^0-9]/g,'')||undefined;
+					a.setAttribute('href',`jc.page.open('${pt}'${ id ? ','+id : ''})`);
+					if ( a.innerHTML.match(/^!+/) && l[pt] && l[pt][id||'0'] ) a.innerHTML = l[pt][id||'0'].title||AS.label('Unknown');
+				} );
+				closure();
+			});
+		} else {
+			closure();
+		}
 	},
 	step : {
 		info : ( page, id, data, infokey ) => {
@@ -1768,8 +1782,7 @@ jc.render = {
 		},
 		html : (b,d)=> {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
-			let h = d[b.prop].replace(/ href="(\.\.\/)*(\.\.)?\/!([a-z]+)([0-9]*)([^"]*)"/g," href=\"javascript:jc.page.open('$3',$4)\"");
-			return '<div class="jcHtml">'+h+'</div>';
+			return '<div class="jcHtml">'+d[b.prop]+'</div>';
 		},
 		date : (b,d) => {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
@@ -1887,8 +1900,8 @@ jc.render = {
 					default : $div.addClass('thumbs'); break;
 				}
 				if ( d.pos ) switch ( d.pos ) {
-					case 'left': $div.addClass('jcBoxFloat jcBoxLeft'); break;
-					case 'right' : $div.addClass('jcBoxFloat jcBoxRight'); break;
+					case 'left': $div.addClass('jcBoxFloatImg jcBoxLeft'); break;
+					case 'right' : $div.addClass('jcBoxFloatImg jcBoxRight'); break;
 				}
 				d[b.prop].forEach( uu => {
 					let u = pdata.uploads.find( x => ( x.uri == uu.uri ));
