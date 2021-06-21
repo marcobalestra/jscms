@@ -1882,9 +1882,13 @@ jc.render = {
 				);
 			} else {
 				$div.addClass('jcGallery');
-				if ( d.aspect == 'I' ) {
-					$div.addClass('inline');
-					//if( d[b.prop].length == 1 ) $div.addClass('jcBoxRight');
+				switch ( d.aspect ) {
+					case 'I': $div.addClass('inline'); break;
+					default : $div.addClass('thumbs'); break;
+				}
+				if ( d.pos ) switch ( d.pos ) {
+					case 'left': $div.addClass('jcBoxFloat jcBoxLeft'); break;
+					case 'right' : $div.addClass('jcBoxFloat jcBoxRight'); break;
 				}
 				d[b.prop].forEach( uu => {
 					let u = pdata.uploads.find( x => ( x.uri == uu.uri ));

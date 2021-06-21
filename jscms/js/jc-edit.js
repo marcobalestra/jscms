@@ -2451,14 +2451,26 @@ jc.edit.uploads = {
 		};
 		if ( params.gallery ) {
 			let $st = $('<select class="mr-1 mt-1"><option value="T">Thumbnails</option><option value="I">Inline</option><option value="C">Carousel</option></select>');
+			let $sp = $('<select class="mr-1 mt-1"><option value="">Center</option><option value="right">Right</option><option value="left">Left</option>');
 			let $sf = $('<select class="mr-1 mt-1"><option value="">Plain</option><option value="c">With captions</option><option value="x">With controls</option><option value="i">With indicators</option><option value="ci">With captions + indicators</option><option value="xi">With controls + indicators</option><option value="cxi">With captions + controls + indicators</option></select>');
 			let $ss = $('<select class="mr-1 mt-1"><option>XS</option><option>S</option><option value="">M</option><option>L</option><option>XL</option><option>XXL</option></select>');
 			$st.val( params.gallery.aspect||'T' );
 			$st.on('change',()=>{
 				params.gallery.aspect = $st.val();
 				if ( params.gallery.aspect != 'C' ) delete params.gallery.flags;
-				//$ss.toggle( params.gallery.aspect != 'C' );
 				$sf.toggle( params.gallery.aspect == 'C' );
+				if ( params.gallery.aspect != 'I' ) delete params.gallery.pos;
+				$sp.toggle( params.gallery.aspect == 'I' );
+				jc.page.save({ maintenance: true, mute: false, callback: ()=>{
+					jc.edit.noModal();
+					$(document.body).on('jc_page_data_loaded',refresh);
+					jc.page.reload();
+				}});
+			});
+			$sp.val( params.gallery.pos||'' ).toggle( params.gallery.aspect == 'I' );
+			$sp.on('change',()=>{
+				if ( $sp.val().length) params.gallery.pos = $sp.val();
+				else delete params.gallery.pos;
 				jc.page.save({ maintenance: true, mute: false, callback: ()=>{
 					jc.edit.noModal();
 					$(document.body).on('jc_page_data_loaded',refresh);
@@ -2485,7 +2497,7 @@ jc.edit.uploads = {
 					jc.page.reload();
 				}});
 			});
-			$('.jcUploadsAdders .btn-group',$out).append($('<span class="ml-3"></span>').append($st,$ss,$sf));
+			$('.jcUploadsAdders .btn-group',$out).append($('<span class="ml-3"></span>').append($st,$ss,$sp,$sf));
 			$('.jcUploadsAdders .btn-group select',$out).css({'max-width':'100px'});
 		}
 		$('.jcImageUpload',$out).on('click',()=>{ $('input[type="file"]',$out).trigger('click'); });

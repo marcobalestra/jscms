@@ -5,6 +5,12 @@
 <link>https://ricette.lan.crossbow.it/</link>
 <generator>jBloud CMS - jscms</generator>
 <item>
+	<link>https://ricette.lan.crossbow.it/index/home-page</link>
+	<pubDate>Mon, 21 Jun 2021 06:04:54 GMT</pubDate>
+	<title>JSCMS is here!</title>
+	<description><![CDATA[JSCMS home page (preview, still under development): the CMS without DB and without server-side languages.]]></description>
+</item>
+<item>
 	<link>https://ricette.lan.crossbow.it/index1/tech</link>
 	<pubDate>Sat, 19 Jun 2021 08:28:52 GMT</pubDate>
 	<title>JSCMS tech info</title>
@@ -37,12 +43,6 @@
 	<link>https://ricette.lan.crossbow.it/browsetags/tag-browser</link>
 	<pubDate>Mon, 14 Jun 2021 08:29:32 GMT</pubDate>
 	<title>Tag browser</title>
-</item>
-<item>
-	<link>https://ricette.lan.crossbow.it/index/home-page</link>
-	<pubDate>Sat, 12 Jun 2021 08:37:51 GMT</pubDate>
-	<title>JSCMS is here!</title>
-	<description><![CDATA[JSCMS home page (preview, still under development): the CMS without DB and without server-side languages.]]></description>
 </item>
 <item>
 	<link>https://ricette.lan.crossbow.it/browsedates/blog</link>
