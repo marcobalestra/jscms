@@ -136,6 +136,7 @@ a[href^="mailto:"]::after { content: ' ✉'; }
 }
 .jcProgressbar { width: 280px; height: 8px; background-color : #eee; border: 1px solid #ccc; overflow: hidden; }
 .jcProgressbar div { height: 8px; float: left; background-color : #ccc; }
+.jcProgressbarText { width: 280px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
 
 #jcPageUploads>div { max-height: 600px; overflow-y: auto; }
 table.jcUploads { min-width: 60%; margin: 0 auto; }
