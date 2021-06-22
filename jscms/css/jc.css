@@ -269,7 +269,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcMediaRecordArea.recording video, .jcMediaRecordArea.recording audio { opacity: .3; background-color : #c00; }
 
 @media (min-width: 601px) {
-	.jcBoxFloat, .jcBoxRight { display:block; min-width: 200px; max-width: calc(100% - 400px); z-index: 2; width: 30%; margin: 0 0 0 8px; padding: 0; }
+	.jcBoxFloat, .jcBoxRight { display:block; min-width: 200px; max-width: calc(100% - 400px); z-index: 2; width: 30%; margin: 0 0 8px 8px; padding: 0; }
 	.jcBoxFloat ul, .jcBoxFloat ol, .jcBoxRight ul,.jcBoxRight ol { margin-bottom: 0; }
 	.jcBoxLeft { float: left; clear: left; }
 	.jcBoxRight { float: right; clear: right; }
