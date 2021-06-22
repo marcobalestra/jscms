@@ -1372,7 +1372,7 @@ jc.page = {
 			}, 100 );
 		};
 		let tbf = [];
-		$('a[href*="/!"]').each( (idx,a) => { if ( a.getAttribute('href').match(/^(\.\.\/)*(\.\.)?\/?!([a-z]+)([0-9]*)/) ) tbf.push( a ); });
+		$('a[href*="!"]').each( (idx,a) => { if ( a.getAttribute('href').match(/^(\.\.\/)*(\.\.)?\/?!([a-z]+)([0-9]*)/) ) tbf.push( a ); });
 		if ( tbf.length ) {
 			jc.lists.list.get( (l)=>{
 				tbf.forEach( (a) => {
