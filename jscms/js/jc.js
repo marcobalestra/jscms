@@ -1379,8 +1379,12 @@ jc.page = {
 					let h = a.getAttribute('href').replace(/^(\.\.\/)*(\.\.)?\/?!([a-z]+)([0-9]*).*$/,"$3$4");
 					let pt = h.replace(/[^a-z]/g,'');
 					let id = h.replace(/[^0-9]/g,'')||undefined;
-					a.setAttribute('href',`javascript:jc.page.open('${pt}'${ id ? ','+id : ''})`);
 					if ( a.innerHTML.match(/^!+/) && l[pt] && l[pt][id||'0'] ) a.innerHTML = l[pt][id||'0'].title||AS.label('Unknown');
+					$(a).on('click',(e)=>{
+						e.preventDefault();
+						jc.page.open(pt,id);
+					}).addClass('jcParsed');
+// 					a.setAttribute('href',`javascript:jc.page.open('${pt}'${ id ? ','+id : ''})`);
 				} );
 				closure();
 			});
