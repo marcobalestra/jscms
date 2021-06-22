@@ -1483,7 +1483,10 @@ jc.page = {
 				$menu.append(`<div class="jcicon jcAuth">${ AS.icon('menu') }</div>`);
 			}
 			$menu.on('click contextmenu',jc.actionsMenu);
-			$(document.body).on('contextmenu',jc.actionsMenu);
+			if ( ! jc.prop.menuTriggerSet ) {
+				jc.prop.menuTriggerSet = true;
+				$(document.body).on('contextmenu',jc.actionsMenu);
+			}
 		} else {
 			$(document.body).removeClass('jcUserAuth');
 			if ( $menu.hasClass('jcMenuText') ) {
@@ -1491,6 +1494,7 @@ jc.page = {
 			} else {
 				$menu.append(`<span class="jcicon jcUnauth">${ AS.icon('lock') }</span>`);
 			}
+			delete jc.prop.menuTriggerSet;
 			$menu.off('click contextmenu',jc.actionsMenu);
 			$(document.body).off('contextmenu',jc.actionsMenu);
 			$('.jcUnauth',$menu).on('click',jc.page.login);
@@ -2212,6 +2216,7 @@ jc.render = {
 
 jc.actionsMenu = (e) => {
 	let acts = [];
+	e.preventDefault();
 	e.stopPropagation();
 	if ( jc.page.prop.editMode == 'page' ) {
 		acts.push(
