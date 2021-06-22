@@ -1372,7 +1372,7 @@ jc.page = {
 			}, 100 );
 		};
 		let tbf = [];
-		$('a[href*="!"]').each( (idx,a) => { if ( a.getAttribute('href').match(/^(\.\.\/)*(\.\.)?\/?!([a-z]+)([0-9]*)/) ) tbf.push( a ); });
+		$('a[href*="!"]:not(.jcParsed)').each( (idx,a) => { if ( a.getAttribute('href').match(/^(\.\.\/)*(\.\.)?\/?!([a-z]+)([0-9]*)/) ) tbf.push( a ); });
 		if ( tbf.length ) {
 			jc.lists.list.get( (l)=>{
 				tbf.forEach( (a) => {
@@ -1992,7 +1992,7 @@ jc.render = {
 					let rn = data[i.item.page] ? data[i.item.page][String(i.item.id||0)] : false;
 					if ( ! rn ) return;
 					let $li = $('<'+nodes[1]+' class="jcRelatedEntry jcEntry"></'+nodes[1]+'>');
-					let $a = $(`<a class="title" href="${ jc.URI.encode(i.item,rn.url) }"></a>`).on('click',(e)=>{
+					let $a = $(`<a class="title jcParsed" href="${ jc.URI.encode(i.item,rn.url) }"></a>`).on('click',(e)=>{
 						e.preventDefault();
 						jc.page.open(i.item.page,i.item.id);
 					}).html(rn.title);
@@ -2057,7 +2057,7 @@ jc.render = {
 					list.sort( (a,b) => (a,b) => ( a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1 ) ).forEach( i => {
 						if ( ! ( i && i.type )) return;
 						let $li = $('<'+nodes[1]+' class="jcPbytgagEntry jcEntry"></'+nodes[1]+'>');
-						let $a = $(`<a class="title" href="${ jc.URI.encode(i) }"></a>`).on('click',(e)=>{
+						let $a = $(`<a class="title jcParsed" href="${ jc.URI.encode(i) }"></a>`).on('click',(e)=>{
 							e.preventDefault();
 							jc.page.open(i.type,i.id);
 						}).html(i.title);
