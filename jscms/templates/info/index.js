@@ -17,9 +17,9 @@
 				blocks:[
 					{ type:"text",wrap:"<h3></h3>",prop:"title" },
 					{ type:"mixed",prop:"blocks" },
-					{ type:"ads", editable: false, prop:"ads" },
 				]
 			},
+			{ type:"ads", editable: false, content:"ads" },
 			{ type:"part", content: "fbcomments.json" },
 			{ type:"part", content: "sharethis.json" },
 		]},
