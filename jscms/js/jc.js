@@ -2228,9 +2228,11 @@ jc.render = {
 			let $div = $('<div class="jcAds"></div>');
 			let foo = () => {
 				if ( ! AS.test.obj(jc.prop.site) ) return setTimeout( foo, 100 );
+				jc.render.queue(-1);
 				if ( ! jc.prop.site.ads ) $div.remove();
 				$div.append( $(jc.prop.site.ads) );
 			}
+			jc.render.queue(1);
 			setTimeout( foo, 100 );
 			return $div;
 		},
