@@ -1757,6 +1757,10 @@ jc.render = {
 		jc.render.main(o);
 		jc.render.queue(-1);
 	},
+	ads : (o) => {
+		if ( ! jc.prop.site.ads ) return '';
+		return $('<div class="jcAds"></div>').append(jc.prop.site.ads);
+	},
 	blocks : (o,pdata,pfull) => {
 		if ( ! Array.isArray(o.blocks)) o.blocks = [o.blocks];
 		let canedit = o.editable;
