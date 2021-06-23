@@ -154,7 +154,7 @@
 			$out.append( $h );
 			$out.append('<div class="jcMenu"></div>');
 			$('#jcCustomAds').remove();
-			if ( data.ads ) $(document.body).prepend($('<div id="jcCustomAds"></div>').append(data.ads));
+			if ( data.ads ) $(document.body).append($('<div id="jcCustomAds"></div>').append(data.ads));
 			return $out;
 		},
 	};
