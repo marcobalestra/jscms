@@ -1763,7 +1763,7 @@ jc.render = {
 			other = {};
 		}
 		if ( ! AS.test.obj(jc.prop.site) ) {
-			setTimeout( ()=>{ jc.render.part(o,pdata,pfull,other) }, 100 );
+			setTimeout( ()=>{ jc.render.ads(o,pdata,pfull,other) }, 100 );
 			return;
 		}
 		o.rendered = jc.prop.site.ads || '';
