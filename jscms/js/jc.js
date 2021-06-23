@@ -2229,7 +2229,7 @@ jc.render = {
 			let foo = () => {
 				if ( ! AS.test.obj(jc.prop.site) ) return setTimeout( foo, 100 );
 				if ( ! jc.prop.site.ads ) $div.remove();
-				$div.append( jc.prop.site.ads );
+				$div.append( $(jc.prop.site.ads) );
 			}
 			setTimeout( foo, 100 );
 			return $div;
