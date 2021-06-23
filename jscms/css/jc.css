@@ -158,6 +158,7 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 	.jcWarning { max-width: 66%; margin-left: auto; }
 }
 @media (min-width: 800px) {
+	.jcCode { width: 100%; overflow-x: auto; }
 	.jcWarning { max-width: 50%; }
 }
 
