@@ -1764,6 +1764,7 @@ jc.render = {
 			if ( ! jc.prop.site.ads ) $div.remove();
 			$div.append( jc.prop.site.ads );
 		}
+		setTimeout( foo, 100 );
 		return $div;
 	},
 	blocks : (o,pdata,pfull) => {
