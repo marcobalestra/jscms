@@ -87,7 +87,7 @@
 					['type','hidden',{value:"header",tab:0}],
 					['sitename','text',{asLabel:'Site name',normalize:true,skipempty:true,mandatory:true,tab:0}],
 					['bgcolor','color',{asLabel:'Background color',value:defaults.bgcolor,skipempty:true,tab:0}],
-					['customheads','textarea',{asLabel:'Headers',tab:0,help:'Custom code (e.g. for Google Ads) appended to document HEAD.\nLeave it blank to skip it.\nIf changed after saving requires page reload.'}],
+					['ads','textarea',{asLabel:'Ads',tab:0,help:'Custom code (e.g. for Google Ads) to be added at body top.\nLeave it blank to skip it.'}],
 					['bannerpos','checklist',{asLabel:'Banner',ctype:'r',list:bannerpos,tab:1}],
 					['headertag','text',{asLabel:'Header text',normalize:true,skipempty:true,tab:1,help:'A few words on the cover page, defaults to site name'}],
 					['headercolor','color',{asLabel:'Header color',value:defaults.headercolor,tab:1,help:'The color of the text of header tag or site name.'}],
@@ -153,10 +153,8 @@
 			if ( ! (data.profile && data.profile.length)) $h.on('click',()=>{ jc.page.open('index'); }).css('cursor','pointer');
 			$out.append( $h );
 			$out.append('<div class="jcMenu"></div>');
-			if ( data.customheads && ! jc.prop.customheadsAdded ) {
-				jc.prop.customheadsAdded = true;
-				$('head',document.documentElement).append( data.customheads );
-			}
+			$('#jcCustomAds').remove();
+			if ( data.ads ) $(document.body).prepend($('<div id="jcCustomAds"></div>').append(data.ads));
 			return $out;
 		},
 	};
