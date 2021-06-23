@@ -11,6 +11,7 @@
 		{ selector: "#belowTopBar", content: false },
 		{ selector: "#topNavbar", part: 'navbar.json' },
 		{ selector: "#mainContainer", content : [
+			{ type:"ads", editable: false, content:"ads" },
 			{
 				type:"blocks",
 				editable:true,
@@ -20,7 +21,6 @@
 				]
 			},
 			{ type:"part", content: "fbcomments.json" },
-			{ type:"ads", editable: false, content:"ads" },
 			{ type:"part", content: "sharethis.json" },
 		]},
 		{ selector: '#topFooter', type:'text', content: '{{label:GlobalFooter}}' },
