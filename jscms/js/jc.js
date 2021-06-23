@@ -1766,7 +1766,7 @@ jc.render = {
 			setTimeout( ()=>{ jc.render.ads(o,pdata,pfull,other) }, 100 );
 			return;
 		}
-		o.rendered = jc.prop.site.ads || '';
+		o.rendered = jc.prop.site.ads ? '<div class="jcAds">'+jc.prop.site.ads+'</div>': '';
 		jc.render.main(o);
 		jc.render.queue(-1);
 	},
