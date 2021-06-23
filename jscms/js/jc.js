@@ -1760,7 +1760,7 @@ jc.render = {
 	ads : () => {
 		let $div = $('<div class="jcAds"></div>');
 		let foo = () => {
-			if ( ! jc.prop.site ) setTimeout( foo, 100 );
+			if ( ! AS.test.obj(jc.prop.site) ) return setTimeout( foo, 100 );
 			if ( ! jc.prop.site.ads ) $div.remove();
 			$div.append( jc.prop.site.ads );
 		}
