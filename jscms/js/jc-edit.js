@@ -240,7 +240,7 @@ $.extend( true, jc.lists, {
 				feed += '\t<link>'+baseuri+pt+(i.id||'')+'/'+(i.url||'')+'</link>\n';
 				feed += '\t<pubDate>'+ (new Date(i.upd)).toUTCString() +'</pubDate>\n';
 				feed += '\t<title>'+i.title.escape()+'</title>\n';
-				if ( i.description && i.description.length ) feed += '\t<description><![CDATA['+i.description+']]></description>\n';
+				feed += '\t<description><![CDATA['+(i.description||i.title)+']]></description>\n';
 				feed += '</item>\n';
 			} );
 			feed += '</channel>\n</rss>\n';
