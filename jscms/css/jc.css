@@ -294,7 +294,6 @@ label svg.bannerPreview { width: 220px; vertical-align: -20px; }
 
 #topFooter { text-align: center; margin: 2em 0; background-color : rgba(255,255,255,.75); }
 
-.jcAds > * { display: block; margin: 8px auto; }
 
 /* Bootstrap enhancements */
 a[onclick] { cursor: pointer; }
