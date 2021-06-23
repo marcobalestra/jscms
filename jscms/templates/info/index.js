@@ -20,6 +20,7 @@
 				]
 			},
 			{ type:"part", content: "fbcomments.json" },
+			{ type:"ads", editable: "false", content:"" },
 			{ type:"part", content: "sharethis.json" },
 		]},
 		{ selector: '#topFooter', type:'text', content: '{{label:GlobalFooter}}' },

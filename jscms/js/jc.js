@@ -2211,6 +2211,10 @@ jc.render = {
 			$( ()=>{ build() } );
 			return $div;
 		},
+		ads : (b,d) => {
+			if ( ! jc.prop.site.ads ) return '';
+			return $('<div class="jcAds"></div>').append(jc.prop.site.ads);
+		},
 	},
 };
 
