@@ -1757,9 +1757,14 @@ jc.render = {
 		jc.render.main(o);
 		jc.render.queue(-1);
 	},
-	ads : (o) => {
-		if ( ! jc.prop.site.ads ) return '';
-		return $('<div class="jcAds"></div>').append(jc.prop.site.ads);
+	ads : () => {
+		let $div = $('<div class="jcAds"></div>');
+		let foo = () => {
+			if ( ! jc.prop.site ) setTimeout( foo, 100 );
+			if ( ! jc.prop.site.ads ) $div.remove();
+			$div.append( jc.prop.site.ads );
+		}
+		return $div;
 	},
 	blocks : (o,pdata,pfull) => {
 		if ( ! Array.isArray(o.blocks)) o.blocks = [o.blocks];
@@ -2215,10 +2220,7 @@ jc.render = {
 			$( ()=>{ build() } );
 			return $div;
 		},
-		ads : (b,d) => {
-			if ( ! jc.prop.site.ads ) return '';
-			return $('<div class="jcAds"></div>').append(jc.prop.site.ads);
-		},
+		ads : (b,d) => { return jc.render.ads(b,d); },
 	},
 };
 
