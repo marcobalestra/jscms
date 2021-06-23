@@ -231,6 +231,7 @@ $.extend( true, jc.lists, {
 			let uri = jc.lists.last.uri(type,qt).replace(/\.json/,'.rss');
 			let feed = '<?xml version="1.0" encoding="UTF-8" ?>\n<rss version="2.0">\n<channel>\n';
 			feed += '<title>'+jc.prop.site.sitename.escape()+'</title>\n';
+			feed += '<description>'+(jc.prop.site.headertag||jc.prop.site.sitename).escape()+'</description>\n';
 			let baseuri = window.location.protocol + '//' + window.location.hostname + '/';
 			feed += '<link>'+baseuri+'</link>\n';
 			feed += '<generator>jBloud CMS - jscms</generator>\n';
