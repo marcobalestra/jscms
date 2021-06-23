@@ -1757,6 +1757,19 @@ jc.render = {
 		jc.render.main(o);
 		jc.render.queue(-1);
 	},
+	ads : ( o,pdata,pfull,other ) => {
+		if ( AS.test.udef(other) ) {
+			jc.render.queue(1);
+			other = {};
+		}
+		if ( ! AS.test.obj(jc.prop.site) ) {
+			setTimeout( ()=>{ jc.render.part(o,pdata,pfull,other) }, 100 );
+			return;
+		}
+		o.rendered = jc.prop.site.ads || '';
+		jc.render.main(o);
+		jc.render.queue(-1);
+	},
 	blocks : (o,pdata,pfull) => {
 		if ( ! Array.isArray(o.blocks)) o.blocks = [o.blocks];
 		let canedit = o.editable;
