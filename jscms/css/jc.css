@@ -154,11 +154,13 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcGallery + .jcHtml { margin-top: 10px; }
 
 .jcCode { background-color: #ffd; font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; font-size: 80%; margin-bottom: 1rem; padding: .5rem 2%; white-space: pre; }
+@media (max-width: 600px; ) {
+	.jcCode { width: 100%; overflow-x: auto; }
+}
 @media (min-width: 601px) {
 	.jcWarning { max-width: 66%; margin-left: auto; }
 }
 @media (min-width: 800px) {
-	.jcCode { width: 100%; overflow-x: auto; }
 	.jcWarning { max-width: 50%; }
 }
 
