@@ -1757,16 +1757,6 @@ jc.render = {
 		jc.render.main(o);
 		jc.render.queue(-1);
 	},
-	ads : () => {
-		let $div = $('<div class="jcAds"></div>');
-		let foo = () => {
-			if ( ! AS.test.obj(jc.prop.site) ) return setTimeout( foo, 100 );
-			if ( ! jc.prop.site.ads ) $div.remove();
-			$div.append( jc.prop.site.ads );
-		}
-		setTimeout( foo, 100 );
-		return $div;
-	},
 	blocks : (o,pdata,pfull) => {
 		if ( ! Array.isArray(o.blocks)) o.blocks = [o.blocks];
 		let canedit = o.editable;
@@ -2221,7 +2211,16 @@ jc.render = {
 			$( ()=>{ build() } );
 			return $div;
 		},
-		ads : (b,d) => { return jc.render.ads(b,d); },
+		ads : (b,d) => {
+			let $div = $('<div class="jcAds"></div>');
+			let foo = () => {
+				if ( ! AS.test.obj(jc.prop.site) ) return setTimeout( foo, 100 );
+				if ( ! jc.prop.site.ads ) $div.remove();
+				$div.append( jc.prop.site.ads );
+			}
+			setTimeout( foo, 100 );
+			return $div;
+		},
 	},
 };
 
