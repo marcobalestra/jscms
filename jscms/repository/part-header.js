@@ -87,6 +87,7 @@
 					['type','hidden',{value:"header",tab:0}],
 					['sitename','text',{asLabel:'Site name',normalize:true,skipempty:true,mandatory:true,tab:0}],
 					['bgcolor','color',{asLabel:'Background color',value:defaults.bgcolor,skipempty:true,tab:0}],
+					['ads','textarea',{asLabel:'Ads',tab:0,help:'Custom code (e.g. for Google Ads) appended to document body.\nLeave it blank to skip it.'}],
 					['bannerpos','checklist',{asLabel:'Banner',ctype:'r',list:bannerpos,tab:1}],
 					['headertag','text',{asLabel:'Header text',normalize:true,skipempty:true,tab:1,help:'A few words on the cover page, defaults to site name'}],
 					['headercolor','color',{asLabel:'Header color',value:defaults.headercolor,tab:1,help:'The color of the text of header tag or site name.'}],
@@ -105,13 +106,14 @@
 			};
 			if ( jc.prop.site.models && jc.prop.site.models.length ) {
 				fo.options.tabs.push( AS.label('Models') );
+				let pos = fo.options.tabs.length -1;
 				let h = '';
 				jc.prop.site.models.forEach( m => {
 					h += `<li><a href="javascript:jc.page.edit(false,false);jc.edit.noModal();jc.page.open('${m.type}',${m.id})">${m.title}</a></li>`;
 				} );
 				fo.fields.push(
-					['models','hidden',{tab:4}],
-					['modellist','freehtml',{value:'<ul>'+h+'</ul>',tab:4}],
+					['models','hidden',{tab:pos}],
+					['modellist','freehtml',{value:'<ul>'+h+'</ul>',tab:pos}],
 				);
 			}
 			if ( AS.test.func(callback) ) callback.call(window,fo);
@@ -151,6 +153,8 @@
 			if ( ! (data.profile && data.profile.length)) $h.on('click',()=>{ jc.page.open('index'); }).css('cursor','pointer');
 			$out.append( $h );
 			$out.append('<div class="jcMenu"></div>');
+			$('#jcCustomAds').remove();
+			if ( data.ads ) $(document.body).prepend($('<div id="jcCustomAds"></div>').append(data.ads));
 			return $out;
 		},
 	};
