@@ -741,6 +741,7 @@ jc.page.makeStatic = ( cb ) => {
 		.replace(/[ \t]*<script [^>]+AS-autoload[^>]+>[^<]*<\/script>[\r\n]*/g,'')
 		.replace(/[ \t]*<script [^>]+facebook\.(com|net)[^>]+>[^<]*<\/script>[\r\n]*/g,'')
 		.replace(/<!--type:part=fbcomments[\s\S]*?<!--\/type:part-->/,'')
+		.replace(/<!--type:ads[\s\S]*?<!--\/type:ads-->/g,'')
 		.replace(/\n*<div id="fb-root" [\s\S]+?<\/div>\n+/,'')
 		.replace(/\n*<div [^>]+swal2-container[\s\S]+?<div [^>]+swal2-timer-progress-bar[^>]+>([\s\S]*?<\/div>\n*){4}/,'')
 		.replace(/\n*<div [^>]*class="[^"]*modal[ "][\s\S]+?<div [^>]*class="[^"]*modal-backdrop[^>]+>[^<]*<\/div>\n*/,'')
