@@ -19,8 +19,8 @@
 					{ type:"mixed",prop:"blocks" },
 				]
 			},
-			{ type:"ads", editable: false, content:"ads" },
 			{ type:"part", content: "fbcomments.json" },
+			{ type:"ads", editable: false, content:"ads" },
 			{ type:"part", content: "sharethis.json" },
 		]},
 		{ selector: '#topFooter', type:'text', content: '{{label:GlobalFooter}}' },
