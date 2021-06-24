@@ -11,6 +11,7 @@
 		{ selector: "#belowTopBar", content: false },
 		{ selector: "#topNavbar", part: 'navbar.json' },
 		{ selector: "#mainContainer", content : [
+			{ type:"ads", editable: false, content:"ads" },
 			{
 				type:"blocks",
 				editable:true,
@@ -18,7 +19,6 @@
 					{ type:"date",wrap:"<div></div>",prop:"blogdate" },
 					{ type:"text",wrap:"<h3></h3>",prop:"title" },
 					{ type:"text",wrap:`<h6 class="jcAbstract"></h6>`,prop:"abstract" },
-					{ type:"ads", editable: false, content:"ads" },
 					{ type:"mixed",prop:"blocks" }
 				]
 			},
