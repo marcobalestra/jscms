@@ -18,10 +18,10 @@
 					{ type:"date",wrap:"<div></div>",prop:"blogdate" },
 					{ type:"text",wrap:"<h3></h3>",prop:"title" },
 					{ type:"text",wrap:`<h6 class="jcAbstract"></h6>`,prop:"abstract" },
+					{ type:"ads", editable: false, content:"ads" },
 					{ type:"mixed",prop:"blocks" }
 				]
 			},
-			{ type:"ads", editable: false, content:"ads" },
 			{ type:"part", content: "fbcomments.json" },
 			{ type:"part", content: "sharethis.json" },
 		]},
