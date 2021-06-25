@@ -41,7 +41,7 @@
 			if ( ! jc.prop.site ) return setTimeout( ()=>{ load(cb) },100);
 			if ( ! tdata ) {
 				tdata = {};
-				ttags = AS.def.arr( jc.prop.site.tags ).map( x => x.name );
+				ttags = AS.def.arr( jc.prop.site.tags ).filter( x => (!x.hidden) ).map( x => x.name );
 				totsteps = 2 + ttags.length;
 			}
 			if ( ! all ) {
@@ -119,7 +119,7 @@
 					$panes.append( '<hr />' );
 				}
 			}
-			AS.def.arr( jc.prop.site.tags ).forEach( to => {
+			AS.def.arr( jc.prop.site.tags ).filter( x => (!x.hidden) ).forEach( to => {
 				let keys = Object.keys(tdata[to.name]);
 				if ( ! keys.length ) return;
 				let tid = AS.generateId('tag');
