@@ -1318,7 +1318,7 @@ jc.page = {
 	open : ( page, id, data, infokey ) => {
 		if ( ! AS && AS.labels && AS.labels.loaded ) return setTimeout( ()=>{ jc.page.open(page, id, data, infokey) }, 100);
 		if ( ! page ) page = 'index';
-		if ( page == jc.page.current() ) {
+		if ( (page == jc.page.current()) && AS.test.udef(data) ) {
 			if ( id ) {
 				if ( jc.page.data() && jc.page.data().id && ( id == jc.page.data().id )) return;
 			} else if (! ( jc.page.data() && jc.page.data().id ) ) {
