@@ -172,6 +172,7 @@ Object.keys( jc.dav ).forEach( (k) => { if (AS.test.udef(jc.jdav[k])) jc.jdav[k]
 $.extend( true, jc.lists, {
 	list: {
 		set : ( ...args ) => {
+			jc.plugin.call('listSetPre',args);
 			let commit = args.find(a=>AS.test.bool(a));
 			if ( AS.test.udef(commit)) commit=true;
 			if ( commit ) {
@@ -185,6 +186,7 @@ $.extend( true, jc.lists, {
 			}
 		},
 		commit : ( ...args ) => {
+			jc.plugin.call('listCommitPre',args);
 			const type = args.find(a=>AS.test.str(a))||'_all';
 			const list = JSON.parse(JSON.stringify(args.find(a=>AS.test.obj(a))||jc.lists.prop.lists[type]||{}));
 			const callback = args.find(a=>AS.test.func(a));
@@ -504,6 +506,7 @@ jc.page.rm = ( params ) => {
 		if ( ! params.pdata.metadata ) params.pdata.metadata = {};
 		params.pdata.metadata.deleted = true;
 		jc.page.makeTagsAll( params.pdata, ()=>{
+			jc.plugin.call('savedPageTags',params);
 			$(document.body).trigger('jc_saved_page_tags',params);
 			params.tagsPurged = true;
 			jc.page.rm( params );
@@ -625,6 +628,7 @@ jc.page.save = ( params ) => {
 	}
 	if ( ! params.saved ) {
 		jc.jdav.put( AS.path('jsdatapages') + params.page + ( params.id || '') + '.json', params.data, ()=>{
+			jc.plugin.call('savedPageData',params);
 			$(document.body).trigger('jc_saved_page_data',params);
 			params.saved = true;
 			jc.page.save( params );
@@ -636,6 +640,7 @@ jc.page.save = ( params ) => {
 		params.fulllist[params.page][String(params.id?params.id:0)] = JSON.parse(JSON.stringify(params.data.metadata));
 		if ( ! params.mute ) jc.progress(AS.label('SavingArticleList'));
 		jc.lists.list.set(params.fulllist,()=>{
+			jc.plugin.call('savedPageFulllist',params);
 			$(document.body).trigger('jc_saved_page_fulllist',params);
 			params.savedFullList = true;
 			jc.page.save( params );
@@ -645,6 +650,7 @@ jc.page.save = ( params ) => {
 	if ( ! ( params.noTypeList || params.savedTypeList) ) {
 		params.typelist[String(params.id?params.id:0)] = JSON.parse(JSON.stringify(params.data.metadata));
 		jc.lists.list.set(params.page,params.typelist,()=>{
+			jc.plugin.call('savedPageTypelist',params);
 			$(document.body).trigger('jc_saved_page_typelist',params);
 			params.savedTypeList = true;
 			jc.page.save( params );
@@ -654,6 +660,7 @@ jc.page.save = ( params ) => {
 	if ( ! ( params.noLasts) && (! params.savedLasts) ) {
 		if ( ! params.mute ) jc.progress(AS.label('SavingLasts'));
 		jc.page.makeLasts( params.fulllist, ()=>{
+			jc.plugin.call('savedPageLasts',params);
 			$(document.body).trigger('jc_saved_page_lasts',params);
 			jc.page.makeTypeLasts( params.page, params.typelist, ()=>{
 				params.savedLasts = true;
@@ -664,6 +671,7 @@ jc.page.save = ( params ) => {
 	}
 	if ( ! ( params.noLasts) && (! params.savedDates) ) {
 		jc.page.makeTypeDates( params.page, params.typelist, ()=>{
+			jc.plugin.call('savedPageDates',params);
 			$(document.body).trigger('jc_saved_page_dates',params);
 			params.savedDates = true;
 			jc.page.save( params );
@@ -673,6 +681,7 @@ jc.page.save = ( params ) => {
 	if ( ! ( params.noTags) && (! params.savedTags) ) {
 		if ( ! params.mute ) jc.progress(AS.label('SavingTags'));
 		jc.page.makeTagsAll( params.data, ()=>{
+			jc.plugin.call('savedPageTags',params);
 			$(document.body).trigger('jc_saved_page_tags',params);
 			params.savedTags = true;
 			jc.page.save( params );
@@ -697,6 +706,7 @@ jc.page.save = ( params ) => {
 		let makeStatic = () => {
 			let afterStatic = ( done ) => {
 				if ( done ) $(document.body).off('jc_render_end', makeStatic );
+				jc.plugin.call('savedPageFull',params);
 				$(document.body).trigger('jc_saved_page_full',params);
 			};
 			if ( params.noStatic || params.isNew  ) {
@@ -708,6 +718,7 @@ jc.page.save = ( params ) => {
 		$(document.body).on('jc_render_end', makeStatic );
 		params.staticSet = true;
 	}
+	jc.plugin.call('savedPage',params);
 	$(document.body).trigger('jc_saved_page',params);
 	if ( AS.test.func(params.callback) ) {
 		params.callback.call(window,params.page,params.id,params.data);
@@ -737,6 +748,7 @@ jc.page.makeStatic = ( cb ) => {
 	let html = $de.html();
 	document.body.className = cn;
 	document.body.style = cs;
+	jc.plugin.call('savingStaticPre',html);
 	html = html
 		.replace(/(<script [^>]+\/jscms\/js\/jc-load\.js"[^>]*>[^<]*<\/script>)[\s\S]*?>\s*(<\/head>)/,"$1$2")
 		.replace(/[ \t]*<script [^>]+AS-autoload[^>]+>[^<]*<\/script>[\r\n]*/g,'')
@@ -751,8 +763,10 @@ jc.page.makeStatic = ( cb ) => {
 		.replace(/<nav [\s\S]+?<\/nav>/g,"")
 		.replace(/<svg [\s\S]+?<\/svg>/g,"")
 		;
+	jc.plugin.call('savingStaticCleaned',html);
 	html = '<!DOCTYPE html>\n<html'+($de.attr('lang') ? ' lang="'+$de.attr('lang')+'"': '')+'>\n'+html+'\n</html>';
 	jc.dav.put( uri, html, ()=>{
+		jc.plugin.call('savedStatic',html);
 		$(document.body).trigger('jc_saved_static');
 		if ( AS.test.func(cb) ) cb.call(window,true);
 	});
@@ -1151,6 +1165,7 @@ jc.edit = {
 		jc.edit.getRepository();
 		jc.edit.loadPageTypes();
 		jc.edit.loadPageParts();
+		jc.plugin.call('editLoaded');
 		$(document.body).trigger('jc_edit_loaded');
 	},
 	loadFormPlugins : () => {
@@ -2421,6 +2436,7 @@ jc.edit.uploads = {
 		params.uploads = AS.def.arr(params.uploads);
 		if ( AS.test.def(params.gallery) && ! AS.test.obj(params.gallery) ) params.gallery = {};
 		if ( params.gallery && ! AS.test.arr( params.gallery.gallery) ) params.gallery.gallery = [];
+		jc.plugin.call('editUploadsPre',params);
 		let $out = $('<div></div>');
 		$out.append($(`<div class="jcUploadsAdders text-center mb-4">
 			<input type="file" multiple="multiple" style="display:none" />
@@ -2592,6 +2608,7 @@ jc.edit.uploads = {
 		} else {
 			$out.append( '<div class="jcPlaceHolder text-center">'+AS.label('NoItemsFound')+'</div>' );
 		}
+		jc.plugin.call('editUploadsPost',$out);
 		if ( params.target ) $(params.target).append($out);
 		if ( AS.test.func(params.callback) ) params.callback.call( window, $out );
 		return $out;

@@ -48,7 +48,7 @@ if ( AS.test.udef(jc.prop.prefs.prefsVersion)) jc.prop.prefs.prefsVersion = 1;
 	if ( AS.test.udef(AS.path('jsauth'))) AS.path({jsauth:lp+'login/'});
 	if ( AS.test.udef(AS.path('jsreporoot'))) AS.path({jsreporoot:bp+'repository/'});
 })()
-
+if ( AS.test.udef( jc.prop.plugins )) jc.prop.plugins = {};
 jc.prop.loadModules = {
 	'basic' : [
 		AS.path('jscdn') + 'css/jc.css',
@@ -1317,6 +1317,7 @@ jc.page = {
 	},
 	open : ( page, id, data, infokey ) => {
 		if ( ! AS && AS.labels && AS.labels.loaded ) return setTimeout( ()=>{ jc.page.open(page, id, data, infokey) }, 100);
+		jc.plugin.call('pagePreOpen',page, id, data);
 		if ( ! page ) page = 'index';
 		if ( (page == jc.page.current()) && AS.test.udef(data) ) {
 			if ( id ) {
@@ -1368,6 +1369,7 @@ jc.page = {
 			if ( ! jc.page.prop.editMode ) window.scrollTo(0,0);
 			setTimeout( ()=>{
 				let d = jc.page.data();
+				jc.plugin.call('pageOpenCompleted');
 				$(document.body).trigger('jc_page_open_completed',{page:jc.page.current(),id:d.id,uriparams:d.args});
 			}, 100 );
 		};
@@ -1395,6 +1397,7 @@ jc.page = {
 	step : {
 		info : ( page, id, data, infokey ) => {
 			jc.template.info.get( infokey, ( tdata )=>{
+				jc.plugin.call('pageTemplateInfoLoaded',tdata);
 				$(document.body).trigger('jc_page_template_info_loaded',tdata);
 				if ( ! data ) data = {};
 				if ( ! data.template ) data.template = tdata;
@@ -1410,6 +1413,7 @@ jc.page = {
 					jc.template.html.current( data.template.html );
 					$('#'+jc.prop.mainContainerId).html( html );
 				}
+				jc.plugin.call('pageTemplateHtmlLoaded',html);
 				$(document.body).trigger('jc_page_template_html_loaded',html);
 				jc.page.step.data( page, id );
 			},()=>{ jc.page.open('index'); });
@@ -1460,6 +1464,7 @@ jc.page = {
 					if ( md.hidden ) $(document.body).append(`<div id="jcHiddenPageIndicator"><span>${ AS.label('PageHidden')}</span></div>`);
 					$(document.body).attr('style','');
 				}
+				jc.plugin.call('pageDataLoaded',j);
 				$(document.body).trigger('jc_page_data_loaded',j);
 				if (jc.page.prop.editMode == 'page') jc.edit.data( j );
 				if ( data.template.content ) jc.render.init(data.template.content);
@@ -1591,6 +1596,7 @@ jc.render = {
 	prop : {},
 	init : ( ...args ) => {
 		delete jc.render.prop.pending;
+		jc.plugin.call('renderStart');
 		$(document.body).trigger('jc_render_start');
 		jc.console('Rendering is starting');
 		jc.render.main.apply( window, args );
@@ -1604,6 +1610,7 @@ jc.render = {
 				jc.render.prop.overtimeout = setTimeout( ()=>{
 					delete jc.render.prop.overtimeout;
 					delete jc.render.prop.pending;
+					jc.plugin.call('renderEnd');
 					$(document.body).trigger('jc_render_end');
 					jc.console('Rendering is over');
 				},100);
@@ -2238,6 +2245,23 @@ jc.render = {
 			setTimeout( foo, 100 );
 			return $div;
 		},
+	},
+};
+
+/* jc.plugin */
+
+jc.plugin = {
+	register : ( pn, co ) => {
+		if ( ! jc.prop.plugins[pn] ) jc.prop.plugins[pn] = {};
+		if ( AS.test.obj(co) ) Object.keys(co).forEach( k => {
+			if ( ! AS.test.func(co[k])) return;
+			jc.prop.plugins[pn][k] = co[k];
+		} );
+	},
+	call : ( optype, ...args ) => {
+		Object.keys( jc.prop.plugins ).filter( pn => (!!jc.prop.plugins[pn][optype]) ).forEach( pn => {
+			jc.prop.plugins[pn][optype].apply( window, args );
+		} );
 	},
 };
 
