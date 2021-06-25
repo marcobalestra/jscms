@@ -56,7 +56,9 @@
 							name : 'tagvals',
 							subtype: 'array',
 							preview : ['tag'],
-							values : [ ['tag','text',{asLabel:'Value',normalize:true,skipempty:true,mandatory:true}] ],
+							values : [
+								['tag','text',{asLabel:'Value',normalize:true,skipempty:true,mandatory:true}]
+							],
 						},
 						{
 							name : 'tagprops',
@@ -77,6 +79,7 @@
 							values : [
 								['name','text',{asLabel:'Name',normalize:true,skipempty:true,mandatory:true,transform:'x=>String(x).toLowerCase()'}],
 								['label','text',{asLabel:'Label',normalize:true,skipempty:true}],
+								['hidden','bool',{asLabel:'Hidden'}],
 								['props','subform',{asLabel:'More fields',subform:'tagprops',skipempty:true,help:'Additional properties that can be added to the tag.'}],
 								['strict','subform',{asLabel:'Restrict',subform:'tagvals',skipempty:true,help:'If the list isn’t empty only the listed values will be accepted.'}],
 							],

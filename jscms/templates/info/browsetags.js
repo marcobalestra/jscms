@@ -107,6 +107,7 @@
 				let tid = AS.generateId('tab_'+to.name);
 				let selected = def_family ? (def_family == to.name) : (!tidx);
 				let $tab = $(`<li class="nav-item${ tidx ? '' : ' ml-4'}"></li>`);
+				if ( to.hidden ) $tab.hide();
 				let $a = $(`<a class="nav-link" data-family="${to.name}" data-toggle="tab" href="#${tid}" role="tab" aria-controls="${tid}" aria-selected="${ selected }">${to.label||to.name}</a>`);
 				$a.on('click',()=>{ maketags(to.name) });
 				let $pane = $(`<div class="tab-pane" id="${tid}" role="tabpanel" aria-labelledby="${to.label||to.name}"></div>`);
