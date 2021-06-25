@@ -29,7 +29,7 @@ AS.labels.load('en',[{
 	'headerTag' : 'Recipes from real Chefs',
 	'HideComments' : 'Disable comments',
 	'HighlightForType' : 'Also active for type',
-	'IncludedParts' : 'Included parts',
+	'IncludedParts' : 'Shared components',
 	'IncludePage' : 'Include another page content',
 	'IncludePagePart' : 'Include external part',
 	'LastChangedPages' : 'Last changed pages',

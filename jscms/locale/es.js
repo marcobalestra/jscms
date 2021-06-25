@@ -40,7 +40,7 @@ AS.labels.load('es',[{
 	'Hide' : 'Esconder',
 	'HideComments' : 'Desactivar comentarios',
 	'HighlightForType' : 'Also active for type',
-	'IncludedParts' : 'Fragmentos excluidos',
+	'IncludedParts' : 'Componentes compartidos',
 	'IncludePage' : 'Incluir una página ya existente',
 	'IncludePagePart' : 'Incluir un fragmento externo',
 	'LastChangedPages' : 'Últimas páginas modificadas',

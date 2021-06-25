@@ -40,7 +40,7 @@ AS.labels.load('it',[{
 	'Hide' : 'Nascondi',
 	'HideComments' : 'Disabilita i commenti',
 	'HighlightForType' : 'Attivo per tipo',
-	'IncludedParts' : 'Frammenti inclusi',
+	'IncludedParts' : 'Componenti comuni',
 	'IncludePage' : 'Includi una pagina esistente',
 	'IncludePagePart' : 'Includi un frammento esterno',
 	'LastChangedPages' : 'Ultime pagine modificate',

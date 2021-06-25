@@ -19,8 +19,18 @@
 					subparts: {
 						label: ['label','text',{asLabel:'Label',normalize:true,mandatory:true,focus:true,depends:'!type=divider,!type=text'}],
 						page : ['item','jcpage',{nolabel:true,depends:'type=item',includecurrent:true}],
+						pparams : ['pparams','subform',{asLabel:'Page params',subform:'pparams',skipempty:true,depends:'type=item'}],
 					},
 					subforms : [
+							{
+								name : 'pparams',
+								subtype: 'array',
+								preview: ['k','v'],
+								values : [
+									['k','text',{asLabel:'Key',normalize:true,skipempty:true,mandatory:true}],
+									['v','text',{asLabel:'Value',normalize:true,skipempty:true,mandatory:true}],
+								]
+							},
 							{
 								name: 'itemd',
 								subtype: 'array',
@@ -29,6 +39,7 @@
 									['type','select',{asLabel:'Type',options:[{label:'Page',value:'item'},{label:'Divider',value:'divider'},{label:'Text',value:'text'}]}],
 									{subpart:'label'},
 									{subpart:'page'},
+									{subpart:'pparams'},
 									['text','text',{asLabel:'Text',normalize:true,mandatory:true,depends:'type=text'}],
 								]
 							},
@@ -40,6 +51,7 @@
 									['type','select',{asLabel:'Type',options:[{label:'Page',value:'item'},{label:'Menu',value:'menu'}]}],
 									{subpart:'label'},
 									{subpart:'page'},
+									{subpart:'pparams'},
 									['menu','subform',{asLabel:'Content',subform:'itemd',depends:'type=menu'}],
 									["hitype","select",{asLabel:'HighlightForType',options:ptypes}],
 								]
@@ -62,10 +74,22 @@
 			let cid = data.id || AS.generateId('jcNavbar');
 			$navbar.append(`<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#${cid}" aria-controls="${cid}" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>`);
 			$navbar.append(`<div class="collapse navbar-collapse" id="${cid}"><ul class="navbar-nav mr-auto jcNavBarLeft"></ul><ul class="navbar-nav ml-auto jcNavBarRight"></ul></div>`);
+			const makepp = (o) => {
+				if ( ! (o.pparams && o.pparams.length ) ) return '{}';
+				let pp = {};
+				o.pparams.forEach( (i) => { pp[i.k]=i.v; } );
+				return JSON.stringify(pp).escape();
+			};
 			const render = ( item, $parent ) => {
 				let $li = $(`<li class="nav-item"></li>`);
 				if ( item.type == "item" ) {
-					$li.append(`<a class="nav-link" onclick="jc.page.open('${item.item.page}'${ item.item.id ? ','+item.item.id : ''})">${ item.label.escape() }</a>`)
+					let pp = false;
+					if ( item.pparams ) {
+						pp = {};
+						item.pparams.forEach( (i) => { pp[i.k]=i.v; } );
+						pp = JSON.stringify(pp);
+					};
+					$li.append(`<a class="nav-link" onclick="jc.page.open('${item.item.page}',${ item.item.id ? item.item.id : 'undefined'}${ item.pparams ? ','+makepp(item) : ''})">${ item.label.escape() }</a>`)
 					if ( (jc.page.current() == item.item.page) && ( item.item.id == jc.page.data().id) ) $li.addClass('active');
 					else if ( item.hitype && item.hitype.length && (item.hitype == jc.page.current())) $li.addClass('active');
 					$li.data(item.item);
@@ -83,7 +107,7 @@
 							$div.append($('<div class="p-2" style="max-width: 320px;"></div>').html(si.text));
 							return;
 						}
-						let $a = $(`<a class="dropdown-item" onclick="jc.page.open('${si.item.page}'${ si.item.id ? ','+si.item.id : ''})">${si.label.escape()}</a>`);
+						let $a = $(`<a class="dropdown-item" onclick="jc.page.open('${si.item.page}',${ si.item.id ? si.item.id : 'undefined'}${ si.pparams ? ','+makepp(si) : ''})">${si.label.escape()}</a>`);
 						if ( (jc.page.current() == si.item.page) && ( si.item.id == jc.page.data().id) ) {
 							$a.addClass('active');
 							$li.addClass('active');
