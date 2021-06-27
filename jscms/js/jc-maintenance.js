@@ -60,6 +60,9 @@ jc.maint = {
 				jc.jdav.ls({dir:'struct',ext:'rss'},(x) => {
 					x.list.forEach( (k) => { jc.dav.rm('struct/'+k,()=>{ }); } );
 				});
+				jc.jdav.ls({dir:'struct',ext:'txt'},(x) => {
+					x.list.forEach( (k) => { jc.dav.rm('struct/'+k,()=>{ }); } );
+				});
 				jc.jdav.ls({dir:'struct'},(x) => {
 					params.tbdLists = x.list;
 					params.tbdCount = params.tbdLists.length;
@@ -86,7 +89,13 @@ jc.maint = {
 				jc.progressbar({ prog: .3 });
 				jc.page.makeLasts( jc.maint.prop.full, ()=>{
 					params.savedFullList = true;
-					setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
+					if (jc.prop.site && jc.prop.site.norss ) {
+						setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
+						return;
+					}
+					jc.lists.list.dositemap( jc.maint.prop.full, ()=>{
+						setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
+					});
 				});
 			});
 			return;

@@ -102,7 +102,7 @@
 					['profile','select',{asLabel:'Profile picture',options:profiles,depends:'!bannerpos=nop',tab:1,help:'It’s possible to choose among the images uploaded in site index page, see site index attachments.'}],
 					['privacynote','freehtml',{tab:2,value:'If you change these values then run «'+AS.label('Maintenance')+'» to reflect changes on existing static files.'}],
 					['noindex','bool',{asLabel:'Don’t index',tab:2,help:'Tell google and other robots to avoid indexing and following links on site pages.'}],
-					['norss','bool',{asLabel:'Don’t create RSS',tab:2,help:'Every time a page is saved an RSS with the latest 100 changes on site is created.'}],
+					['norss','bool',{asLabel:'Don’t create RSS',tab:2,help:'Every time a page is saved both a Sitemap.txt and an RSS with the latest 100 changes on site are created. You can prevent such files creation.'}],
 					['nostatic','bool',{asLabel:'Don’t create static',tab:2,help:'If a static version of the page isn’t created search engines won’t be able to scan page content.\nIncluded for those who prefer a more private blog.'}],
 					['tagsnote','freehtml',{tab:3,value:'If you change these values then run «'+AS.label('Maintenance')+'» to reflect changes on existing static files.'}],
 					['tags','subform',{asLabel:'Tags',subform:'tag',tab:3}],

@@ -2269,6 +2269,7 @@ jc.actionsMenu = (e) => {
 	let acts = [];
 	e.preventDefault();
 	e.stopPropagation();
+	const isAlt = (e.originalEvent?e.originalEvent:e).altKey && (e.originalEvent?e.originalEvent:e).ctrlKey;
 	if ( jc.page.prop.editMode == 'page' ) {
 		acts.push(
 			AS.label('ThisPage')+':',
@@ -2296,8 +2297,9 @@ jc.actionsMenu = (e) => {
 		ws.content.push(
 			{icon:'jcicon',iconKey:'pageAdd',label:AS.label('NewPage')+'…',action:()=>{jc.page.create();} },
 			{icon:'jcicon',iconKey:'pageParts',label:AS.label('IncludedParts'),action:()=>{jc.page.edit('parts');} },
-			'-',
-			{icon:'jcicon',iconKey:'maintenance',label:AS.label('Maintenance'),action:()=>{jc.page.edit('maintenance');} },
+		);
+		if ( isAlt ) ws.content.push( '-',
+			{icon:'jcicon',iconKey:'maintenance',label:AS.label('Maintenance'),action:()=>{jc.page.edit('maintenance');} }
 		);
 		acts.push(AS.label('menuActionsTitle'),tp,'-',ws);
 	}

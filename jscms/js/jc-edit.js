@@ -671,6 +671,11 @@ jc.page.save = ( params ) => {
 		jc.lists.list.set(params.fulllist,()=>{
 			jc.plugin.call('savedPageFulllist',params);
 			$(document.body).trigger('jc_saved_page_fulllist',params);
+			if (jc.prop.site && jc.prop.site.norss ) {
+				params.savedFullList = true;
+				jc.page.save( params );
+				return;
+			}
 			jc.lists.list.dositemap( params.fulllist, ()=>{
 				jc.plugin.call('savedSiteMap',params);
 				$(document.body).trigger('jc_saved_sitemap',params);
