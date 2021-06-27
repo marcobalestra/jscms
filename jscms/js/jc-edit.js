@@ -266,6 +266,7 @@ $.extend( true, jc.lists, {
 			feed += '<link>'+baseuri+'</link>\n';
 			feed += '<generator>jBloud CMS - jscms</generator>\n';
 			list.forEach( i => {
+				if ( i.hidden ) return;
 				let pt = i.page||i.type||type;
 				feed += '<item>\n';
 				feed += '\t<link>'+baseuri+'!'+pt+(i.id||'')+(i.url?'/'+i.url:'')+'</link>\n';
