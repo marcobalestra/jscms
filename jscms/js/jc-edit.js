@@ -195,6 +195,33 @@ $.extend( true, jc.lists, {
 				if ( AS.test.func(callback)) callback.call(window,r);
 			});
 		},
+		dositemap : ( ...args ) => {
+			const callback = args.find(a=>AS.test.func(a));
+			let list = args.find(a=>AS.test.arr(a));
+			if ( ! list ) {
+				jc.lists.list.get( (l)=>{
+					let lst = [];
+					Object.keys(l).forEach( (pt) => {
+						Object.keys(l[pt]).forEach( (id) => {
+							lst.push( l[pt][id] );
+						} );
+					} );
+					args.push( lst );
+					jc.lists.list.dositemap.apply( window, args );
+				});
+				return;
+			}
+			let uri = jc.lists.list.uri().replace(/\/[^\/]+$/,'/sitemap.txt');
+			let txt = '';
+			let baseuri = window.location.protocol + '//' + window.location.hostname + '/!';
+			list.forEach( i => {
+				if ( i.hidden ) return;
+				txt += baseuri+i.type+(i.id||'')+(i.url?'/'+i.url:'')+'\n';
+			});
+			jc.dav.put( uri, txt, (r)=>{
+				if ( AS.test.func(callback)) callback.call(window,r);
+			});
+		},
 	},
 	last: {
 		set : ( ...args ) => {
@@ -642,8 +669,12 @@ jc.page.save = ( params ) => {
 		jc.lists.list.set(params.fulllist,()=>{
 			jc.plugin.call('savedPageFulllist',params);
 			$(document.body).trigger('jc_saved_page_fulllist',params);
-			params.savedFullList = true;
-			jc.page.save( params );
+			jc.lists.list.dositemap( params.fulllist, ()=>{
+				jc.plugin.call('savedSiteMap',params);
+				$(document.body).trigger('jc_saved_sitemap',params);
+				params.savedFullList = true;
+				jc.page.save( params );
+			});
 		});
 		return;
 	}
