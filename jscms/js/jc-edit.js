@@ -212,8 +212,9 @@ $.extend( true, jc.lists, {
 				return;
 			}
 			let uri = jc.lists.list.uri().replace(/\/[^\/]+$/,'/sitemap.txt');
-			let txt = '';
-			let baseuri = window.location.protocol + '//' + window.location.hostname + '/!';
+			let baseuri = window.location.protocol + '//' + window.location.hostname + '/';
+			let txt = baseuri + '\n';
+			baseuri += '!';
 			list.forEach( i => {
 				if ( i.hidden ) return;
 				txt += baseuri+i.type+(i.id||'')+(i.url?'/'+i.url:'')+'\n';
