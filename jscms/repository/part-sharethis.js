@@ -1,9 +1,9 @@
 (()=>{
 	const shares = [
 		{key:'facebook',href:'https://facebook.com/sharer.php?display=page&u={{uri}}',label:'Facebook'},
-		{key:'twitter',href:'https://twitter.com/intent/tweet/?text={{title}}&url={{uri}}',label:'Twitter'},
+		{key:'twitter',href:'https://twitter.com/intent/tweet/?text={{title}}:&url={{uri}}',label:'Twitter'},
 		{key:'telegram',href:'https://telegram.me/share/url?text={{title}}&url={{uri}}',label:'Telegram'},
-		{key:'whatsapp',href:'https://wa.me/?text={{title}}+{{uri}}',label:'WhatsApp'},
+		{key:'whatsapp',href:'https://wa.me/?text={{title}}:+{{uri}}',label:'WhatsApp'},
 		{key:'email',href:'mailto:?subject={{title}}&body={{uri}}',label:'Email',target:'_self'},
 		{key:'tumblr',href:'https://www.tumblr.com/widgets/share/tool?posttype=link&title={{title}}&url={{uri}}&shareSource=tumblr_share_button',label:'Tumblr'},
 		{key:'pinterest',href:'https://pinterest.com/pin/create/button/?url={{uri}}&media={{uri}}&description={{title}}',label:'Pinterest'},
@@ -46,7 +46,7 @@
 				const pd = jc.page.data().pageContent;
 				let fo = {};
 				fo.uri = encodeURIComponent(window.location.href);
-				fo.title = encodeURIComponent(((pd && pd.metadata && pd.metadata.title && pd.metadata.title.length) ? pd.metadata.title : 'Look at this page')+': ');
+				fo.title = encodeURIComponent(((pd && pd.metadata && pd.metadata.title && pd.metadata.title.length) ? pd.metadata.title : 'Look at this page'));
 				fo.desc = (( pd && pd.metadata && pd.metadata.desc && pd.metadata.desc.length) ? encodeURIComponent(pd.metadata.desc) : fo.title);
 				shares.forEach( s => {
 					if ( blockdata['hide-'+s.key] ) return;
