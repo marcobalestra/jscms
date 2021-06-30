@@ -290,8 +290,14 @@ label svg.bannerPreview { width: 220px; vertical-align: -20px; }
 .jcTags ul li:before { position: absolute; left: 12px; content: '🔖'; }
 .jcTags .title  { cursor: pointer ;}
 .jcTags .title:hover  { text-decoration: underline; }
+/* 
 .jcTagEntries.compact i:first-child::before { content: '🔖'; margin-right: 8px; }
 .jcTagEntries.compact { margin: 0 0 8px 8px; }
+.jcTagEntries.compact .jcTagEntry::after { content: ', '; }
+.jcTagEntries.compact .jcTagEntry:last-child::after { content: '.'; }
+ */
+p.jcTagEntries.compact { margin: 0 0 .5rem 0; padding: 0 0 0 40px; position: relative; display: block; }
+p.jcTagEntries.compact i:first-child::before { position: absolute; left: 12px; content: '🔖'; font-style: normal; }
 .jcTagEntries.compact .jcTagEntry::after { content: ', '; }
 .jcTagEntries.compact .jcTagEntry:last-child::after { content: '.'; }
 

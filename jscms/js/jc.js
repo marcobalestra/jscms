@@ -2251,16 +2251,34 @@ jc.render = {
 /* jc.plugin */
 
 jc.plugin = {
+	prop: {},
 	register : ( pn, co ) => {
-		if ( ! jc.prop.plugins[pn] ) jc.prop.plugins[pn] = {};
-		if ( AS.test.obj(co) ) Object.keys(co).forEach( k => {
-			if ( ! AS.test.func(co[k])) return;
-			jc.prop.plugins[pn][k] = co[k];
-		} );
+		if ( ! jc.plugin.prop[pn] ) jc.plugin.prop[pn] = {};
+		if ( AS.test.obj(co) ) {
+			if ( AS.test.func(co.pluginPreInit) ) co.pluginPreInit.call( window );
+			Object.keys(co).forEach( k => {
+				if ( ! AS.test.func(co[k])) return;
+				switch ( k ) {
+					case 'pluginPreInit': break;
+					case 'pluginInit': break;
+					default: jc.plugin.prop[pn][k] = co[k];
+				}
+			} );
+			if ( AS.test.func(co.pluginInit) ) co.pluginInit.call( window );
+		}
 	},
+	unregister : ( pn ) => {
+		if ( AS.test.ob(jc.plugin.prop[pn]) ) {
+			if ( AS.test.func(jc.plugin.prop[pn].pluginCommit) ) jc.plugin.prop[pn].pluginCommit.call( window );
+			delete jc.plugin.prop[pn];
+		}
+	},
+	add : (pn,co) => { return jc.plugin.register(pn,co); },
+	rm : (pn ) => { return jc.plugin.unregister(pn); },
+	list : () => { return Object.keys( jc.plugin.prop ); },
 	call : ( optype, ...args ) => {
-		Object.keys( jc.prop.plugins ).filter( pn => (!!jc.prop.plugins[pn][optype]) ).forEach( pn => {
-			jc.prop.plugins[pn][optype].apply( window, args );
+		Object.keys( jc.plugin.prop ).filter( pn => (!!jc.plugin.prop[pn][optype]) ).forEach( pn => {
+			jc.plugin.prop[pn][optype].apply( window, args );
 		} );
 	},
 };
