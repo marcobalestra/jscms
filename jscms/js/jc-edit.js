@@ -686,7 +686,11 @@ jc.page.save = ( params ) => {
 		return;
 	}
 	if ( ! ( params.noTypeList || params.savedTypeList) ) {
-		params.typelist[String(params.id?params.id:0)] = JSON.parse(JSON.stringify(params.data.metadata));
+		if ( params.data.metadata.hidden ) {
+			delete params.typelist[String(params.id?params.id:0)];
+		} else {
+			params.typelist[String(params.id?params.id:0)] = JSON.parse(JSON.stringify(params.data.metadata));
+		}
 		jc.lists.list.set(params.page,params.typelist,()=>{
 			jc.plugin.call('savedPageTypelist',params);
 			$(document.body).trigger('jc_saved_page_typelist',params);
@@ -782,6 +786,7 @@ jc.page.makeStatic = ( cb ) => {
 	let cs = document.body.getAttribute('style');
 	document.body.className = '';
 	document.body.style='';
+	$('ins').remove();
 	let $de = $(document.documentElement);
 	let html = $de.html();
 	document.body.className = cn;
