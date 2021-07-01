@@ -1823,7 +1823,7 @@ jc.render = {
 				jc.render.queue(1);
 				jc.lists.list.get(d.metadata.type,( ld )=>{
 					let sl = [];
-					Object.keys(ld).forEach( k => { sl.push(ld[k])} );
+					Object.keys(ld).filter( x => (! ld[x].hidden) ).forEach( k => { sl.push(ld[k])} );
 					sl.sort( (a,b) => (a.date < b.date ? 1 : -1 ) );
 					let prev,next,max=(sl.length -1);
 					for ( let i = 0; i <= max; i++ ) {
