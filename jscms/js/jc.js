@@ -2252,6 +2252,11 @@ jc.render = {
 
 jc.plugin = {
 	prop: {},
+	keys : ( pn ) => {
+		if ( ! pn ) return false;
+		if ( ! jc.plugin.prop[pn] ) return undefined;
+		return Object.keys(jc.plugin.prop[pn]);
+	},
 	register : ( pn, co ) => {
 		if ( ! jc.plugin.prop[pn] ) jc.plugin.prop[pn] = {};
 		if ( AS.test.obj(co) ) {
@@ -2265,16 +2270,21 @@ jc.plugin = {
 				}
 			} );
 			if ( AS.test.func(co.pluginInit) ) co.pluginInit.call( window );
+			$(document.body).trigger('jc_plugin_registered',pn);
+			jc.plugin.call('pluginRegistered',pn);
 		}
 	},
 	unregister : ( pn ) => {
 		if ( AS.test.ob(jc.plugin.prop[pn]) ) {
 			if ( AS.test.func(jc.plugin.prop[pn].pluginCommit) ) jc.plugin.prop[pn].pluginCommit.call( window );
 			delete jc.plugin.prop[pn];
+			$(document.body).trigger('jc_plugin_unregistered',pn);
+			jc.plugin.call('pluginUnregistered',pn);
 		}
 	},
 	add : (pn,co) => { return jc.plugin.register(pn,co); },
 	rm : (pn ) => { return jc.plugin.unregister(pn); },
+	rmkey : ( pn, k ) => { if ( pn && jc.plugin.prop[pn] ) delete jc.plugin.prop[pn][k]; },
 	list : () => { return Object.keys( jc.plugin.prop ); },
 	call : ( optype, ...args ) => {
 		Object.keys( jc.plugin.prop ).filter( pn => (!!jc.plugin.prop[pn][optype]) ).forEach( pn => {
