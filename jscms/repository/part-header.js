@@ -161,6 +161,8 @@
 				jc.prop.customheadersAdded = true;
 				$('head',document.documentElement).append( data.customheaders );
 			}
+			jc.plugin.call('sitePropDefined',data);
+			$(document.body).trigger('jc_site_prop_defined',data);
 			return $out;
 		},
 	};

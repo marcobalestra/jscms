@@ -2291,6 +2291,10 @@ jc.plugin = {
 			jc.plugin.prop[pn][optype].apply( window, args );
 		} );
 	},
+	acall : ( pn, optype, ...args ) => {
+		if ( jc.plugin.prop[pn] && jc.plugin.prop[pn][optype] ) return jc.plugin.prop[pn][optype].apply( window, args );
+		return undefined;
+	},
 };
 
 jc.actionsMenu = (e) => {
