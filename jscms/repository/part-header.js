@@ -125,14 +125,25 @@
 		},
 		render : ( data ) => {
 			jc.prop.site = data;
+			let pd = jc.page.data();
 			let $out = $(`<div class="jcBannerArea"></div>`);
 			if ( data.sitename ) {
 				const $t = $('head>title',document.documentElement);
 				$t.attr('site',data.sitename);
 				if ( $t.html().indexOf(data.sitename)!=0 ) $t.html( data.sitename+': '+$t.html());
 			}
+			let isHidden = pd.metadata ? pd.metadata.hidden : false;
 			if ( data.norss ) $('head>link[type="application/rss+xml"]',document.documentElement).remove();
-			$('head>meta[name="robots"]',document.documentElement).attr('content',(data.noindex?'noindex,nofollow,noarchive,nosnippet':'all'));
+			let $robNode = $('head>meta[name="robots"]',document.documentElement);
+			if ( ! $robNode.length ) {
+				$robNode = $('<meta name="robots" content="" />');
+				$('head',document.documentElement).append( $robNode );
+			}
+			if ( data.noindex||isHidden) {
+				$robNode.attr('content','noindex,nofollow,noarchive,nosnippet');
+			} else {
+				$robNode.attr('content','all');
+			}
 			if ( data.bgcolor ) document.body.style.backgroundColor = data.bgcolor;
 			if ( data.coversize ) $out.addClass(data.coversize);
 			let $c = $('<div class="jcCover"></div>').css({backgroundColor:(data.covercolor||defaults.covercolor)});
