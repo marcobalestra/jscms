@@ -215,7 +215,7 @@ $.extend( true, jc.lists, {
 			let baseuri = window.location.protocol + '//' + window.location.hostname + '/';
 			let txt = baseuri + '\n';
 			baseuri += '!';
-			list.forEach( i => {
+			list.filter( x => (! x.hidden) ).forEach( i => {
 				if ( i.hidden ) return;
 				txt += baseuri+i.type+(i.id||'')+(i.url?'/'+i.url:'')+'\n';
 			});
@@ -265,7 +265,7 @@ $.extend( true, jc.lists, {
 			let baseuri = window.location.protocol + '//' + window.location.hostname + '/';
 			feed += '<link>'+baseuri+'</link>\n';
 			feed += '<generator>jBloud CMS - jscms</generator>\n';
-			list.forEach( i => {
+			list.filter( x => (!x.hidden) ).forEach( i => {
 				if ( i.hidden ) return;
 				let pt = i.page||i.type||type;
 				feed += '<item>\n';
