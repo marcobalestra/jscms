@@ -53,11 +53,11 @@ jc.prop.loadModules = {
 	'basic' : [
 		AS.path('jscdn') + 'css/jc.css',
 		{ type:'js', src: AS.path('jscdn')+'libs/sweetalert2.js'},
-		{ type:'js', src:'https:///cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js'},
-		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
-		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js',
-		'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
-		'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
+		{ type:'js', src: AS.path('jscdn')+'libs/polyfill.js'},
+		{ type:'css', src: AS.path('jscdn')+'libs/fancybox/jquery.fancybox.min.css'},
+		{ type:'js', src: AS.path('jscdn')+'libs/fancybox/jquery.fancybox.min.js'},
+		{ type:'css', src: AS.path('jscdn')+'libs/select2/select2.min.css'},
+		{ type:'js', src: AS.path('jscdn')+'libs/select2/select2.min.js'},
 		'wait:()=>( window.Swal && jQuery.fn.select2 )',
 	],
 	'edit' : [
