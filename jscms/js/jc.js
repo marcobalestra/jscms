@@ -1605,6 +1605,7 @@ jc.render = {
 		if ( AS.test.num(delta) ) {
 			if (AS.test.udef(jc.render.prop.pending)) jc.render.prop.pending = 0;
 			jc.render.prop.pending += delta;
+			if ( jc.render.prop.failtimeout ) window.clearTimeout( jc.render.prop.failtimeout );
 			if ( jc.render.prop.pending == 0 ) {
 				if ( jc.render.prop.overtimeout ) window.clearTimeout( jc.render.prop.overtimeout );
 				jc.render.prop.overtimeout = setTimeout( ()=>{
@@ -1614,6 +1615,12 @@ jc.render = {
 					$(document.body).trigger('jc_render_end');
 					jc.console('Rendering is over');
 				},100);
+			} else {
+				jc.render.prop.failtimeout = setTimeout( ()=>{
+					jc.console('Rendering timeout');
+					jc.render.prop.pending = 1;
+					jc.render.queue( -1 );
+				},3000);
 			}
 		}
 		return jc.render.prop.pending;
