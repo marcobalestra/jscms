@@ -450,7 +450,7 @@ jc.progressbar = (options) => {
 	if ( options ) {
 		let newopts = {};
 		if ( options.text ) newopts.html = `<div class="jcProgressbarText">${ options.text }</div>`;
-		if ( options.prog ) newopts.title = `<div class="jcProgressbar"><div style="width:${ 100 * options.prog }%;"></div></div>`;
+		if ( options.prog ) newopts.title = `<div class="jcProgressbar"><div style="width:${ parseInt(1000 * parseFloat(options.prog))/10 }%;"></div></div>`;
 		if (jc.prop.progressbar && Swal.isVisible() && Object.keys(newopts).length ) try { jc.prop.progressbar.update(newopts); } catch(e){ }
 	}
 	return jc.prop.progressbar;

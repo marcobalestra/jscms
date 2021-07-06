@@ -40,7 +40,7 @@ jc.maint = {
 				isfirst = true;
 			}
 			let nxt = params.tobescanned.shift();
-			jc.progressbar({ text:'Loading page…', prog: (parseInt(10*(params.totpages - params.tobescanned.length)/params.totpages)/10) });
+			jc.progressbar({ text:'Loading page…', prog: ((params.totpages - params.tobescanned.length)/params.totpages) });
 			params.scanlist.push(nxt);
 			if ( ! params.tobescanned.length ) delete params.tobescanned;
 			let page = nxt.replace(/^([^0-9.]+).*/,"$1");
@@ -71,7 +71,7 @@ jc.maint = {
 				return;
 			}
 			if ( params.tbdLists.length ) {
-				jc.progressbar({ prog: (parseInt(10*(params.tbdCount - params.tbdLists.length)/params.tbdCount)/10) });
+				jc.progressbar({ prog: ((params.tbdCount - params.tbdLists.length)/params.tbdCount) });
 				jc.dav.rm('struct/'+params.tbdLists.shift(),()=>{
 					setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 				});
@@ -107,7 +107,7 @@ jc.maint = {
 			}
 			if ( params.ptypes.length ) {
 				let k = params.ptypes.shift();
-				jc.progressbar({ text: 'Saving type: '+k, prog: (parseInt(10*(params.ptypesCount - params.ptypes.length)/params.ptypesCount)/10) });
+				jc.progressbar({ text: 'Saving type: '+k, prog: ((params.ptypesCount - params.ptypes.length)/params.ptypesCount) });
 				jc.lists.list.set(k,jc.maint.prop.full[k],()=>{
 					jc.page.makeTypeLasts( k, jc.maint.prop.full[k], ()=>{
 						jc.page.makeTypeDates( k, jc.maint.prop.full[k], ()=>{
@@ -130,7 +130,7 @@ jc.maint = {
 			}
 			if ( params.tagnames.length ) {
 				let k = params.tagnames.shift();
-				jc.progressbar({ text: 'Saving tags: '+k, prog: (parseInt(10*(params.tagnamesCount - params.tagnames.length)/params.tagnamesCount)/10) });
+				jc.progressbar({ text: 'Saving tags: '+k, prog: ((params.tagnamesCount - params.tagnames.length)/params.tagnamesCount) });
 				jc.lists.tag.set(k,jc.maint.prop.tags[k],()=>{
 					setTimeout( ()=> { jc.maint.proc( params ) }, 10 );
 				});
