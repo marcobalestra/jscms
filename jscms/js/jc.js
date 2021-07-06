@@ -52,7 +52,7 @@ if ( AS.test.udef( jc.prop.plugins )) jc.prop.plugins = {};
 jc.prop.loadModules = {
 	'basic' : [
 		AS.path('jscdn') + 'css/jc.css',
-		{ type:'js', src:'https://cdn.jsdelivr.net/npm/sweetalert2@10'},
+		{ type:'js', src: AS.path('jscdn')+'libs/sweetalert2.js'},
 		{ type:'js', src:'https:///cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js'},
 		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css',
 		'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js',
