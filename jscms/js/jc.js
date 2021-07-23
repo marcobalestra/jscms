@@ -1821,6 +1821,12 @@ jc.render = {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
 			return '<div class="jcHtml">'+d[b.prop]+'</div>';
 		},
+		spacer : (b,d)=> {
+			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
+			let $s = $('<'+d[b.prop]+' class="jcSpacer" />');
+			if ( d.clear ) $s.addClass('jcSpacerClear');
+			return $s;
+		},
 		date : (b,d) => {
 			if ( AS.test.udef(d[b.prop]) || ( AS.test.str(d[b.prop]) && (d[b.prop].length==0)) ) return undefined;
 			let $out = $(b.wrap||'<div></div>');

@@ -10,6 +10,7 @@ AS.labels.load('en',[{
 	'CantDeleteIndex' : 'The homepage can’t be deleted.',
 	'ChooseAudio' : 'Choose an audio',
 	'ChooseVideo' : 'Choose a video',
+	'ClearFloating' : 'Clear floating',
 	'DeleteThisPage' : 'Delete this page',
 	'DeletingPage' : 'Deleting page',
 	'editYetItBody' : 'Resume previous edit or restart?',

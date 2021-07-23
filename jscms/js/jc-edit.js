@@ -1185,6 +1185,7 @@ jc.edit = {
 			{type:'youtube',label:'YtVimeo',menu:true},
 			{type:'gallery',label:'Gallery',menu:true},
 			{type:'tags',label:'Tags',menu:true},
+			{type:'spacer',label:'Spacer',menu:true},
 			{type:'pbytag',label:'PagesByTags'},
 			{type:'relateds',label:'RelatedPages'},
 			{type:'audio',label:'Audio'},
@@ -1552,6 +1553,15 @@ jc.edit = {
 				["subpage","jcpage",{nolabel:true,skypempty:true,mandatory:true}],
 				["force",'bool',{asLabel:'ForceAlsoHidden',depends:'subpage'}],
 				['footer','freehtml',{value:'<br />'}],
+			);
+			return o;
+		},
+		spacer : (b,d) => {
+			let o = jc.edit.form._base(b,d);
+			o.fields.push(
+				['type','hidden',{value:'spacer'}],
+				['spacer','select',{asLabel:'Type',default:'br',options:[{label:AS.label('Spacer'),value:'br'},{label:AS.label('HR'),value:'hr'}]}],
+				["clear",'bool',{asLabel:'ClearFloating'}],
 			);
 			return o;
 		},

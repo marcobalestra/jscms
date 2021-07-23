@@ -240,6 +240,8 @@ table.jcUploads th:last-child, table.jcUploads td:last-child { width: 80px; }
 .jcEntry .date::before { content: ' — '; }
 .jcEntry .time::before { content: ', '; }
 
+.jcSpacerClear { clear: both; }
+
 .jcAudio audio { width: 80%; height: 64px; margin: 10px 10%; }
 .jcVideo { margin: 1em -1px; width: 100%; padding: 0; overflow: visible; }
 .jcVideo video { max-width: 100%; margin: 0 auto; display: block; box-shadow: 0 0 2px #999, 3px 3px 3px #ccc; }
