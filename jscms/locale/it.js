@@ -25,6 +25,7 @@ AS.labels.load('it',[{
 	'editYetItOk' : 'Continua',
 	'editYetItTitle' : 'La pagina era già in modifica.',
 	'Empty pages' : 'Pagine vuote',
+	'ExitEditorForBrowse' : 'Termina la modifica prima di cambiare pagina.',
 	'Error' : 'Errore',
 	'FacebookID' : 'ID Facebook',
 	'FacebookIdHelp' : '<a href="https://www.facebook.com/help/1397933243846983" target="_blank">Come conoscere il proprio Facebook ID</a>\nÈ necessario per attivare i commenti, identifica l’utente che potrà moderarli.\nSei un geek? Leggi il cookie <code>c_user</code> di FB.',
