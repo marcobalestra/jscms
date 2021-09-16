@@ -1316,11 +1316,11 @@ jc.page = {
 		return jc.page.prop.data;
 	},
 	open : ( page, id, data, infokey ) => {
+		if ( ! AS && AS.labels && AS.labels.loaded ) return setTimeout( ()=>{ jc.page.open(page, id, data, infokey) }, 100);
 		if ( jc.page.prop.editMode ) {
 			Swal.fire({ title: AS.label('menuEditOver'), text: AS.label('ExitEditorForBrowse'), icon: "error" });
 			return undefined;
 		}
-		if ( ! AS && AS.labels && AS.labels.loaded ) return setTimeout( ()=>{ jc.page.open(page, id, data, infokey) }, 100);
 		jc.plugin.call('pagePreOpen',page, id, data);
 		if ( ! page ) page = 'index';
 		if ( (page == jc.page.current()) && AS.test.udef(data) ) {
