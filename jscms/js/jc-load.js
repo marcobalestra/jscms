@@ -1,5 +1,5 @@
 var jc = { prop : { prefs: {} }};
-jc.prop.isDeveloper = window.location.host.includes('.lan.');
+jc.prop.isDeveloper = (window.location.host.includes('.lan.') || window.location.host.startsWith('192.168.'));
 jc.prop.uriPrefixPlain = '/!';
 jc.prop.mainContainerId = 'jcToplevelContainer';
 jc.prop.prefs.prefsVersion = 1;
