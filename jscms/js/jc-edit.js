@@ -419,7 +419,9 @@ jc.page.create = ( options ) => {
 	}
 	options.callback = (page,id,data) => {
 		jc.page.prop.editMode = 'page';
+		jc.page.prop.creatingPageInProgress = true;
 		jc.page.open( page, id );
+		delete jc.page.prop.creatingPageInProgress;
 	};
 	jc.page.save( options );
 };

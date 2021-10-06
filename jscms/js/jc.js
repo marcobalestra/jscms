@@ -1317,7 +1317,7 @@ jc.page = {
 	},
 	open : ( page, id, data, infokey ) => {
 		if ( ! AS && AS.labels && AS.labels.loaded ) return setTimeout( ()=>{ jc.page.open(page, id, data, infokey) }, 100);
-		if ( jc.page.prop.editMode ) {
+		if ( jc.page.prop.editMode && (! jc.page.prop.creatingPageInProgress ) ) {
 			Swal.fire({ title: AS.label('menuEditOver'), text: AS.label('ExitEditorForBrowse'), icon: "error" });
 			return undefined;
 		}
