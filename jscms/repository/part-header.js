@@ -164,7 +164,7 @@
 					color: (data.headercolor||defaults.headercolor),
 					textShadow : `-1px 0 1px ${data.headerborder||defaults.headerborder},0 -1px 1px ${data.headerborder||defaults.headerborder},0 1px 1px ${data.headerborder||defaults.headerborder},1px 1px 1px ${data.headerborder||defaults.headerborder}`,
 				})
-				.html( data.headertag && data.headershorttag ? `<span class="d-none d-md-block">${data.headertag}</span><span class="d-md-none">${data.headershorttag}</span>` : (data.headertag||data.headershorttag||data.sitename||''))
+				.html( data.headertag && data.headershorttag ? `<span class="d-none d-sm-block">${data.headertag}</span><span class="d-sm-none">${data.headershorttag}</span>` : (data.headertag||data.headershorttag||data.sitename||''))
 				;
 			if ( ! (data.profile && data.profile.length)) $h.on('click',()=>{ jc.page.open('index'); }).css('cursor','pointer');
 			$out.append( $h );
