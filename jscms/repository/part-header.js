@@ -94,7 +94,7 @@
 					['ads','textarea',{asLabel:'Ads',tab:0,help:'Custom code (e.g. for Google Ads) to be appended to document.\nLeave it blank to skip it.'}],
 					['bannerpos','checklist',{asLabel:'Banner',ctype:'r',list:bannerpos,tab:1}],
 					['headertag','text',{asLabel:'Header text',normalize:true,skipempty:true,tab:1,help:'A few words on the cover page, defaults to site name'}],
-					['headershorttag','text',{asLabel:'Header small text',normalize:true,skipempty:true,tab:1,help:'A few words on the cover page for small screens, defaults to site name'}],
+					['headershorttag','text',{asLabel:'Small header text',normalize:true,skipempty:true,tab:1,help:'A few words on the cover page for small screens, defaults to header text'}],
 					['headercolor','color',{asLabel:'Header color',value:defaults.headercolor,tab:1,help:'The color of the text of header tag or site name.'}],
 					['headerborder','color',{asLabel:'Header border',value:defaults.headerborder,tab:1,help:'The color of the border of the text of header tag or site name.'}],
 					['covertype','select',{asLabel:'Cover source',options:covertypes,tab:1,help:'It’s possible to choose among the images uploaded in site index page, see site index attachments.'}],
